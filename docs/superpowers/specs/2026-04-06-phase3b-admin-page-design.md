@@ -1,4 +1,4 @@
-# Phase 3b: Next.js Admin Page — Design Spec
+**# Phase 3b: Next.js Admin Page — Design Spec
 
 **Date:** 2026-04-06
 **Status:** Approved

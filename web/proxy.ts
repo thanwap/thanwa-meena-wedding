@@ -5,7 +5,8 @@ import type { NextRequest } from 'next/server'
 export async function proxy(request: NextRequest) {
   const session = await auth()
   if (!session) {
-    return NextResponse.redirect(new URL('/api/auth/signin', request.url))
+    const callbackUrl = encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)
+    return NextResponse.redirect(new URL(`/api/auth/signin?callbackUrl=${callbackUrl}`, request.url))
   }
   return NextResponse.next()
 }

@@ -9,7 +9,7 @@ Wedding event website for Thanwa & Meena.
 ## Tech Stack
 - **Frontend**: Next.js (App Router) + Tailwind CSS
 - **Database**: Supabase (RSVP & Guestbook data)
-- **Backend API**: .NET 10 (Admin Dashboard) deployed on Railway/Render via Docker
+- **Backend API**: .NET 10 (Admin Dashboard) deployed on Render via Docker
 - **CI/CD**: GitHub Actions + Vercel Auto-deploy
 
 ## Development Phases
