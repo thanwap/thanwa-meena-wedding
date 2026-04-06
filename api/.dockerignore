@@ -3,3 +3,7 @@
 **/.vs/
 WeddingApi.UnitTests/
 WeddingApi.IntegrationTests/
+**/.env
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/*.user
