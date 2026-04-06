@@ -3,6 +3,8 @@ name: Deploy API
 on:
   push:
     branches: [main]
+    paths:
+      - 'api/**'
 
 concurrency:
   group: deploy-api-${{ github.ref }}

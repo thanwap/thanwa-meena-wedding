@@ -3,6 +3,8 @@ name: Deploy Web
 on:
   push:
     branches: [main]
+    paths:
+      - 'web/**'
 
 concurrency:
   group: deploy-web-${{ github.ref }}
