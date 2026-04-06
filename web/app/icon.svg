@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Outer ring -->
+  <circle cx="16" cy="16" r="13" stroke="#1e3028" stroke-width="2.5" fill="none"/>
+  <!-- Inner ring detail -->
+  <circle cx="16" cy="16" r="9" stroke="#1e3028" stroke-width="1" fill="none" opacity="0.4"/>
+  <!-- Small diamond/gem on top -->
+  <polygon points="16,4 18,7 16,8.5 14,7" fill="#1e3028" opacity="0.8"/>
+</svg>
