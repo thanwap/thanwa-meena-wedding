@@ -5,7 +5,7 @@
 - [x] Cloudflare setup (Nameservers, Orange Cloud Proxy, SSL)
 - [x] Next.js project setup (App Router)
 - [x] "Save the Date: 26/12/2026" page with pre-wedding photo
-- [ ] Deploy to Vercel, connect custom domain via CNAME in Cloudflare
+- [x] Deploy to Vercel, connect custom domain via CNAME in Cloudflare
 
 ### Phase 2: QR Code & Print
 - [ ] Generate high-res QR Code (SVG/PNG) pointing to root domain
