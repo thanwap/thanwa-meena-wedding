@@ -1,65 +1,108 @@
-import Image from "next/image";
+// web/app/page.tsx
+import Image from 'next/image'
 
-export default function Home() {
+export default function Page() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="relative h-screen w-full overflow-hidden">
+      {/* Background photo */}
+      <Image
+        src="/placeholder.jpg"
+        alt="Thanwa and Meena"
+        fill
+        priority
+        className="object-cover object-center"
+        sizes="100vw"
+      />
+
+      {/* Dark gradient overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.08) 100%)',
+        }}
+      />
+
+      {/* Content — anchored bottom-center */}
+      <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 px-6 text-center text-white">
+        {/* Eyebrow */}
+        <p
+          className="mb-4 text-xs tracking-[0.35em] uppercase"
+          style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-geist)' }}
+        >
+          Save the Date
+        </p>
+
+        {/* Names */}
+        <h1
+          className="text-4xl sm:text-5xl font-light tracking-wide leading-tight"
+          style={{ fontFamily: 'var(--font-playfair)' }}
+        >
+          <span className="block">Thanwa</span>
+          <span
+            className="block text-2xl sm:text-3xl my-1"
+            style={{ color: 'rgba(255,255,255,0.7)' }}
+          >
+            &amp;
+          </span>
+          <span className="block">Meena</span>
+        </h1>
+
+        {/* Divider */}
+        <div
+          className="my-4 w-8"
+          style={{ height: '1px', background: 'rgba(255,255,255,0.35)' }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        {/* Date */}
+        <p
+          className="text-sm tracking-[0.25em]"
+          style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-geist)' }}
+        >
+          26 · 12 · 2026
+        </p>
+
+        {/* Venue */}
+        <p
+          className="mt-1 text-xs tracking-wide"
+          style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'var(--font-geist)' }}
+        >
+          The Cop Seminar and Resort, Pattaya
+        </p>
+
+        {/* Google Maps link */}
+        <a
+          href="https://maps.app.goo.gl/WysXSoYYKXm98CcD8"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 text-xs"
+          style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-geist)' }}
+        >
+          📍 View on Google Maps
+        </a>
+
+        {/* Tagline */}
+        <p
+          className="mt-3 text-xs italic"
+          style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-playfair)' }}
+        >
+          Join us as we celebrate our love
+        </p>
+
+        {/* Coming Soon badge */}
+        <div
+          className="mt-5 px-4 py-1.5 rounded-full text-xs tracking-[0.2em] uppercase"
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            color: 'rgba(255,255,255,0.7)',
+            fontFamily: 'var(--font-geist)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          WEBSITE COMING SOON
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+      </div>
+    </main>
+  )
 }
