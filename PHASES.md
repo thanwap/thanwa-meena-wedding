@@ -12,24 +12,24 @@
 - [x] Test scan in various lighting conditions
 
 ### Phase 3a: .NET 10 API (Config Service)
-- [ ] Scaffold .NET 10 Web API solution at `api/` (Controllers style)
-- [ ] EF Core code-first: `Config` entity, Npgsql provider, Supabase PostgreSQL
-- [ ] `configs` table migration (Key, Value, Type, CreatedAt, UpdatedAt, DeletedAt)
-- [ ] Full CRUD endpoints: `GET/POST/PUT/DELETE /api/configs`
-- [ ] Google ID token authentication (`JwtBearer`)
-- [ ] Unit tests (xUnit + Moq) — `ConfigController` with mocked `IConfigService`
-- [ ] Integration tests (xUnit + WebApplicationFactory + Testcontainers PostgreSQL)
+- [x] Scaffold .NET 10 Web API solution at `api/` (Controllers style)
+- [x] EF Core code-first: `Config` entity, Npgsql provider, Supabase PostgreSQL
+- [x] `configs` table migration (Key, Value, Type, CreatedAt, UpdatedAt, DeletedAt)
+- [x] Full CRUD endpoints: `GET/POST/PUT/DELETE /api/configs`
+- [x] Google ID token authentication (`JwtBearer`)
+- [x] Unit tests (xUnit + Moq) — `ConfigController` with mocked `IConfigService`
+- [x] Integration tests (xUnit + WebApplicationFactory + Testcontainers PostgreSQL)
 
 ### Phase 3b: Next.js Admin Page
-- [ ] `/admin` route — list & manage configs via .NET API
-- [ ] Google OAuth login (NextAuth.js / Auth.js) — gate for `/admin`
-- [ ] Config list, create, edit, delete UI
+- [x] `/admin` route — list & manage configs via .NET API
+- [x] Google OAuth login (NextAuth.js / Auth.js) — gate for `/admin`
+- [x] Config list, create, edit, delete UI
 
 ### Phase 3c: CI/CD & Infrastructure
-- [ ] `.github/workflows/deploy.yml` — lint/test/build before Vercel deploy
-- [ ] `.github/workflows/api.yml` — test/build .NET API before Railway/Render deploy
-- [ ] Supabase connection string → GitHub Secrets & Vercel env vars
-- [ ] .NET 10 API secrets → GitHub Secrets & Railway/Render
+- [x] `.github/workflows/deploy-web.yml` — lint/test/build before Vercel deploy
+- [x] `.github/workflows/deploy-api.yml` — test/build .NET API before Render deploy
+- [x] Supabase connection string → GitHub Secrets & Vercel env vars
+- [x] .NET 10 API secrets → GitHub Secrets & Render
 
 ### Phase 4: Full Wedding Features
 - [ ] RSVP system (Next.js + Supabase-js)
