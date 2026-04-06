@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: deploy-api-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
@@ -34,7 +38,9 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/wedding-api:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/wedding-api:latest
+            ghcr.io/${{ github.repository_owner }}/wedding-api:${{ github.sha }}
 
       - name: Trigger Render deploy
         run: curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
