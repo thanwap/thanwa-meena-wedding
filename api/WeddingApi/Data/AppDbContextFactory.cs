@@ -18,6 +18,6 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder.UseNpgsql(connectionString);
 
-        return new AppDbContext(optionsBuilder.Build());
+        return new AppDbContext(optionsBuilder.Options);
     }
 }
