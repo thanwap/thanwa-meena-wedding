@@ -8,8 +8,8 @@
 - [x] Deploy to Vercel, connect custom domain via CNAME in Cloudflare
 
 ### Phase 2: QR Code & Print
-- [ ] Generate high-res QR Code (SVG/PNG) pointing to root domain
-- [ ] Test scan in various lighting conditions
+- [x] Generate high-res QR Code (SVG/PNG) pointing to root domain
+- [x] Test scan in various lighting conditions
 
 ### Phase 3: CI/CD & Infrastructure
 - [ ] `.github/workflows/deploy.yml` — lint/test/build before Vercel deploy
