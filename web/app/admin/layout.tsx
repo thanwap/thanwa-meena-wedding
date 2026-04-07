@@ -1,5 +1,7 @@
-import { auth, signOut } from '@/auth'
-import { redirect } from 'next/navigation'
+import Link from "next/link"
+import { auth, signOut } from "@/auth"
+import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/sonner"
 
 export default async function AdminLayout({
   children,
@@ -7,30 +9,43 @@ export default async function AdminLayout({
   children: React.ReactNode
 }) {
   const session = await auth()
-  if (!session) redirect('/api/auth/signin')
-
-  async function handleSignOut() {
-    'use server'
-    await signOut({ redirectTo: '/' })
-  }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="flex justify-between items-center px-6 py-3 border-b border-gray-200">
-        <span className="font-semibold text-gray-800">Wedding Admin</span>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">{session.user?.email}</span>
-          <form action={handleSignOut}>
-            <button
-              type="submit"
-              className="text-sm text-red-600 hover:underline"
+    <div className="min-h-svh bg-background">
+      <header className="border-b">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <nav className="flex items-center gap-6">
+            <Link href="/admin" className="font-medium">
+              Admin
+            </Link>
+            <Link
+              href="/admin/configs"
+              className="text-muted-foreground text-sm hover:text-foreground"
             >
-              Sign out
-            </button>
-          </form>
+              Configs
+            </Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            {session?.user?.email && (
+              <span className="text-muted-foreground text-sm">
+                {session.user.email}
+              </span>
+            )}
+            <form
+              action={async () => {
+                "use server"
+                await signOut({ redirectTo: "/" })
+              }}
+            >
+              <Button type="submit" variant="outline" size="sm">
+                Sign out
+              </Button>
+            </form>
+          </div>
         </div>
       </header>
-      <main className="p-6">{children}</main>
+      <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+      <Toaster />
     </div>
   )
 }

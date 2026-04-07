@@ -3,6 +3,10 @@ export type ConfigDto = {
   key: string
   value: string
   type: string
-  createdAt: string
-  updatedAt: string
+}
+
+export type ConfigInput = {
+  key: string
+  value: string
+  type: string
 }

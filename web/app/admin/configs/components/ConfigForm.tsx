@@ -1,101 +1,122 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import type { ConfigDto } from '../types'
+import { useEffect, useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import type { ConfigDto, ConfigInput } from "../types"
 
-interface Props {
-  initial?: ConfigDto
-  onSave: (key: string, value: string, type: string) => void
-  onCancel: () => void
-}
+const TYPES = ["string", "number", "boolean", "json"] as const
 
-export default function ConfigForm({ initial, onSave, onCancel }: Props) {
-  const [key, setKey] = useState(initial?.key ?? '')
-  const [value, setValue] = useState(initial?.value ?? '')
-  const [type, setType] = useState(initial?.type ?? '')
-  const [error, setError] = useState('')
+export function ConfigForm({
+  open,
+  onOpenChange,
+  initial,
+  onSubmit,
+  isPending,
+}: {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  initial: ConfigDto | null
+  onSubmit: (input: ConfigInput) => void
+  isPending: boolean
+}) {
+  const [key, setKey] = useState("")
+  const [value, setValue] = useState("")
+  const [type, setType] = useState<string>("string")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!key.trim() || !value.trim() || !type.trim()) {
-      setError('All fields are required')
-      return
+  useEffect(() => {
+    if (open) {
+      setKey(initial?.key ?? "")
+      setValue(initial?.value ?? "")
+      setType(initial?.type ?? "string")
     }
-    setError('')
-    onSave(key.trim(), value.trim(), type.trim())
+  }, [open, initial])
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit({ key, value, type })
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mb-6 p-4 border border-gray-200 rounded bg-gray-50"
-    >
-      <div className="grid grid-cols-3 gap-3 mb-3">
-        <div>
-          <label
-            htmlFor="key"
-            className="block text-xs font-medium text-gray-600 mb-1"
-          >
-            Key
-          </label>
-          <input
-            id="key"
-            type="text"
-            value={key}
-            onChange={(e) => setKey(e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-            placeholder="e.g. marry_date"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="value"
-            className="block text-xs font-medium text-gray-600 mb-1"
-          >
-            Value
-          </label>
-          <input
-            id="value"
-            type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-            placeholder="e.g. 2026-12-26"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="type"
-            className="block text-xs font-medium text-gray-600 mb-1"
-          >
-            Type
-          </label>
-          <input
-            id="type"
-            type="text"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-            placeholder="e.g. date"
-          />
-        </div>
-      </div>
-      {error && <p className="text-red-500 text-xs mb-3">{error}</p>}
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          className="px-3 py-1.5 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
-        >
-          Save
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-3 py-1.5 border border-gray-300 text-sm rounded hover:bg-gray-100"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <form onSubmit={submit} className="space-y-4">
+          <DialogHeader>
+            <DialogTitle>
+              {initial ? "Edit config" : "New config"}
+            </DialogTitle>
+            <DialogDescription>
+              Key/value setting stored in the admin API.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Label htmlFor="key">Key</Label>
+            <Input
+              id="key"
+              value={key}
+              onChange={(e) => setKey(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="value">Value</Label>
+            <Input
+              id="value"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="type">Type</Label>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger id="type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Saving…" : "Save"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

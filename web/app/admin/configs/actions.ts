@@ -1,68 +1,67 @@
-'use server'
+"use server"
 
-import { auth } from '@/auth'
-import type { ConfigDto } from './types'
-
-async function getIdToken(): Promise<string> {
-  const session = await auth()
-  if (!session?.idToken) throw new Error('Not authenticated')
-  return session.idToken
-}
+import { revalidatePath } from "next/cache"
+import { auth } from "@/auth"
+import type { ConfigDto, ConfigInput } from "./types"
 
 const API = process.env.DOTNET_API_URL!
 
-export async function getConfigs(): Promise<ConfigDto[]> {
+async function getIdToken(): Promise<string> {
+  const session = await auth()
+  if (!session?.idToken) throw new Error("Not authenticated")
+  return session.idToken
+}
+
+async function authHeaders() {
   const token = await getIdToken()
-  const res = await fetch(`${API}/api/configs`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) throw new Error(`Failed to fetch configs: ${res.status}`)
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  }
+}
+
+export async function getConfigs(): Promise<ConfigDto[]> {
+  const headers = await authHeaders()
+  const res = await fetch(`${API}/api/configs`, { headers, cache: "no-store" })
+  if (!res.ok) {
+    const body = await res.text().catch(() => "")
+    const wwwAuth = res.headers.get("www-authenticate") ?? ""
+    console.error("[getConfigs] failed", { status: res.status, wwwAuth, body })
+    throw new Error(
+      `Failed to fetch configs: ${res.status} ${wwwAuth || body}`.trim()
+    )
+  }
   return res.json()
 }
 
-export async function createConfig(
-  key: string,
-  value: string,
-  type: string,
-): Promise<ConfigDto> {
-  const token = await getIdToken()
+export async function createConfig(input: ConfigInput) {
+  const headers = await authHeaders()
   const res = await fetch(`${API}/api/configs`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ key, value, type }),
+    method: "POST",
+    headers,
+    body: JSON.stringify(input),
   })
   if (!res.ok) throw new Error(`Failed to create config: ${res.status}`)
-  return res.json()
+  revalidatePath("/admin/configs")
 }
 
-export async function updateConfig(
-  id: number,
-  key: string,
-  value: string,
-  type: string,
-): Promise<ConfigDto> {
-  const token = await getIdToken()
+export async function updateConfig(id: number, input: ConfigInput) {
+  const headers = await authHeaders()
   const res = await fetch(`${API}/api/configs/${id}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ key, value, type }),
+    method: "PUT",
+    headers,
+    body: JSON.stringify(input),
   })
   if (!res.ok) throw new Error(`Failed to update config: ${res.status}`)
-  return res.json()
+  revalidatePath("/admin/configs")
 }
 
-export async function deleteConfig(id: number): Promise<void> {
-  const token = await getIdToken()
+export async function deleteConfig(id: number) {
+  const headers = await authHeaders()
   const res = await fetch(`${API}/api/configs/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    method: "DELETE",
+    headers,
   })
   if (!res.ok) throw new Error(`Failed to delete config: ${res.status}`)
+  revalidatePath("/admin/configs")
 }
