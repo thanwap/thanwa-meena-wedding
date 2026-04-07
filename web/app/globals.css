@@ -127,3 +127,144 @@
     @apply font-sans;
     }
 }
+
+/* ═══════════════════════════════════════════════
+   WEDDING DESIGN SYSTEM — Garden Whimsical Pastel
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* Palette */
+  --c-ivory:        #FAF7F0;
+  --c-ivory-dark:   #F0EBE1;
+  --c-blush:        #E8C3BE;
+  --c-blush-deep:   #B8847E;
+  --c-sage:         #8AA882;
+  --c-sage-light:   #C5D8C0;
+  --c-lavender:     #C2B3D2;
+  --c-champagne:    #DEC89C;
+  --c-ink:          #1C2A18;
+  --c-ink-2:        #485440;
+  --c-muted:        #877A6A;
+}
+
+/* ── Keyframes ── */
+@keyframes hero-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(7px); }
+}
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-6px) rotate(1deg); }
+}
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+
+/* ── Hero entrance stagger ── */
+.hero-1 { animation: hero-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.10s both; }
+.hero-2 { animation: hero-up 1.0s cubic-bezier(0.16,1,0.3,1) 0.30s both; }
+.hero-3 { animation: hero-up 1.0s cubic-bezier(0.16,1,0.3,1) 0.58s both; }
+.hero-4 { animation: hero-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.85s both; }
+.hero-5 { animation: hero-in  0.9s ease                       1.10s both; }
+.hero-scroll { animation: hero-in 0.8s ease 1.5s both; }
+
+/* ── Scroll-driven reveal (Chrome 115+, Safari 18+) ── */
+@supports (animation-timeline: scroll()) {
+  .reveal {
+    animation: reveal-up 0.85s cubic-bezier(0.16,1,0.3,1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 32%;
+  }
+}
+@supports not (animation-timeline: scroll()) {
+  /* Graceful fallback: content is always visible */
+  .reveal { opacity: 1; }
+}
+
+/* ── Floating ornament ── */
+.float-anim {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* ── Mouse scroll indicator ── */
+.scroll-dot {
+  animation: scroll-bounce 1.6s ease-in-out infinite;
+}
+
+/* ── Timeline dot pulse ── */
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-blush) 60%, transparent); }
+  50%       { box-shadow: 0 0 0 5px color-mix(in srgb, var(--c-blush) 0%, transparent); }
+}
+.timeline-dot {
+  animation: dot-pulse 2.4s ease-in-out infinite;
+}
+
+/* ── RSVP input focus line ── */
+.rsvp-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--c-blush);
+  border-radius: 0;
+  padding: 8px 0;
+  font-size: 14px;
+  font-family: var(--font-sarabun), sans-serif;
+  color: var(--c-ink);
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.rsvp-input:focus {
+  border-bottom-color: var(--c-sage);
+}
+.rsvp-input::placeholder {
+  color: var(--c-muted);
+  opacity: 0.7;
+}
+.rsvp-textarea {
+  background: transparent;
+  border: 1px solid var(--c-blush);
+  border-radius: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-sarabun), sans-serif;
+  color: var(--c-ink);
+  width: 100%;
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s;
+}
+.rsvp-textarea:focus {
+  border-color: var(--c-sage);
+}
+.rsvp-textarea::placeholder {
+  color: var(--c-muted);
+  opacity: 0.7;
+}
+.rsvp-select {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--c-blush);
+  border-radius: 0;
+  padding: 8px 0;
+  font-size: 14px;
+  font-family: var(--font-sarabun), sans-serif;
+  color: var(--c-ink);
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+}
