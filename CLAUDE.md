@@ -25,7 +25,20 @@ npm run build
 
 # Lint
 npm run lint
+
+# Test (TypeScript typecheck — runs in CI)
+npm test
 ```
+
+## Before Every Commit (web/)
+Always run these in order before committing or tagging:
+```bash
+npm run lint   # must pass (0 errors)
+npm test       # must pass (tsc --noEmit)
+npm run build  # must compile clean
+```
+CI pipeline (GitHub Actions on version tags) runs lint → test → build → deploy in that order.
+A tag should only be pushed after all three pass locally.
 
 ## Environment Variables
 ```
