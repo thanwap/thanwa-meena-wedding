@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, startTransition } from "react"
 
 export function Countdown() {
   const [days, setDays] = useState<number | null>(null)
@@ -8,7 +8,8 @@ export function Countdown() {
   useEffect(() => {
     const target = new Date("2026-12-26T00:00:00+07:00")
     const diff = target.getTime() - Date.now()
-    setDays(Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24))))
+    const remaining = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+    startTransition(() => setDays(remaining))
   }, [])
 
   if (days === null) return null

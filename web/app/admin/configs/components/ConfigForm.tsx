@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, startTransition } from "react"
 import {
   Dialog,
   DialogContent,
@@ -42,9 +42,11 @@ export function ConfigForm({
 
   useEffect(() => {
     if (open) {
-      setKey(initial?.key ?? "")
-      setValue(initial?.value ?? "")
-      setType(initial?.type ?? "string")
+      startTransition(() => {
+        setKey(initial?.key ?? "")
+        setValue(initial?.value ?? "")
+        setType(initial?.type ?? "string")
+      })
     }
   }, [open, initial])
 
