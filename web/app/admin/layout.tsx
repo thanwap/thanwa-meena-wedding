@@ -10,6 +10,11 @@ export default async function AdminLayout({
 }) {
   const session = await auth()
 
+  // Unauthenticated routes (e.g. /admin/login) render without the admin chrome
+  if (!session) {
+    return <>{children}</>
+  }
+
   return (
     <div className="min-h-svh bg-background">
       <header className="border-b">
@@ -24,11 +29,17 @@ export default async function AdminLayout({
             >
               Configs
             </Link>
+            <Link
+              href="/admin/change-password"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              Change password
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
-            {session?.user?.email && (
+            {session?.user?.name && (
               <span className="text-muted-foreground text-sm">
-                {session.user.email}
+                {session.user.name}
               </span>
             )}
             <form

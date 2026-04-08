@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Config> Configs => Set<Config>();
+    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,6 +37,15 @@ public class AppDbContext : DbContext
 
             // Automatically excludes soft-deleted rows from all queries
             entity.HasQueryFilter(e => e.DeletedAt == null);
+        });
+
+        modelBuilder.Entity<AdminUser>(entity =>
+        {
+            entity.ToTable("admin_users");
+            entity.HasKey(e => e.Username);
+            entity.Property(e => e.Username).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.PasswordHash).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
         });
     }
 }

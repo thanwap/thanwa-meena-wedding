@@ -138,30 +138,17 @@ export default function Page() {
           <SectionLabel color="var(--c-muted)">Save the Date</SectionLabel>
         </div>
 
-        {/* Names */}
-        <h1 className="hero-2 relative z-10">
-          <span
-            className="block font-[family-name:var(--font-cormorant)] font-light tracking-[0.12em]"
-            style={{ fontSize: "clamp(60px, 17vw, 92px)", lineHeight: 1 }}
-          >
-            MEENA
-          </span>
-          <span
-            className="block font-[family-name:var(--font-script)] my-1"
-            style={{
-              fontSize: "clamp(50px, 14vw, 72px)",
-              color: "var(--c-blush-deep)",
-              lineHeight: 1.1,
-            }}
-          >
-            &amp;
-          </span>
-          <span
-            className="block font-[family-name:var(--font-cormorant)] font-light tracking-[0.12em]"
-            style={{ fontSize: "clamp(60px, 17vw, 92px)", lineHeight: 1 }}
-          >
-            THANWA
-          </span>
+        {/* Names — wedding logo */}
+        <h1 className="hero-2 relative z-10 flex justify-center">
+          <span className="sr-only">Meena &amp; Thanwa</span>
+          <Image
+            src="/wedding-logo-transparent.png"
+            alt="Thanwa & Tittinan"
+            width={960}
+            height={460}
+            priority
+            className="h-auto w-full max-w-[min(92vw,720px)]"
+          />
         </h1>
 
         {/* Hero image in decorative frame */}

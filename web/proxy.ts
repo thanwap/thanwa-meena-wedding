@@ -9,12 +9,16 @@ export async function proxy(request: NextRequest) {
       request.nextUrl.pathname + request.nextUrl.search
     )
     return NextResponse.redirect(
-      new URL(`/api/auth/signin?callbackUrl=${callbackUrl}`, request.url)
+      new URL(`/admin/login?callbackUrl=${callbackUrl}`, request.url)
     )
   }
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    // Protect everything under /admin EXCEPT the login page itself
+    "/admin/((?!login).*)",
+    "/admin",
+  ],
 }

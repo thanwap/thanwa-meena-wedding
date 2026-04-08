@@ -19,6 +19,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
 
     public async Task InitializeAsync()
     {
+        Environment.SetEnvironmentVariable("Jwt__Key", "test-secret-key-must-be-long-enough-for-hs256-aaaaaaaa");
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "wedding-api");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "wedding-web");
         await _postgres.StartAsync();
     }
 
@@ -35,7 +38,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Authentication:Google:ClientId"] = "test-client-id"
+                ["Jwt:Key"] = "test-secret-key-must-be-long-enough-for-hs256-aaaaaaaa",
+                ["Jwt:Issuer"] = "wedding-api",
+                ["Jwt:Audience"] = "wedding-web"
             });
         });
 
