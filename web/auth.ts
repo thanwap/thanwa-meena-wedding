@@ -15,6 +15,9 @@ declare module "@auth/core/jwt" {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
   callbacks: {
+    authorized({ auth }) {
+      return !!auth
+    },
     jwt({ token, account }) {
       if (account?.id_token) token.idToken = account.id_token
       return token
