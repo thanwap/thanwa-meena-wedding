@@ -201,6 +201,23 @@ Seeder prints a clearly-bannered credentials table at the end.
 
 ---
 
+## Admin UI conventions
+
+**Always use shadcn/ui for admin pages** (`web/app/admin/**`).
+
+- Project is already initialised — see `web/components.json` and
+  `web/components/ui/`.
+- Installed components: `badge`, `button`, `card`, `dialog`, `dropdown-menu`,
+  `input`, `label`, `select`, `sonner`, `table`.
+- Install more as needed: `cd web && npx shadcn@latest add <component>`.
+- Do not hand-roll admin form controls, tables, or dialogs with raw HTML +
+  Tailwind — use the shadcn primitives so the admin surface stays visually
+  consistent.
+- Public landing page (`web/app/page.tsx`) is intentionally custom-styled
+  (Garden Whimsical Pastel) — **this rule does not apply there**.
+
+---
+
 ## Gotchas / do not do
 
 - **`npm test` is Vitest, not tsc.** Typecheck is a separate script
