@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
+import { submitRsvp } from "@/app/actions/rsvp"
 
 type FormState = {
   name: string
@@ -44,11 +45,28 @@ export function RSVPForm() {
     dietary: "",
     message: "",
   })
+  const [formError, setFormError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: wire to Supabase
-    setSubmitted(true)
+    setFormError(null)
+    const formData = new FormData(e.currentTarget)
+    // Ensure attending value is included (it's managed in state, not a form input)
+    formData.set("attending", String(attending))
+    // Coerce guests value
+    formData.set("guestCount", form.guests)
+    // dietary — only include if hasDietary is true
+    formData.set("dietary", form.hasDietary ? form.dietary : "")
+
+    startTransition(async () => {
+      const result = await submitRsvp(formData)
+      if (result.success) {
+        setSubmitted(true)
+      } else {
+        setFormError(result.error)
+      }
+    })
   }
 
   if (submitted) {
@@ -78,6 +96,16 @@ export function RSVPForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Honeypot field — hidden from real users */}
+      <input
+        type="text"
+        name="hp_website"
+        style={{ display: "none" }}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+      />
+
       {/* ── Attendance toggle ── */}
       <div>
         <label style={LABEL}>จะมาร่วมงานไหม?</label>
@@ -125,6 +153,7 @@ export function RSVPForm() {
             </label>
             <input
               id="rsvp-name"
+              name="name"
               type="text"
               required
               className="rsvp-input"
@@ -144,6 +173,7 @@ export function RSVPForm() {
             <div className="relative">
               <select
                 id="rsvp-guests"
+                name="guestCount"
                 className="rsvp-select"
                 value={form.guests}
                 onChange={(e) =>
@@ -205,6 +235,7 @@ export function RSVPForm() {
             {form.hasDietary && (
               <input
                 type="text"
+                name="dietary"
                 className="rsvp-input mt-3"
                 placeholder="ระบุอาหารที่แพ้หรืออาหารพิเศษ"
                 value={form.dietary}
@@ -222,6 +253,7 @@ export function RSVPForm() {
             </label>
             <textarea
               id="rsvp-msg"
+              name="message"
               rows={3}
               className="rsvp-textarea"
               placeholder="ส่งคำอวยพร หรือข้อความพิเศษถึงบ่าวสาว..."
@@ -232,10 +264,22 @@ export function RSVPForm() {
             />
           </div>
 
+          {/* Inline error */}
+          {formError && (
+            <p
+              className="font-[family-name:var(--font-sarabun)] text-sm"
+              style={{ color: "var(--c-blush-deep)" }}
+              role="alert"
+            >
+              {formError}
+            </p>
+          )}
+
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-4 transition-opacity hover:opacity-75 active:opacity-60"
+            disabled={isPending}
+            className="w-full py-4 transition-opacity hover:opacity-75 active:opacity-60 disabled:opacity-50"
             style={{
               background: "var(--c-ink)",
               color: "var(--c-ivory)",
@@ -245,29 +289,41 @@ export function RSVPForm() {
               textTransform: "uppercase",
             }}
           >
-            Confirm Attendance
+            {isPending ? "Sending…" : "Confirm Attendance"}
           </button>
         </>
       )}
 
       {/* ── Decline message ── */}
       {attending === false && (
-        <div className="text-center py-6 space-y-2">
-          <p
-            className="font-[family-name:var(--font-cormorant)] text-2xl italic"
-            style={{ color: "var(--c-ink-2)" }}
-          >
-            เราเข้าใจค่ะ 💗
-          </p>
-          <p
-            className="font-[family-name:var(--font-sarabun)] text-sm leading-relaxed"
-            style={{ color: "var(--c-muted)" }}
-          >
-            ขอบคุณที่แจ้งให้ทราบ
-            <br />
-            และขอบคุณสำหรับความรักที่มีให้เราเสมอ
-          </p>
-        </div>
+        <>
+          {/* Inline error for declining path */}
+          {formError && (
+            <p
+              className="font-[family-name:var(--font-sarabun)] text-sm"
+              style={{ color: "var(--c-blush-deep)" }}
+              role="alert"
+            >
+              {formError}
+            </p>
+          )}
+          <div className="text-center py-6 space-y-2">
+            <p
+              className="font-[family-name:var(--font-cormorant)] text-2xl italic"
+              style={{ color: "var(--c-ink-2)" }}
+            >
+              เราเข้าใจค่ะ 💗
+            </p>
+            <p
+              className="font-[family-name:var(--font-sarabun)] text-sm leading-relaxed"
+              style={{ color: "var(--c-muted)" }}
+            >
+              ขอบคุณที่แจ้งให้ทราบ
+              <br />
+              และขอบคุณสำหรับความรักที่มีให้เราเสมอ
+            </p>
+          </div>
+        </>
       )}
     </form>
   )

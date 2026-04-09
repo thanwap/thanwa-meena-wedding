@@ -30,6 +30,12 @@ export default async function AdminLayout({
               Configs
             </Link>
             <Link
+              href="/admin/rsvps"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              RSVPs
+            </Link>
+            <Link
               href="/admin/change-password"
               className="text-muted-foreground text-sm hover:text-foreground"
             >

@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Config> Configs => Set<Config>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<Rsvp> Rsvps => Set<Rsvp>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +38,38 @@ public class AppDbContext : DbContext
 
             // Automatically excludes soft-deleted rows from all queries
             entity.HasQueryFilter(e => e.DeletedAt == null);
+        });
+
+        modelBuilder.Entity<Rsvp>(entity =>
+        {
+            entity.ToTable("rsvps");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.Dietary)
+                .HasMaxLength(300)
+                .IsRequired(false);
+
+            entity.Property(e => e.Message)
+                .HasMaxLength(1000)
+                .IsRequired(false);
+
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+            entity.Property(e => e.DeletedAt).IsRequired(false);
+
+            // Automatically excludes soft-deleted rows from all queries
+            entity.HasQueryFilter(e => e.DeletedAt == null);
+
+            entity.HasIndex(e => e.CreatedAt);
         });
 
         modelBuilder.Entity<AdminUser>(entity =>

@@ -1,5 +1,7 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WeddingApi.Data;
@@ -14,6 +16,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ─── Services ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IConfigService, ConfigService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRsvpService, RsvpService>();
+
+// ─── Rate Limiting ─────────────────────────────────────────────────────────
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("rsvp-post", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+    options.RejectionStatusCode = 429;
+});
 
 // ─── Authentication: self-issued HS256 JWT ────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -115,6 +131,7 @@ if (args.Length > 0 && (args[0] == "seed-admins" || args[0] == "reset-admins"))
     return;
 }
 
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
