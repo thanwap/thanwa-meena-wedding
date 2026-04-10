@@ -193,7 +193,7 @@ Seeder prints a clearly-bannered credentials table at the end.
 
 1. Merge/push to `main`.
 2. Run the pre-commit checklist for the affected subproject.
-3. Tag: `git tag vX.Y.Z && git push --tags`.
+3. Tag: `git tag X.Y.Z && git push --tags`. **No `v` prefix** (e.g. `1.2.2`, not `v1.2.2`).
 4. GitHub Actions (`deploy-web.yml`, `deploy-api.yml`) runs on tag push:
    - **web**: lint → test → `vercel pull` → `vercel build --prod` → `vercel deploy --prebuilt --prod`
    - **api**: build → test → Docker build → push to Render

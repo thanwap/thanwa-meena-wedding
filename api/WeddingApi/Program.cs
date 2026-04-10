@@ -17,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IConfigService, ConfigService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRsvpService, RsvpService>();
+builder.Services.AddScoped<ISeatingService, SeatingService>();
 
 // ─── Rate Limiting ─────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(options =>

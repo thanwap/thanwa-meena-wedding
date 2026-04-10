@@ -36,6 +36,12 @@ export default async function AdminLayout({
               RSVPs
             </Link>
             <Link
+              href="/admin/seating"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              Seating
+            </Link>
+            <Link
               href="/admin/change-password"
               className="text-muted-foreground text-sm hover:text-foreground"
             >
