@@ -20,27 +20,28 @@ export function SeatingCanvas({
     <div
       className="relative flex-1 overflow-auto"
       style={{
-        minHeight: 600,
-        minWidth: 900,
         backgroundImage:
           "radial-gradient(circle, #ddd 1px, transparent 1px)",
         backgroundSize: "24px 24px",
       }}
     >
-      {tables.map((table) => (
-        <DraggableTable
-          key={table.id}
-          table={table}
-          onUnassignGuest={onUnassignGuest}
-          onEditTable={onEditTable}
-          onDeleteTable={onDeleteTable}
-        />
-      ))}
-      {tables.length === 0 && (
-        <div className="text-muted-foreground flex h-full items-center justify-center">
-          <p className="text-sm">Click &quot;Add Table&quot; to get started</p>
-        </div>
-      )}
+      {/* Large inner canvas — creates the scrollable area in both directions */}
+      <div style={{ width: 3200, height: 2400, position: "relative" }}>
+        {tables.map((table) => (
+          <DraggableTable
+            key={table.id}
+            table={table}
+            onUnassignGuest={onUnassignGuest}
+            onEditTable={onEditTable}
+            onDeleteTable={onDeleteTable}
+          />
+        ))}
+        {tables.length === 0 && (
+          <div className="text-muted-foreground flex h-full items-center justify-center">
+            <p className="text-sm">Click &quot;Add Table&quot; to get started</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
