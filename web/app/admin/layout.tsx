@@ -24,12 +24,6 @@ export default async function AdminLayout({
               Admin
             </Link>
             <Link
-              href="/admin/configs"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Configs
-            </Link>
-            <Link
               href="/admin/rsvps"
               className="text-muted-foreground text-sm hover:text-foreground"
             >
