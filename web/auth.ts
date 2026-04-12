@@ -42,12 +42,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        const res = await fetch(`${apiUrl}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-          cache: "no-store",
-        })
+        let res: Response
+        try {
+          res = await fetch(`${apiUrl}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+            cache: "no-store",
+          })
+        } catch (err) {
+          console.error("[auth] API unreachable:", err)
+          return null
+        }
 
         if (!res.ok) return null
         const data = (await res.json()) as { token: string; username: string }

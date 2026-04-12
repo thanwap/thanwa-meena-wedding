@@ -25,10 +25,13 @@ export default async function LoginPage({
         redirectTo: callbackUrl,
       })
     } catch (err) {
+      // NEXT_REDIRECT is thrown by Next.js on successful redirect — let it through
+      if ((err as { digest?: string }).digest?.startsWith("NEXT_REDIRECT")) throw err
       if (err instanceof AuthError) {
         redirect(`/admin/login?error=invalid&callbackUrl=${encodeURIComponent(callbackUrl)}`)
       }
-      throw err
+      // Network errors, API down, etc. — show generic error instead of silent failure
+      redirect(`/admin/login?error=unavailable&callbackUrl=${encodeURIComponent(callbackUrl)}`)
     }
   }
 
@@ -40,8 +43,11 @@ export default async function LoginPage({
       >
         <h1 className="text-xl font-semibold">Admin login</h1>
 
-        {params.error && (
+        {params.error === "invalid" && (
           <p className="text-sm text-red-600">Invalid username or password.</p>
+        )}
+        {params.error === "unavailable" && (
+          <p className="text-sm text-red-600">Service unavailable. Please try again shortly.</p>
         )}
 
         <input
