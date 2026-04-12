@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from "react"
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react"
+import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { SeatingToolbar } from "./seating-toolbar"
 import { GuestSidebar } from "./guest-sidebar"
@@ -44,13 +45,14 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
     if (event.canceled) return
 
     const { source, target, transform } = event.operation
-    if (!source || !target) return
+    if (!source) return
 
     const sourceData = source.data as
       | { type: string; guest?: GuestDto; tableId?: number }
       | undefined
 
     if (sourceData?.type === "guest" && sourceData.guest) {
+      if (!target) return
       const guest = sourceData.guest
       const targetId = String(target.id)
 
@@ -245,16 +247,56 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
             {(source) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const data = source.data as any
-              if (data?.type !== "guest" || !data.guest) return null
-              const guest = data.guest as { name: string; rsvpName: string }
-              return (
-                <div className="cursor-grabbing rounded-md border bg-white px-3 py-2 text-sm shadow-xl ring-1 ring-blue-300 rotate-2 pointer-events-none">
-                  <div className="font-medium">{guest.name}</div>
-                  {guest.name !== guest.rsvpName && (
-                    <div className="text-muted-foreground text-xs">{guest.rsvpName}</div>
-                  )}
-                </div>
-              )
+
+              if (data?.type === "guest" && data.guest) {
+                const guest = data.guest as { name: string; rsvpName: string }
+                return (
+                  <div className="cursor-grabbing rounded-md border bg-white px-3 py-2 text-sm shadow-xl ring-1 ring-blue-300 rotate-2 pointer-events-none">
+                    <div className="font-medium">{guest.name}</div>
+                    {guest.name !== guest.rsvpName && (
+                      <div className="text-muted-foreground text-xs">{guest.rsvpName}</div>
+                    )}
+                  </div>
+                )
+              }
+
+              if (data?.type === "table-move" && data.tableId) {
+                const table = tables.find((t) => t.id === data.tableId)
+                if (!table) return null
+                const isFull = table.guests.length >= table.capacity
+                const isCircle = table.shape === "circle"
+                return (
+                  <div
+                    className={`pointer-events-none flex cursor-grabbing flex-col items-center justify-start border-2 border-gray-400 bg-white shadow-2xl rotate-1 ${
+                      isCircle
+                        ? "h-64 w-64 rounded-full p-6"
+                        : "h-40 w-80 rounded-lg p-4"
+                    }`}
+                  >
+                    <div className="mb-1 flex w-full items-center justify-center gap-1">
+                      <span className="truncate text-xs font-semibold">{table.name}</span>
+                      <Badge
+                        variant={isFull ? "destructive" : "secondary"}
+                        className="ml-1 text-[10px]"
+                      >
+                        {table.guests.length}/{table.capacity}
+                      </Badge>
+                    </div>
+                    <div className={`w-full flex-1 space-y-0.5 overflow-y-auto ${isCircle ? "px-2 text-center" : ""}`}>
+                      {table.guests.map((guest) => (
+                        <div
+                          key={guest.id}
+                          className="text-muted-foreground block w-full truncate text-[11px]"
+                        >
+                          {guest.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+
+              return null
             }}
           </DragOverlay>
         </DragDropProvider>
