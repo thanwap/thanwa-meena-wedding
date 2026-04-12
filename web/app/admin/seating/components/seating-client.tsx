@@ -28,6 +28,7 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
   const [unassigned, setUnassigned] = useState<GuestDto[]>(
     initialData.unassignedGuests,
   )
+  const [selectedGuestIds, setSelectedGuestIds] = useState<Set<number>>(new Set())
   const [editingTable, setEditingTable] = useState<WeddingTableDto | null>(null)
   const [isGenerating, startGenerating] = useTransition()
   const [, startTransition] = useTransition()
@@ -61,24 +62,39 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
         const table = tables.find((t) => t.id === tableId)
         if (!table) return
 
-        if (table.guests.length >= table.capacity) {
-          toast.error(`${table.name} is at full capacity`)
+        // Multi-select: if dragged guest is selected, move all selected guests
+        const guestsToAssign =
+          selectedGuestIds.has(guest.id) && selectedGuestIds.size > 1
+            ? unassigned.filter((g) => selectedGuestIds.has(g.id))
+            : [guest]
+
+        const seatsLeft = table.capacity - table.guests.length
+        if (guestsToAssign.length > seatsLeft) {
+          toast.error(
+            guestsToAssign.length === 1
+              ? `${table.name} is at full capacity`
+              : `${table.name} only has ${seatsLeft} seat${seatsLeft === 1 ? "" : "s"} left`,
+          )
           return
         }
 
-        const updatedGuest = { ...guest, tableId }
-        setUnassigned((prev) => prev.filter((g) => g.id !== guest.id))
+        const assignedIds = new Set(guestsToAssign.map((g) => g.id))
+        const updatedGuests = guestsToAssign.map((g) => ({ ...g, tableId }))
+        setUnassigned((prev) => prev.filter((g) => !assignedIds.has(g.id)))
         setTables((prev) =>
           prev.map((t) =>
             t.id === tableId
-              ? { ...t, guests: [...t.guests, updatedGuest] }
+              ? { ...t, guests: [...t.guests, ...updatedGuests] }
               : t,
           ),
         )
+        setSelectedGuestIds(new Set())
 
-        updateGuest(guest.id, { tableId }).catch(() => {
-          toast.error("Failed to save — please reload")
-        })
+        for (const g of guestsToAssign) {
+          updateGuest(g.id, { tableId }).catch(() => {
+            toast.error("Failed to save — please reload")
+          })
+        }
       }
     }
 
@@ -209,6 +225,15 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
     })
   }
 
+  function handleToggleGuestSelect(guestId: number) {
+    setSelectedGuestIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(guestId)) next.delete(guestId)
+      else next.add(guestId)
+      return next
+    })
+  }
+
   function handleGenerateAll() {
     startGenerating(async () => {
       try {
@@ -236,7 +261,11 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
       />
       <div className="flex flex-1 overflow-hidden">
         <DragDropProvider onDragEnd={handleDragEnd}>
-          <GuestSidebar guests={unassigned} />
+          <GuestSidebar
+            guests={unassigned}
+            selectedGuestIds={selectedGuestIds}
+            onToggleSelect={handleToggleGuestSelect}
+          />
           <SeatingCanvas
             tables={tables}
             onUnassignGuest={handleUnassignGuest}
@@ -249,7 +278,22 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
               const data = source.data as any
 
               if (data?.type === "guest" && data.guest) {
-                const guest = data.guest as { name: string; rsvpName: string }
+                const guest = data.guest as GuestDto
+                const isMulti = selectedGuestIds.has(guest.id) && selectedGuestIds.size > 1
+
+                if (isMulti) {
+                  return (
+                    <div className="pointer-events-none cursor-grabbing rounded-md border border-blue-400 bg-blue-50 px-3 py-2 text-sm shadow-xl ring-1 ring-blue-300 rotate-2">
+                      <div className="font-semibold text-blue-700">
+                        {selectedGuestIds.size} guests
+                      </div>
+                      <div className="text-blue-500 text-xs truncate max-w-[160px]">
+                        {guest.name}{selectedGuestIds.size > 1 ? ` +${selectedGuestIds.size - 1} more` : ""}
+                      </div>
+                    </div>
+                  )
+                }
+
                 return (
                   <div className="cursor-grabbing rounded-md border bg-white px-3 py-2 text-sm shadow-xl ring-1 ring-blue-300 rotate-2 pointer-events-none">
                     <div className="font-medium">{guest.name}</div>

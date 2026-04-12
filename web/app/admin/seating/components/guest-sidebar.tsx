@@ -7,9 +7,11 @@ import type { GuestDto } from "../types"
 
 interface GuestSidebarProps {
   guests: GuestDto[]
+  selectedGuestIds: Set<number>
+  onToggleSelect: (id: number) => void
 }
 
-export function GuestSidebar({ guests }: GuestSidebarProps) {
+export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect }: GuestSidebarProps) {
   const [search, setSearch] = useState("")
 
   const filtered = search
@@ -18,12 +20,19 @@ export function GuestSidebar({ guests }: GuestSidebarProps) {
       )
     : guests
 
+  const selectedCount = selectedGuestIds.size
+
   return (
     <div className="flex h-full w-72 flex-shrink-0 flex-col border-r bg-gray-50">
       <div className="border-b p-3">
-        <h3 className="mb-2 text-sm font-semibold">
-          Unassigned ({guests.length})
-        </h3>
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Unassigned ({guests.length})</h3>
+          {selectedCount > 0 && (
+            <span className="rounded-full bg-blue-500 px-2 py-0.5 text-[11px] font-medium text-white">
+              {selectedCount} selected
+            </span>
+          )}
+        </div>
         <Input
           placeholder="Search guests..."
           value={search}
@@ -40,7 +49,12 @@ export function GuestSidebar({ guests }: GuestSidebarProps) {
           </p>
         )}
         {filtered.map((guest) => (
-          <DraggableGuest key={guest.id} guest={guest} />
+          <DraggableGuest
+            key={guest.id}
+            guest={guest}
+            isSelected={selectedGuestIds.has(guest.id)}
+            onToggleSelect={onToggleSelect}
+          />
         ))}
       </div>
     </div>
