@@ -225,6 +225,32 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
     })
   }
 
+  function handleClearTable(tableId: number) {
+    const table = tables.find((t) => t.id === tableId)
+    if (!table || table.guests.length === 0) return
+
+    const cleared = table.guests.map((g) => ({ ...g, tableId: null }))
+    setTables((prev) =>
+      prev.map((t) => (t.id === tableId ? { ...t, guests: [] } : t)),
+    )
+    setUnassigned((prev) => [...prev, ...cleared])
+
+    startTransition(async () => {
+      try {
+        await Promise.all(table.guests.map((g) => unassignGuest(g.id)))
+      } catch {
+        // Revert
+        setTables((prev) =>
+          prev.map((t) => (t.id === tableId ? table : t)),
+        )
+        setUnassigned((prev) =>
+          prev.filter((g) => !cleared.some((c) => c.id === g.id)),
+        )
+        toast.error("Failed to clear table")
+      }
+    })
+  }
+
   function handleToggleGuestSelect(guestId: number) {
     setSelectedGuestIds((prev) => {
       const next = new Set(prev)
@@ -271,6 +297,7 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
             onUnassignGuest={handleUnassignGuest}
             onEditTable={setEditingTable}
             onDeleteTable={handleDeleteTable}
+            onClearTable={handleClearTable}
           />
           <DragOverlay dropAnimation={null}>
             {(source) => {

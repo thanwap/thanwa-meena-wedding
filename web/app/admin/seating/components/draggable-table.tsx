@@ -10,6 +10,7 @@ interface DraggableTableProps {
   onUnassignGuest: (guestId: number) => void
   onEditTable: (table: WeddingTableDto) => void
   onDeleteTable: (tableId: number) => void
+  onClearTable: (tableId: number) => void
 }
 
 export const DraggableTable = memo(function DraggableTable({
@@ -17,6 +18,7 @@ export const DraggableTable = memo(function DraggableTable({
   onUnassignGuest,
   onEditTable,
   onDeleteTable,
+  onClearTable,
 }: DraggableTableProps) {
   const { ref, isDragging } = useDraggable({
     id: `move-table-${table.id}`,
@@ -39,6 +41,7 @@ export const DraggableTable = memo(function DraggableTable({
         onUnassignGuest={onUnassignGuest}
         onEditTable={onEditTable}
         onDeleteTable={onDeleteTable}
+        onClearTable={onClearTable}
       />
     </div>
   )

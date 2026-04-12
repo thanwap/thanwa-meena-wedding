@@ -8,6 +8,7 @@ interface SeatingCanvasProps {
   onUnassignGuest: (guestId: number) => void
   onEditTable: (table: WeddingTableDto) => void
   onDeleteTable: (tableId: number) => void
+  onClearTable: (tableId: number) => void
 }
 
 export function SeatingCanvas({
@@ -15,6 +16,7 @@ export function SeatingCanvas({
   onUnassignGuest,
   onEditTable,
   onDeleteTable,
+  onClearTable,
 }: SeatingCanvasProps) {
   return (
     <div
@@ -34,6 +36,7 @@ export function SeatingCanvas({
             onUnassignGuest={onUnassignGuest}
             onEditTable={onEditTable}
             onDeleteTable={onDeleteTable}
+            onClearTable={onClearTable}
           />
         ))}
         {tables.length === 0 && (

@@ -10,6 +10,7 @@ interface DroppableTableProps {
   onUnassignGuest: (guestId: number) => void
   onEditTable: (table: WeddingTableDto) => void
   onDeleteTable: (tableId: number) => void
+  onClearTable: (tableId: number) => void
 }
 
 export const DroppableTable = memo(function DroppableTable({
@@ -17,6 +18,7 @@ export const DroppableTable = memo(function DroppableTable({
   onUnassignGuest,
   onEditTable,
   onDeleteTable,
+  onClearTable,
 }: DroppableTableProps) {
   const { ref, isDropTarget } = useDroppable({
     id: `table-${table.id}`,
@@ -76,6 +78,17 @@ export const DroppableTable = memo(function DroppableTable({
           Edit
         </button>
         <span className="text-muted-foreground text-[10px]">·</span>
+        {table.guests.length > 0 && (
+          <>
+            <button
+              onClick={() => onClearTable(table.id)}
+              className="text-muted-foreground hover:text-orange-500 cursor-pointer text-[10px]"
+            >
+              Clear
+            </button>
+            <span className="text-muted-foreground text-[10px]">·</span>
+          </>
+        )}
         <button
           onClick={() => onDeleteTable(table.id)}
           className="text-muted-foreground hover:text-destructive cursor-pointer text-[10px]"
