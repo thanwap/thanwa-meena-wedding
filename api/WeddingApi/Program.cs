@@ -14,7 +14,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ─── Services ──────────────────────────────────────────────────────────────
-builder.Services.AddScoped<IConfigService, ConfigService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRsvpService, RsvpService>();
 builder.Services.AddScoped<ISeatingService, SeatingService>();
