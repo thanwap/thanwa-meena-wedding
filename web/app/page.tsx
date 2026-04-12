@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { Countdown } from "@/components/countdown"
 import { RSVPForm } from "@/components/rsvp-form"
+import { NavMenu } from "@/components/nav-menu"
 
 /* ── Shared ornament components ────────────────── */
 
@@ -109,10 +110,12 @@ export default function Page() {
         overflowX: "hidden",
       }}
     >
+      <NavMenu />
       {/* ══════════════════════════════
           SECTION 1 — HERO
           ══════════════════════════════ */}
       <section
+        id="hero"
         className="relative flex min-h-svh flex-col items-center justify-center px-6 pb-16 pt-14 text-center"
         style={{ background: "var(--c-ivory)" }}
       >
@@ -143,11 +146,11 @@ export default function Page() {
           <span className="sr-only">Meena &amp; Thanwa</span>
           <Image
             src="/wedding-logo-transparent.png"
-            alt="Thanwa & Tittinan"
+            alt="Thanwa & Jittinan"
             width={960}
             height={460}
             priority
-            className="h-auto w-full max-w-[min(92vw,720px)]"
+            className="h-auto w-full max-w-[72vw] md:max-w-[min(88vw,960px)]"
           />
         </h1>
 
@@ -225,6 +228,7 @@ export default function Page() {
           SECTION 2 — OUR STORY
           ══════════════════════════════ */}
       <section
+        id="story"
         className="px-6 py-20 text-center"
         style={{ background: "var(--c-ivory-dark)" }}
       >
@@ -295,6 +299,7 @@ export default function Page() {
           SECTION 3 — THE COUPLE
           ══════════════════════════════ */}
       <section
+        id="couple"
         className="px-6 py-20"
         style={{ background: "var(--c-ivory)" }}
       >
@@ -393,6 +398,7 @@ export default function Page() {
           SECTION 4 — FIRST CONNECTION
           ══════════════════════════════ */}
       <section
+        id="beginning"
         className="px-6 py-20 text-center"
         style={{ background: "var(--c-ivory-dark)" }}
       >
@@ -506,6 +512,7 @@ export default function Page() {
           SECTION 5 — EVENT DETAILS
           ══════════════════════════════ */}
       <section
+        id="details"
         className="px-6 py-20"
         style={{ background: "var(--c-ivory)" }}
       >
@@ -688,6 +695,7 @@ export default function Page() {
           SECTION 6 — RSVP
           ══════════════════════════════ */}
       <section
+        id="rsvp"
         className="px-6 py-20"
         style={{ background: "var(--c-ivory-dark)" }}
       >
@@ -724,6 +732,7 @@ export default function Page() {
           SECTION 7 — DRESS CODE
           ══════════════════════════════ */}
       <section
+        id="dress"
         className="px-6 py-20 text-center"
         style={{ background: "var(--c-ivory)" }}
       >
