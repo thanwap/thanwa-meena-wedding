@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { signIn, auth } from "@/auth"
 import { AuthError } from "next-auth"
+import { SubmitButton } from "@/components/submit-button"
 
 export default async function LoginPage({
   searchParams,
@@ -83,12 +84,7 @@ export default async function LoginPage({
           />
         </div>
 
-        <button
-          type="submit"
-          className="w-full cursor-pointer rounded bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90"
-        >
-          Sign in
-        </button>
+        <SubmitButton label="Sign in" loadingLabel="Signing in…" />
       </form>
     </div>
   )

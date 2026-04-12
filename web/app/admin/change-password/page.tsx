@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
+import { SubmitButton } from "@/components/submit-button"
 
 const API = process.env.DOTNET_API_URL!
 
@@ -108,12 +109,7 @@ export default async function ChangePasswordPage({
           />
         </div>
 
-        <button
-          type="submit"
-          className="w-full cursor-pointer rounded bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90"
-        >
-          Update password
-        </button>
+        <SubmitButton label="Update password" loadingLabel="Updating…" />
       </form>
     </div>
   )
