@@ -70,7 +70,6 @@ export async function updateTablePosition(
     body: JSON.stringify({ positionX, positionY }),
   })
   if (!res.ok) throw new Error(`Failed to update table position: ${res.status}`)
-  revalidatePath("/admin/seating")
 }
 
 export async function deleteTable(id: number): Promise<void> {
@@ -123,7 +122,6 @@ export async function updateGuest(
     const body = await res.text().catch(() => "")
     throw new Error(`Failed to update guest: ${res.status} ${body}`)
   }
-  revalidatePath("/admin/seating")
   return res.json()
 }
 
@@ -134,5 +132,4 @@ export async function unassignGuest(id: number): Promise<void> {
     headers,
   })
   if (!res.ok) throw new Error(`Failed to unassign guest: ${res.status}`)
-  revalidatePath("/admin/seating")
 }
