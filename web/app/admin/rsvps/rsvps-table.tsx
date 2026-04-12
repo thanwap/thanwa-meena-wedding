@@ -8,9 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { updateRsvpStatus, deleteRsvp } from "./actions"
+import { updateRsvpStatus, deleteRsvp, createRsvp } from "./actions"
 import type { RsvpDto, RsvpStatsDto, RsvpStatus } from "./actions"
 
 // ── Status helpers ──────────────────────────────────────────────────────────
@@ -136,6 +145,149 @@ function Row({
   )
 }
 
+// ── Add Guest dialog ────────────────────────────────────────────────────────
+
+const EMPTY_FORM = {
+  name: "",
+  attending: "true",
+  guestCount: "1",
+  dietary: "",
+  message: "",
+  status: "confirmed",
+}
+
+function AddGuestDialog({
+  open,
+  onOpenChange,
+  onCreated,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onCreated: (rsvp: RsvpDto) => void
+}) {
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [isPending, startTransition] = useTransition()
+
+  function set(field: keyof typeof EMPTY_FORM, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function handleSubmit() {
+    if (!form.name.trim()) {
+      toast.error("Name is required.")
+      return
+    }
+    const guestCount = parseInt(form.guestCount, 10)
+    if (isNaN(guestCount) || guestCount < 1 || guestCount > 10) {
+      toast.error("Guest count must be between 1 and 10.")
+      return
+    }
+    startTransition(async () => {
+      try {
+        const created = await createRsvp({
+          name: form.name.trim(),
+          attending: form.attending === "true",
+          guestCount,
+          dietary: form.dietary.trim() || undefined,
+          message: form.message.trim() || undefined,
+          status: form.status as RsvpStatus,
+        })
+        onCreated(created)
+        setForm(EMPTY_FORM)
+        onOpenChange(false)
+        toast.success(`RSVP for "${created.name}" added.`)
+      } catch (e) {
+        toast.error((e as Error).message)
+      }
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Guest</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="ag-name">Name *</Label>
+            <Input
+              id="ag-name"
+              placeholder="Full name"
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="ag-attending">Attending</Label>
+              <Select value={form.attending} onValueChange={(v) => v && set("attending", v)}>
+                <SelectTrigger id="ag-attending">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ag-guests">Guests</Label>
+              <Input
+                id="ag-guests"
+                type="number"
+                min={1}
+                max={10}
+                value={form.guestCount}
+                onChange={(e) => set("guestCount", e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="ag-status">Status</Label>
+            <Select value={form.status} onValueChange={(v) => v && set("status", v)}>
+              <SelectTrigger id="ag-status">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="ag-dietary">Dietary restrictions</Label>
+            <Input
+              id="ag-dietary"
+              placeholder="Optional"
+              value={form.dietary}
+              onChange={(e) => set("dietary", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="ag-message">Message</Label>
+            <Input
+              id="ag-message"
+              placeholder="Optional"
+              value={form.message}
+              onChange={(e) => set("message", e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isPending}>
+            {isPending ? "Adding…" : "Add Guest"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ── Main client component ───────────────────────────────────────────────────
 
 type FilterStatus = "all" | RsvpStatus
@@ -153,6 +305,8 @@ export function RsvpsClient({
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all")
   const [detailRsvp, setDetailRsvp] = useState<RsvpDto | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+  const [deletingRsvp, setDeletingRsvp] = useState<{ id: number; name: string } | null>(null)
   const [isPending, startTransition] = useTransition()
 
   // ── Derived filtered list ─────────────────────────────────────────────────
@@ -183,7 +337,13 @@ export function RsvpsClient({
   }
 
   function handleDelete(id: number, name: string) {
-    if (!confirm(`Delete RSVP from "${name}"?`)) return
+    setDeletingRsvp({ id, name })
+  }
+
+  function confirmDelete() {
+    if (!deletingRsvp) return
+    const { id } = deletingRsvp
+    setDeletingRsvp(null)
     startTransition(async () => {
       try {
         await deleteRsvp(id)
@@ -194,6 +354,20 @@ export function RsvpsClient({
         toast.error((e as Error).message)
       }
     })
+  }
+
+  function handleGuestCreated(rsvp: RsvpDto) {
+    setRsvps((prev) => [rsvp, ...prev])
+    setStats((prev) => ({
+      ...prev,
+      total: prev.total + 1,
+      attending: rsvp.attending ? prev.attending + 1 : prev.attending,
+      declining: rsvp.attending ? prev.declining : prev.declining + 1,
+      totalGuests: rsvp.attending ? prev.totalGuests + rsvp.guestCount : prev.totalGuests,
+      pending: rsvp.status === "pending" ? prev.pending + 1 : prev.pending,
+      confirmed: rsvp.status === "confirmed" ? prev.confirmed + 1 : prev.confirmed,
+      cancelled: rsvp.status === "cancelled" ? prev.cancelled + 1 : prev.cancelled,
+    }))
   }
 
   function handleViewDetail(rsvp: RsvpDto) {
@@ -241,9 +415,12 @@ export function RsvpsClient({
             Manage guest responses and attendance.
           </p>
         </div>
-        <Button variant="outline" onClick={handleExportCsv}>
-          Export CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setAddOpen(true)}>Add Guest</Button>
+          <Button variant="outline" onClick={handleExportCsv}>
+            Export CSV
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -262,7 +439,7 @@ export function RsvpsClient({
             <button
               key={value}
               onClick={() => setStatusFilter(value)}
-              className="inline-flex items-center gap-1"
+              className="inline-flex cursor-pointer items-center gap-1"
             >
               <Badge
                 variant={statusFilter === value ? "default" : "outline"}
@@ -324,7 +501,7 @@ export function RsvpsClient({
                       <DropdownMenuTrigger
                         disabled={isPending}
                         aria-label="Row actions"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                       >
                         ⋯
                       </DropdownMenuTrigger>
@@ -381,6 +558,35 @@ export function RsvpsClient({
         open={detailOpen}
         onOpenChange={setDetailOpen}
       />
+
+      {/* Add Guest dialog */}
+      <AddGuestDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onCreated={handleGuestCreated}
+      />
+
+      {/* Delete confirm dialog */}
+      <Dialog open={!!deletingRsvp} onOpenChange={(o) => !o && setDeletingRsvp(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete RSVP?</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            RSVP from{" "}
+            <span className="text-foreground font-medium">&ldquo;{deletingRsvp?.name}&rdquo;</span>{" "}
+            will be permanently removed.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingRsvp(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={isPending}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

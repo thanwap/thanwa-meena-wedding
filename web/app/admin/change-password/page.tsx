@@ -110,7 +110,7 @@ export default async function ChangePasswordPage({
 
         <button
           type="submit"
-          className="w-full rounded bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90"
+          className="w-full cursor-pointer rounded bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90"
         >
           Update password
         </button>

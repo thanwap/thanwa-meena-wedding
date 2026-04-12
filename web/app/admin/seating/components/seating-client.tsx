@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition, useRef } from "react"
-import { DragDropProvider } from "@dnd-kit/react"
+import { DragDropProvider, DragOverlay } from "@dnd-kit/react"
 import { toast } from "sonner"
 import { SeatingToolbar } from "./seating-toolbar"
 import { GuestSidebar } from "./guest-sidebar"
@@ -64,7 +64,6 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
           return
         }
 
-        // Optimistic update
         const updatedGuest = { ...guest, tableId }
         setUnassigned((prev) => prev.filter((g) => g.id !== guest.id))
         setTables((prev) =>
@@ -75,21 +74,8 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
           ),
         )
 
-        startTransition(async () => {
-          try {
-            await updateGuest(guest.id, { tableId })
-          } catch {
-            // Revert on failure
-            setUnassigned((prev) => [...prev, guest])
-            setTables((prev) =>
-              prev.map((t) =>
-                t.id === tableId
-                  ? { ...t, guests: t.guests.filter((g) => g.id !== guest.id) }
-                  : t,
-              ),
-            )
-            toast.error("Failed to assign guest")
-          }
+        updateGuest(guest.id, { tableId }).catch(() => {
+          toast.error("Failed to save — please reload")
         })
       }
     }
@@ -255,6 +241,22 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
             onEditTable={setEditingTable}
             onDeleteTable={handleDeleteTable}
           />
+          <DragOverlay dropAnimation={null}>
+            {(source) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const data = source.data as any
+              if (data?.type !== "guest" || !data.guest) return null
+              const guest = data.guest as { name: string; rsvpName: string }
+              return (
+                <div className="cursor-grabbing rounded-md border bg-white px-3 py-2 text-sm shadow-xl ring-1 ring-blue-300 rotate-2 pointer-events-none">
+                  <div className="font-medium">{guest.name}</div>
+                  {guest.name !== guest.rsvpName && (
+                    <div className="text-muted-foreground text-xs">{guest.rsvpName}</div>
+                  )}
+                </div>
+              )
+            }}
+          </DragOverlay>
         </DragDropProvider>
       </div>
       <EditTableDialog

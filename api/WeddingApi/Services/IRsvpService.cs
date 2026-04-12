@@ -5,6 +5,7 @@ namespace WeddingApi.Services;
 public interface IRsvpService
 {
     Task<RsvpDto> CreateAsync(RsvpCreateRequest request);
+    Task<RsvpDto> AdminCreateAsync(AdminRsvpCreateRequest request);
     Task<List<RsvpDto>> ListAsync();
     Task<RsvpDto?> GetAsync(int id);
     Task<RsvpDto?> UpdateStatusAsync(int id, RsvpUpdateRequest request);

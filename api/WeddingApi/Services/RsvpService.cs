@@ -45,6 +45,35 @@ public class RsvpService : IRsvpService
         return ToDto(rsvp);
     }
 
+    public async Task<RsvpDto> AdminCreateAsync(AdminRsvpCreateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+            throw new ArgumentException("Name is required.", nameof(request));
+
+        if (request.GuestCount < 1 || request.GuestCount > 10)
+            throw new ArgumentOutOfRangeException(nameof(request), "GuestCount must be between 1 and 10.");
+
+        var validStatuses = new[] { "pending", "confirmed", "cancelled" };
+        var status = validStatuses.Contains(request.Status) ? request.Status : "confirmed";
+
+        var now = DateTime.UtcNow;
+        var rsvp = new Rsvp
+        {
+            Attending = request.Attending,
+            Name = request.Name.Trim(),
+            GuestCount = request.GuestCount,
+            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : request.Dietary.Trim(),
+            Message = string.IsNullOrWhiteSpace(request.Message) ? null : request.Message.Trim(),
+            Status = status,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        _db.Rsvps.Add(rsvp);
+        await _db.SaveChangesAsync();
+        return ToDto(rsvp);
+    }
+
     public async Task<List<RsvpDto>> ListAsync() =>
         await _db.Rsvps
             .OrderByDescending(r => r.CreatedAt)

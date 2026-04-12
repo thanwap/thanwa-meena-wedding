@@ -74,6 +74,37 @@ export async function updateRsvpStatus(
   revalidatePath("/admin/rsvps")
 }
 
+export interface CreateRsvpInput {
+  name: string
+  attending: boolean
+  guestCount: number
+  dietary?: string
+  message?: string
+  status: RsvpStatus
+}
+
+export async function createRsvp(input: CreateRsvpInput): Promise<RsvpDto> {
+  const headers = await authHeaders()
+  const res = await fetch(`${API}/api/rsvps/admin`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      name: input.name,
+      attending: input.attending,
+      guestCount: input.guestCount,
+      dietary: input.dietary ?? null,
+      message: input.message ?? null,
+      status: input.status,
+    }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error ?? `Failed to create RSVP: ${res.status}`)
+  }
+  revalidatePath("/admin/rsvps")
+  return res.json()
+}
+
 export async function deleteRsvp(id: number): Promise<void> {
   const headers = await authHeaders()
   const res = await fetch(`${API}/api/rsvps/${id}`, {

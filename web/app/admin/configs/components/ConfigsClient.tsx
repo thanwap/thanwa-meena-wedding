@@ -4,6 +4,13 @@ import { useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Table,
   TableBody,
   TableCell,
@@ -23,6 +30,7 @@ export function ConfigsClient({
 }) {
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<ConfigDto | null>(null)
+  const [deletingCfg, setDeletingCfg] = useState<ConfigDto | null>(null)
   const [isPending, startTransition] = useTransition()
 
   const onCreate = () => {
@@ -52,8 +60,12 @@ export function ConfigsClient({
     })
   }
 
-  const onDelete = (cfg: ConfigDto) => {
-    if (!confirm(`Delete "${cfg.key}"?`)) return
+  const onDelete = (cfg: ConfigDto) => setDeletingCfg(cfg)
+
+  const confirmDelete = () => {
+    if (!deletingCfg) return
+    const cfg = deletingCfg
+    setDeletingCfg(null)
     startTransition(async () => {
       try {
         await deleteConfig(cfg.id)
@@ -138,6 +150,25 @@ export function ConfigsClient({
         onSubmit={onSubmit}
         isPending={isPending}
       />
+
+      <Dialog open={!!deletingCfg} onOpenChange={(o) => !o && setDeletingCfg(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete config?</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            <span className="text-foreground font-medium">&ldquo;{deletingCfg?.key}&rdquo;</span> will be permanently removed.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingCfg(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={isPending}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

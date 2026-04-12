@@ -16,8 +16,8 @@ export function DraggableGuest({ guest }: DraggableGuestProps) {
   return (
     <div
       ref={ref}
-      className={`cursor-grab rounded-md border bg-white px-3 py-2 text-sm shadow-sm transition-opacity ${
-        isDragging ? "opacity-40" : "opacity-100"
+      className={`cursor-grab rounded-md border bg-white px-3 py-2 text-sm shadow-sm transition-opacity active:cursor-grabbing ${
+        isDragging ? "opacity-0" : "opacity-100"
       }`}
     >
       <div className="font-medium">{guest.name}</div>

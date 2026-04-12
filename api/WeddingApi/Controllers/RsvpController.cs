@@ -44,6 +44,19 @@ public class RsvpController : ControllerBase
         }
     }
 
+    [HttpPost("admin")]
+    public async Task<IActionResult> AdminCreate([FromBody] AdminRsvpCreateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return BadRequest(new { error = "Name is required." });
+
+        if (request.GuestCount < 1 || request.GuestCount > 10)
+            return BadRequest(new { error = "GuestCount must be between 1 and 10." });
+
+        var created = await _service.AdminCreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
     [HttpGet]
     public async Task<IActionResult> List()
     {

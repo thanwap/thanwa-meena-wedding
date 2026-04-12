@@ -29,13 +29,13 @@ export const DroppableTable = memo(function DroppableTable({
   return (
     <div
       ref={ref}
-      className={`flex flex-col items-center justify-start border-2 bg-white shadow-md transition-colors ${
+      className={`flex flex-col items-center justify-start border-2 bg-white shadow-md transition-all duration-150 ${
         isCircle
           ? "h-64 w-64 rounded-full p-6"
           : "h-40 w-80 rounded-lg p-4"
       } ${
         isDropTarget && !isFull
-          ? "border-blue-500 bg-blue-50"
+          ? "scale-[1.03] border-blue-500 bg-blue-50 shadow-lg"
           : isDropTarget && isFull
             ? "border-red-400 bg-red-50"
             : "border-gray-300"
@@ -60,7 +60,7 @@ export const DroppableTable = memo(function DroppableTable({
           <button
             key={guest.id}
             onClick={() => onUnassignGuest(guest.id)}
-            className="text-muted-foreground hover:text-destructive block w-full truncate text-[11px] transition-colors hover:line-through"
+            className="text-muted-foreground hover:text-destructive block w-full cursor-pointer truncate text-[11px] transition-colors hover:line-through"
             title={`Click to unassign ${guest.name}`}
           >
             {guest.name}
@@ -71,14 +71,14 @@ export const DroppableTable = memo(function DroppableTable({
       <div className="mt-1 flex gap-1">
         <button
           onClick={() => onEditTable(table)}
-          className="text-muted-foreground hover:text-foreground text-[10px]"
+          className="text-muted-foreground hover:text-foreground cursor-pointer text-[10px]"
         >
           Edit
         </button>
         <span className="text-muted-foreground text-[10px]">·</span>
         <button
           onClick={() => onDeleteTable(table.id)}
-          className="text-muted-foreground hover:text-destructive text-[10px]"
+          className="text-muted-foreground hover:text-destructive cursor-pointer text-[10px]"
         >
           Delete
         </button>

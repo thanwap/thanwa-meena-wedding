@@ -8,6 +8,14 @@ public record RsvpCreateRequest(
     string? Message,
     string? HpWebsite);
 
+public record AdminRsvpCreateRequest(
+    bool Attending,
+    string Name,
+    int GuestCount,
+    string? Dietary,
+    string? Message,
+    string Status);
+
 public record RsvpUpdateRequest(string Status);
 
 public record RsvpDto(
