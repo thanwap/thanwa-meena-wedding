@@ -9,9 +9,10 @@ interface GuestSidebarProps {
   guests: GuestDto[]
   selectedGuestIds: Set<number>
   onToggleSelect: (id: number) => void
+  onSelectAll: (ids: number[], select: boolean) => void
 }
 
-export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect }: GuestSidebarProps) {
+export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect, onSelectAll }: GuestSidebarProps) {
   const [search, setSearch] = useState("")
 
   const filtered = search
@@ -21,6 +22,9 @@ export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect }: Guest
     : guests
 
   const selectedCount = selectedGuestIds.size
+  const filteredIds = filtered.map((g) => g.id)
+  const allFilteredSelected = filtered.length > 0 && filtered.every((g) => selectedGuestIds.has(g.id))
+  const someFilteredSelected = !allFilteredSelected && filtered.some((g) => selectedGuestIds.has(g.id))
 
   return (
     <div className="flex h-full w-72 flex-shrink-0 flex-col border-r bg-gray-50">
@@ -40,6 +44,28 @@ export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect }: Guest
           className="h-8 text-sm"
         />
       </div>
+      {filtered.length > 0 && (
+        <div className="border-b px-3 py-2">
+          <button
+            onClick={() => onSelectAll(filteredIds, !allFilteredSelected)}
+            className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900"
+          >
+            <span
+              className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border text-[10px] font-bold transition-colors ${
+                allFilteredSelected
+                  ? "border-blue-500 bg-blue-500 text-white"
+                  : someFilteredSelected
+                    ? "border-blue-400 bg-blue-100 text-blue-500"
+                    : "border-gray-300 text-transparent"
+              }`}
+            >
+              {someFilteredSelected ? "−" : "✓"}
+            </span>
+            {allFilteredSelected ? "Deselect all" : "Select all"}
+            {search && ` (${filtered.length})`}
+          </button>
+        </div>
+      )}
       <div className="flex-1 space-y-1 overflow-y-auto p-3">
         {filtered.length === 0 && (
           <p className="text-muted-foreground py-4 text-center text-xs">

@@ -251,6 +251,14 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
     })
   }
 
+  function handleSelectAllGuests(ids: number[], select: boolean) {
+    setSelectedGuestIds((prev) => {
+      const next = new Set(prev)
+      ids.forEach((id) => (select ? next.add(id) : next.delete(id)))
+      return next
+    })
+  }
+
   function handleToggleGuestSelect(guestId: number) {
     setSelectedGuestIds((prev) => {
       const next = new Set(prev)
@@ -291,6 +299,7 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
             guests={unassigned}
             selectedGuestIds={selectedGuestIds}
             onToggleSelect={handleToggleGuestSelect}
+            onSelectAll={handleSelectAllGuests}
           />
           <SeatingCanvas
             tables={tables}
