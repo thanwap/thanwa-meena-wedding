@@ -24,9 +24,18 @@ export interface RsvpStatsDto {
   attending: number
   declining: number
   totalGuests: number
+  confirmedGuests: number
   pending: number
   confirmed: number
   cancelled: number
+}
+
+export interface PagedResult<T> {
+  items: T[]
+  totalCount: number
+  page: number
+  pageSize: number
+  totalPages: number
 }
 
 async function getIdToken(): Promise<string> {
@@ -53,9 +62,17 @@ export async function getStats(): Promise<RsvpStatsDto> {
   return res.json()
 }
 
-export async function getRsvps(): Promise<RsvpDto[]> {
+export async function getRsvps(
+  page = 1,
+  pageSize = 20,
+  search = "",
+  status = "",
+): Promise<PagedResult<RsvpDto>> {
   const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps`, { headers, cache: "no-store" })
+  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) })
+  if (search) params.set("search", search)
+  if (status && status !== "all") params.set("status", status)
+  const res = await fetch(`${API}/api/rsvps?${params}`, { headers, cache: "no-store" })
   if (!res.ok) throw new Error(`Failed to fetch RSVPs: ${res.status}`)
   return res.json()
 }
@@ -113,4 +130,30 @@ export async function deleteRsvp(id: number): Promise<void> {
   })
   if (!res.ok) throw new Error(`Failed to delete RSVP: ${res.status}`)
   revalidatePath("/admin/rsvps")
+}
+
+export async function batchUpdateStatus(ids: number[], status: RsvpStatus): Promise<number> {
+  const headers = await authHeaders()
+  const res = await fetch(`${API}/api/rsvps/batch-status`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ids, status }),
+  })
+  if (!res.ok) throw new Error(`Failed to batch update status: ${res.status}`)
+  const data = await res.json()
+  revalidatePath("/admin/rsvps")
+  return data.updated
+}
+
+export async function batchDelete(ids: number[]): Promise<number> {
+  const headers = await authHeaders()
+  const res = await fetch(`${API}/api/rsvps/batch`, {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify({ ids }),
+  })
+  if (!res.ok) throw new Error(`Failed to batch delete: ${res.status}`)
+  const data = await res.json()
+  revalidatePath("/admin/rsvps")
+  return data.deleted
 }

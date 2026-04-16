@@ -2,6 +2,9 @@ import Image from "next/image"
 import { Countdown } from "@/components/countdown"
 import { RSVPForm } from "@/components/rsvp-form"
 import { NavMenu } from "@/components/nav-menu"
+import { GuestbookForm } from "@/components/guestbook-form"
+import { GuestbookWall } from "@/components/guestbook-wall"
+import { getGuestbookEntries } from "@/app/actions/guestbook"
 
 /* ── Shared ornament components ────────────────── */
 
@@ -101,7 +104,8 @@ function FloralAccent({ className = "" }: { className?: string }) {
    PAGE
    ═══════════════════════════════════════════════ */
 
-export default function Page() {
+export default async function Page() {
+  const guestbookEntries = await getGuestbookEntries()
   return (
     <main
       style={{
@@ -729,7 +733,42 @@ export default function Page() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 7 — DRESS CODE
+          SECTION 7 — GUESTBOOK
+          ══════════════════════════════ */}
+      <section
+        id="guestbook"
+        className="px-6 py-20"
+        style={{ background: "var(--c-ivory)" }}
+      >
+        <div className="mx-auto max-w-sm">
+          <div className="reveal mb-10 text-center">
+            <SectionLabel>Guestbook</SectionLabel>
+            <h2
+              className="font-[family-name:var(--font-cormorant)] font-light italic mt-3 mb-5"
+              style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+            >
+              ข้อความถึงบ่าวสาว
+            </h2>
+            <p
+              className="font-[family-name:var(--font-sarabun)] text-base leading-relaxed"
+              style={{ color: "var(--c-ink-2)" }}
+            >
+              ฝากคำอวยพรและความประทับใจให้กับคู่บ่าวสาว
+            </p>
+          </div>
+
+          <div className="reveal mb-12">
+            <GuestbookForm />
+          </div>
+
+          <div className="reveal">
+            <GuestbookWall entries={guestbookEntries} />
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════
+          SECTION 8 — DRESS CODE
           ══════════════════════════════ */}
       <section
         id="dress"

@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Rsvp> Rsvps => Set<Rsvp>();
     public DbSet<Guest> Guests => Set<Guest>();
     public DbSet<WeddingTable> WeddingTables => Set<WeddingTable>();
+    public DbSet<GuestbookEntry> GuestbookEntries => Set<GuestbookEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -105,6 +106,32 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Username).HasMaxLength(50).IsRequired();
             entity.Property(e => e.PasswordHash).HasMaxLength(200).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
+        });
+
+        modelBuilder.Entity<GuestbookEntry>(entity =>
+        {
+            entity.ToTable("guestbook_entries");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(e => e.Message)
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(e => e.ImageUrls)
+                .HasMaxLength(3000)
+                .IsRequired(false);
+
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+            entity.Property(e => e.DeletedAt).IsRequired(false);
+
+            entity.HasQueryFilter(e => e.DeletedAt == null);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

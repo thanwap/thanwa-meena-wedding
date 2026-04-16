@@ -18,6 +18,10 @@ public record AdminRsvpCreateRequest(
 
 public record RsvpUpdateRequest(string Status);
 
+public record BatchUpdateStatusRequest(List<int> Ids, string Status);
+
+public record BatchDeleteRequest(List<int> Ids);
+
 public record RsvpDto(
     int Id,
     bool Attending,
@@ -34,6 +38,7 @@ public record RsvpStatsDto(
     int Attending,
     int Declining,
     int TotalGuests,
+    int ConfirmedGuests,
     int Pending,
     int Confirmed,
     int Cancelled);

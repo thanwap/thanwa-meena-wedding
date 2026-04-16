@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -39,7 +40,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { updateRsvpStatus, deleteRsvp, createRsvp } from "./actions"
+import { Pagination } from "@/components/pagination"
+import { Checkbox } from "@/components/ui/checkbox"
+import { updateRsvpStatus, deleteRsvp, createRsvp, batchUpdateStatus, batchDelete } from "./actions"
 import type { RsvpDto, RsvpStatsDto, RsvpStatus } from "./actions"
 
 // ── Status helpers ──────────────────────────────────────────────────────────
@@ -63,13 +66,12 @@ const STATUS_LABELS: Record<RsvpStatus, string> = {
 
 function StatsBar({ stats }: { stats: RsvpStatsDto }) {
   const cards = [
-    { label: "Total RSVPs", value: stats.total },
-    { label: "Attending", value: stats.attending },
-    { label: "Declining", value: stats.declining },
-    { label: "Total Guests", value: stats.totalGuests },
+    { label: "Total RSVPs", value: String(stats.total) },
+    { label: "Cancelled", value: String(stats.cancelled) },
+    { label: "Total Guests", value: `${stats.totalGuests} (${stats.confirmedGuests})` },
   ]
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
       {cards.map(({ label, value }) => (
         <Card key={label}>
           <CardHeader className="pb-2">
@@ -295,28 +297,69 @@ type FilterStatus = "all" | RsvpStatus
 export function RsvpsClient({
   initialStats,
   initialRsvps,
+  page,
+  pageSize,
+  totalPages,
+  totalCount,
+  search,
+  statusFilter,
 }: {
   initialStats: RsvpStatsDto
   initialRsvps: RsvpDto[]
+  page: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+  search: string
+  statusFilter: string
 }) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const [rsvps, setRsvps] = useState<RsvpDto[]>(initialRsvps)
   const [stats, setStats] = useState<RsvpStatsDto>(initialStats)
-  const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>("all")
+  const [searchInput, setSearchInput] = useState(search)
   const [detailRsvp, setDetailRsvp] = useState<RsvpDto | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [deletingRsvp, setDeletingRsvp] = useState<{ id: number; name: string } | null>(null)
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [isPending, startTransition] = useTransition()
 
-  // ── Derived filtered list ─────────────────────────────────────────────────
-  const filtered = rsvps.filter((r) => {
-    const matchesSearch = r.name
-      .toLowerCase()
-      .includes(search.toLowerCase().trim())
-    const matchesStatus = statusFilter === "all" || r.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  // Sync when server re-renders with new data
+  useEffect(() => { setRsvps(initialRsvps); setSelectedIds(new Set()) }, [initialRsvps])
+  useEffect(() => { setStats(initialStats) }, [initialStats])
+  useEffect(() => { setSearchInput(search) }, [search])
+
+  // Debounce search → URL navigation
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (searchInput === search) return
+      navigate({ search: searchInput, status: statusFilter, page: 1 })
+    }, 400)
+    return () => clearTimeout(timeout)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput])
+
+  function navigate({
+    search: s = searchInput,
+    status: st = statusFilter,
+    page: p = page,
+  }: { search?: string; status?: string; page?: number }) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("page", String(p))
+    if (s) params.set("search", s)
+    else params.delete("search")
+    if (st && st !== "all") params.set("status", st)
+    else params.delete("status")
+    router.push(`${pathname}?${params}`)
+  }
+
+  function handleStatusFilterChange(value: FilterStatus) {
+    navigate({ status: value, page: 1 })
+  }
 
   // ── Actions ───────────────────────────────────────────────────────────────
   function handleStatusChange(id: number, status: RsvpStatus) {
@@ -328,7 +371,6 @@ export function RsvpsClient({
             r.id === id ? { ...r, status, updatedAt: new Date().toISOString() } : r,
           ),
         )
-        // Recompute stats locally (simple approach — server revalidation handles the next load)
         toast.success(`Status updated to ${STATUS_LABELS[status]}`)
       } catch (e) {
         toast.error((e as Error).message)
@@ -375,10 +417,69 @@ export function RsvpsClient({
     setDetailOpen(true)
   }
 
+  // ── Selection ─────────────────────────────────────────────────────────────
+  const allPageIds = rsvps.map((r) => r.id)
+  const allSelected = allPageIds.length > 0 && allPageIds.every((id) => selectedIds.has(id))
+  const someSelected = allPageIds.some((id) => selectedIds.has(id)) && !allSelected
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        allPageIds.forEach((id) => next.delete(id))
+        return next
+      })
+    } else {
+      setSelectedIds((prev) => new Set([...prev, ...allPageIds]))
+    }
+  }
+
+  function toggleSelect(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  // ── Batch actions ─────────────────────────────────────────────────────────
+  function handleBatchStatusChange(status: RsvpStatus) {
+    const ids = [...selectedIds]
+    startTransition(async () => {
+      try {
+        await batchUpdateStatus(ids, status)
+        setRsvps((prev) =>
+          prev.map((r) =>
+            selectedIds.has(r.id) ? { ...r, status, updatedAt: new Date().toISOString() } : r,
+          ),
+        )
+        setSelectedIds(new Set())
+        toast.success(`Updated ${ids.length} RSVP${ids.length > 1 ? "s" : ""} to ${STATUS_LABELS[status]}`)
+      } catch (e) {
+        toast.error((e as Error).message)
+      }
+    })
+  }
+
+  function confirmBatchDelete() {
+    const ids = [...selectedIds]
+    setBatchDeleteOpen(false)
+    startTransition(async () => {
+      try {
+        await batchDelete(ids)
+        setRsvps((prev) => prev.filter((r) => !selectedIds.has(r.id)))
+        setStats((prev) => ({ ...prev, total: Math.max(0, prev.total - ids.length) }))
+        setSelectedIds(new Set())
+        toast.success(`Deleted ${ids.length} RSVP${ids.length > 1 ? "s" : ""}`)
+      } catch (e) {
+        toast.error((e as Error).message)
+      }
+    })
+  }
+
   // ── CSV export ────────────────────────────────────────────────────────────
   async function handleExportCsv() {
     try {
-      // Hits the Next.js proxy route — bearer token injected server-side
       const res = await fetch("/api/admin/rsvps/export.csv")
       if (!res.ok) {
         toast.error(`Export failed (${res.status})`)
@@ -397,13 +498,12 @@ export function RsvpsClient({
   }
 
   // ── Status filter chips ────────────────────────────────────────────────────
-  const filterOptions: { value: FilterStatus; label: string; count?: number }[] =
-    [
-      { value: "all", label: "All", count: rsvps.length },
-      { value: "pending", label: "Pending", count: stats.pending },
-      { value: "confirmed", label: "Confirmed", count: stats.confirmed },
-      { value: "cancelled", label: "Cancelled", count: stats.cancelled },
-    ]
+  const filterOptions: { value: FilterStatus; label: string; count: number }[] = [
+    { value: "all", label: "All", count: stats.total },
+    { value: "pending", label: "Pending", count: stats.pending },
+    { value: "confirmed", label: "Confirmed", count: stats.confirmed },
+    { value: "cancelled", label: "Cancelled", count: stats.cancelled },
+  ]
 
   return (
     <div className="space-y-6">
@@ -430,38 +530,84 @@ export function RsvpsClient({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Input
           placeholder="Search by name…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="max-w-xs"
         />
         <div className="flex gap-2 flex-wrap">
           {filterOptions.map(({ value, label, count }) => (
             <button
               key={value}
-              onClick={() => setStatusFilter(value)}
+              onClick={() => handleStatusFilterChange(value)}
               className="inline-flex cursor-pointer items-center gap-1"
             >
               <Badge
-                variant={statusFilter === value ? "default" : "outline"}
+                variant={statusFilter === value || (value === "all" && !statusFilter) ? "default" : "outline"}
                 className="cursor-pointer"
               >
                 {label}
-                {count !== undefined && (
-                  <span className="ml-1 opacity-70">({count})</span>
-                )}
+                <span className="ml-1 opacity-70">({count})</span>
               </Badge>
             </button>
           ))}
         </div>
       </div>
 
+      {/* Batch toolbar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 rounded-md border bg-muted/50 px-4 py-2">
+          <span className="text-sm font-medium">
+            {selectedIds.size} selected
+          </span>
+          <div className="flex gap-2 ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                disabled={isPending}
+                className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+              >
+                Change status
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {(["pending", "confirmed", "cancelled"] as RsvpStatus[]).map((s) => (
+                  <DropdownMenuItem key={s} onClick={() => handleBatchStatusChange(s)}>
+                    {STATUS_LABELS[s]}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isPending}
+              onClick={() => setBatchDeleteOpen(true)}
+            >
+              Delete
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[40px]">
+                <Checkbox
+                  checked={allSelected}
+                  indeterminate={someSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Attending</TableHead>
               <TableHead>Guests</TableHead>
               <TableHead>Dietary</TableHead>
               <TableHead>Status</TableHead>
@@ -470,7 +616,7 @@ export function RsvpsClient({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {rsvps.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={7}
@@ -480,10 +626,16 @@ export function RsvpsClient({
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((rsvp) => (
-                <TableRow key={rsvp.id}>
+              rsvps.map((rsvp) => (
+                <TableRow key={rsvp.id} data-state={selectedIds.has(rsvp.id) ? "selected" : undefined}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(rsvp.id)}
+                      onCheckedChange={() => toggleSelect(rsvp.id)}
+                      aria-label={`Select ${rsvp.name}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{rsvp.name}</TableCell>
-                  <TableCell>{rsvp.attending ? "Yes" : "No"}</TableCell>
                   <TableCell>{rsvp.guestCount}</TableCell>
                   <TableCell className="max-w-[160px] truncate">
                     {rsvp.dietary ?? "—"}
@@ -552,6 +704,8 @@ export function RsvpsClient({
         </Table>
       </div>
 
+      <Pagination page={page} pageSize={pageSize} totalPages={totalPages} totalCount={totalCount} />
+
       {/* Detail dialog */}
       <DetailDialog
         rsvp={detailRsvp}
@@ -565,6 +719,26 @@ export function RsvpsClient({
         onOpenChange={setAddOpen}
         onCreated={handleGuestCreated}
       />
+
+      {/* Batch delete confirm dialog */}
+      <Dialog open={batchDeleteOpen} onOpenChange={setBatchDeleteOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete {selectedIds.size} RSVP{selectedIds.size > 1 ? "s" : ""}?</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            This will permanently remove the selected RSVPs.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBatchDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmBatchDelete} disabled={isPending}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete confirm dialog */}
       <Dialog open={!!deletingRsvp} onOpenChange={(o) => !o && setDeletingRsvp(null)}>

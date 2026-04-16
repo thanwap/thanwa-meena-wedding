@@ -58,17 +58,22 @@ public class RsvpController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null)
     {
-        var rsvps = await _service.ListAsync();
-        return Ok(rsvps);
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        var result = await _service.ListPagedAsync(page, pageSize, search, status);
+        return Ok(result);
     }
 
     [HttpGet("stats")]
     public async Task<IActionResult> Stats()
     {
-        var rsvps = await _service.ListAsync();
-        var stats = _service.GetStats(rsvps);
+        var stats = await _service.GetStatsAsync();
         return Ok(stats);
     }
 
@@ -98,5 +103,28 @@ public class RsvpController : ControllerBase
     {
         var deleted = await _service.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    [HttpPost("batch-status")]
+    public async Task<IActionResult> BatchUpdateStatus([FromBody] BatchUpdateStatusRequest request)
+    {
+        var validStatuses = new[] { "pending", "confirmed", "cancelled" };
+        if (!validStatuses.Contains(request.Status))
+            return BadRequest(new { error = "Invalid status." });
+        if (request.Ids is null || request.Ids.Count == 0)
+            return BadRequest(new { error = "No IDs provided." });
+
+        var count = await _service.BatchUpdateStatusAsync(request.Ids, request.Status);
+        return Ok(new { updated = count });
+    }
+
+    [HttpDelete("batch")]
+    public async Task<IActionResult> BatchDelete([FromBody] BatchDeleteRequest request)
+    {
+        if (request.Ids is null || request.Ids.Count == 0)
+            return BadRequest(new { error = "No IDs provided." });
+
+        var count = await _service.BatchDeleteAsync(request.Ids);
+        return Ok(new { deleted = count });
     }
 }

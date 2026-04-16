@@ -14,9 +14,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ─── Services ──────────────────────────────────────────────────────────────
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IStorageService, SupabaseStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRsvpService, RsvpService>();
 builder.Services.AddScoped<ISeatingService, SeatingService>();
+builder.Services.AddScoped<IGuestbookService, GuestbookService>();
 
 // ─── Rate Limiting ─────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(options =>
@@ -24,6 +27,13 @@ builder.Services.AddRateLimiter(options =>
     options.AddFixedWindowLimiter("rsvp-post", opt =>
     {
         opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("guestbook-post", opt =>
+    {
+        opt.PermitLimit = 3;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;

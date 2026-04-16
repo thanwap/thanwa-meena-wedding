@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { id: "beginning", label: "Beginning", th: "จุดเริ่มต้น" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
+  { id: "guestbook", label: "Guestbook", th: "ข้อความ" },
   { id: "dress",     label: "Dress Code",th: "การแต่งกาย" },
 ]
 

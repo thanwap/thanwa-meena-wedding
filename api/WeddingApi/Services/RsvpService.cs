@@ -74,11 +74,47 @@ public class RsvpService : IRsvpService
         return ToDto(rsvp);
     }
 
-    public async Task<List<RsvpDto>> ListAsync() =>
-        await _db.Rsvps
-            .OrderByDescending(r => r.CreatedAt)
-            .Select(r => ToDto(r))
+    public async Task<PagedResult<RsvpDto>> ListPagedAsync(int page, int pageSize, string? search, string? status)
+    {
+        var query = _db.Rsvps.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var q = search.ToLower();
+            query = query.Where(r => r.Name.ToLower().Contains(q));
+        }
+
+        if (!string.IsNullOrWhiteSpace(status) && status != "all")
+            query = query.Where(r => r.Status == status);
+
+        query = query.OrderByDescending(r => r.CreatedAt);
+
+        var total = await query.CountAsync();
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return new PagedResult<RsvpDto>
+        {
+            Items = items.Select(ToDto).ToList(),
+            TotalCount = total,
+            Page = page,
+            PageSize = pageSize,
+        };
+    }
+
+    public async Task<RsvpStatsDto> GetStatsAsync()
+    {
+        var total = await _db.Rsvps.CountAsync();
+        var attending = await _db.Rsvps.CountAsync(r => r.Attending);
+        var totalGuests = await _db.Rsvps.Where(r => r.Attending).SumAsync(r => r.GuestCount);
+        var confirmedGuests = await _db.Rsvps.Where(r => r.Status == "confirmed").SumAsync(r => r.GuestCount);
+        var pending = await _db.Rsvps.CountAsync(r => r.Status == "pending");
+        var confirmed = await _db.Rsvps.CountAsync(r => r.Status == "confirmed");
+        var cancelled = await _db.Rsvps.CountAsync(r => r.Status == "cancelled");
+        return new RsvpStatsDto(total, attending, total - attending, totalGuests, confirmedGuests, pending, confirmed, cancelled);
+    }
 
     public async Task<RsvpDto?> GetAsync(int id)
     {
@@ -107,17 +143,40 @@ public class RsvpService : IRsvpService
         return true;
     }
 
+    public async Task<int> BatchUpdateStatusAsync(List<int> ids, string status)
+    {
+        var rsvps = await _db.Rsvps.Where(r => ids.Contains(r.Id)).ToListAsync();
+        var now = DateTime.UtcNow;
+        foreach (var r in rsvps)
+        {
+            r.Status = status;
+            r.UpdatedAt = now;
+        }
+        await _db.SaveChangesAsync();
+        return rsvps.Count;
+    }
+
+    public async Task<int> BatchDeleteAsync(List<int> ids)
+    {
+        var rsvps = await _db.Rsvps.Where(r => ids.Contains(r.Id)).ToListAsync();
+        var now = DateTime.UtcNow;
+        foreach (var r in rsvps)
+            r.DeletedAt = now;
+        await _db.SaveChangesAsync();
+        return rsvps.Count;
+    }
+
+    // Kept for unit-test convenience; production code uses GetStatsAsync().
     public RsvpStatsDto GetStats(List<RsvpDto> rsvps)
     {
         var total = rsvps.Count;
         var attending = rsvps.Count(r => r.Attending);
-        var declining = rsvps.Count(r => !r.Attending);
         var totalGuests = rsvps.Where(r => r.Attending).Sum(r => r.GuestCount);
+        var confirmedGuests = rsvps.Where(r => r.Status == "confirmed").Sum(r => r.GuestCount);
         var pending = rsvps.Count(r => r.Status == "pending");
         var confirmed = rsvps.Count(r => r.Status == "confirmed");
         var cancelled = rsvps.Count(r => r.Status == "cancelled");
-
-        return new RsvpStatsDto(total, attending, declining, totalGuests, pending, confirmed, cancelled);
+        return new RsvpStatsDto(total, attending, total - attending, totalGuests, confirmedGuests, pending, confirmed, cancelled);
     }
 
     public async Task<string> ExportCsvAsync()

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { auth, signOut } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default async function AdminLayout({
   children,
@@ -36,6 +37,12 @@ export default async function AdminLayout({
               Seating
             </Link>
             <Link
+              href="/admin/guestbook"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              Guestbook
+            </Link>
+            <Link
               href="/admin/change-password"
               className="text-muted-foreground text-sm hover:text-foreground"
             >
@@ -43,6 +50,7 @@ export default async function AdminLayout({
             </Link>
           </nav>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {session?.user?.name && (
               <span className="text-muted-foreground text-sm">
                 {session.user.name}
