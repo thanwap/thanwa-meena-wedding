@@ -83,9 +83,9 @@ public class RsvpApiTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/api/rsvps");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var rsvps = await response.Content.ReadFromJsonAsync<List<RsvpDto>>();
-        Assert.NotNull(rsvps);
-        Assert.Contains(rsvps, r => r.Name == "List Test Guest");
+        var result = await response.Content.ReadFromJsonAsync<PagedResult<RsvpDto>>();
+        Assert.NotNull(result);
+        Assert.Contains(result.Items, r => r.Name == "List Test Guest");
     }
 
     [Fact]
