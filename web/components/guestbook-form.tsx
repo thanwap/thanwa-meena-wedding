@@ -3,7 +3,41 @@
 import { useRef, useState, useTransition } from "react"
 
 const MAX_IMAGES = 3
-const MAX_SIZE_MB = 5
+const TARGET_SIZE_MB = 1
+const MAX_DIMENSION = 1920
+
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      let { width, height } = img
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
+        width = Math.round(width * ratio)
+        height = Math.round(height * ratio)
+      }
+      const canvas = document.createElement("canvas")
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext("2d")
+      if (!ctx) { resolve(file); return }
+      ctx.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { resolve(file); return }
+          const name = file.name.replace(/\.[^.]+$/, ".jpg")
+          resolve(new File([blob], name, { type: "image/jpeg" }))
+        },
+        "image/jpeg",
+        0.85,
+      )
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Failed to load image")) }
+    img.src = url
+  })
+}
 
 export function GuestbookForm() {
   const [name, setName] = useState("")
@@ -13,29 +47,36 @@ export function GuestbookForm() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [isCompressing, setIsCompressing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const hpRef = useRef<HTMLInputElement>(null)
 
-  function handleFiles(selected: FileList | null) {
+  async function handleFiles(selected: FileList | null) {
     if (!selected) return
     const arr = Array.from(selected)
     const remaining = MAX_IMAGES - files.length
     const toAdd = arr.slice(0, remaining)
 
-    const oversized = toAdd.find((f) => f.size > MAX_SIZE_MB * 1024 * 1024)
-    if (oversized) {
-      setError(`"${oversized.name}" exceeds ${MAX_SIZE_MB} MB limit.`)
-      return
-    }
-
     setError(null)
-    setFiles((prev) => [...prev, ...toAdd])
-    toAdd.forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (e) =>
-        setPreviews((prev) => [...prev, e.target?.result as string])
-      reader.readAsDataURL(file)
-    })
+    setIsCompressing(true)
+    try {
+      const compressed = await Promise.all(
+        toAdd.map((f) =>
+          f.size > TARGET_SIZE_MB * 1024 * 1024 ? compressImage(f) : Promise.resolve(f),
+        ),
+      )
+      setFiles((prev) => [...prev, ...compressed])
+      compressed.forEach((file) => {
+        const reader = new FileReader()
+        reader.onload = (e) =>
+          setPreviews((prev) => [...prev, e.target?.result as string])
+        reader.readAsDataURL(file)
+      })
+    } catch {
+      setError("Failed to process one or more images. Please try again.")
+    } finally {
+      setIsCompressing(false)
+    }
   }
 
   function removeImage(idx: number) {
@@ -235,7 +276,7 @@ export function GuestbookForm() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={isPending}
+              disabled={isPending || isCompressing}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -272,25 +313,25 @@ export function GuestbookForm() {
 
       <button
         type="submit"
-        disabled={isPending}
+        disabled={isPending || isCompressing}
         style={{
           width: "100%",
           padding: "14px",
           borderRadius: 8,
           border: "none",
-          background: isPending
+          background: isPending || isCompressing
             ? "rgba(232,195,190,0.5)"
             : "linear-gradient(135deg, var(--c-blush) 0%, var(--c-blush-deep) 100%)",
-          color: isPending ? "var(--c-muted)" : "#fff",
+          color: isPending || isCompressing ? "var(--c-muted)" : "#fff",
           fontFamily: "var(--font-josefin)",
           fontSize: 12,
           letterSpacing: "0.35em",
           textTransform: "uppercase",
-          cursor: isPending ? "not-allowed" : "pointer",
+          cursor: isPending || isCompressing ? "not-allowed" : "pointer",
           transition: "opacity 0.2s ease",
         }}
       >
-        {isPending ? "Sending…" : "Leave a Message"}
+        {isCompressing ? "Processing…" : isPending ? "Sending…" : "Leave a Message"}
       </button>
     </form>
   )

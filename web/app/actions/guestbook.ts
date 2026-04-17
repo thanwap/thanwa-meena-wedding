@@ -21,3 +21,13 @@ export async function getGuestbookEntries(): Promise<GuestbookEntryDto[]> {
     return []
   }
 }
+
+export async function getRandomGuestbookEntries(count: number): Promise<GuestbookEntryDto[]> {
+  const all = await getGuestbookEntries()
+  const shuffled = [...all]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled.slice(0, count)
+}

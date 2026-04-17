@@ -4,7 +4,7 @@ import { RSVPForm } from "@/components/rsvp-form"
 import { NavMenu } from "@/components/nav-menu"
 import { GuestbookForm } from "@/components/guestbook-form"
 import { GuestbookWall } from "@/components/guestbook-wall"
-import { getGuestbookEntries } from "@/app/actions/guestbook"
+import { getRandomGuestbookEntries } from "@/app/actions/guestbook"
 
 /* ── Shared ornament components ────────────────── */
 
@@ -105,7 +105,7 @@ function FloralAccent({ className = "" }: { className?: string }) {
    ═══════════════════════════════════════════════ */
 
 export default async function Page() {
-  const guestbookEntries = await getGuestbookEntries()
+  const guestbookEntries = await getRandomGuestbookEntries(5)
   return (
     <main
       style={{
