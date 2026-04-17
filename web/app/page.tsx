@@ -149,14 +149,16 @@ export default async function Page() {
         {/* Names — wedding logo */}
         <h1 className="hero-2 relative z-10 flex justify-center">
           <span className="sr-only">Meena &amp; Thanwa</span>
-          <Image
-            src="/wedding-logo-transparent.png"
-            alt="Thanwa & Jittinan"
-            width={960}
-            height={460}
-            priority
-            className="h-auto w-full max-w-[72vw] md:max-w-[min(88vw,960px)]"
-          />
+          <span className="logo-anim">
+            <Image
+              src="/wedding-logo-transparent.png"
+              alt="Thanwa & Jittinan"
+              width={960}
+              height={460}
+              priority
+              className="h-auto w-full max-w-[72vw] md:max-w-[min(88vw,960px)]"
+            />
+          </span>
         </h1>
 
         {/* Hero image in decorative frame */}
@@ -684,7 +686,7 @@ export default async function Page() {
       <section
         id="dress"
         className="px-6 py-20 text-center"
-        style={{ background: "var(--c-ivory)" }}
+        style={{ background: "var(--c-ivory-dark)" }}
       >
         <div className="mx-auto max-w-sm reveal">
           <SectionLabel>Dress Code</SectionLabel>

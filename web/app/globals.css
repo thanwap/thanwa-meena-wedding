@@ -201,6 +201,17 @@
   animation: float 5s ease-in-out infinite;
 }
 
+/* ── Wedding logo breathe (starts after entrance finishes) ── */
+@keyframes logo-breathe {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-6px) scale(1.012); }
+}
+.logo-anim {
+  display: block;
+  animation: logo-breathe 7s cubic-bezier(0.45, 0, 0.55, 1) 1.5s infinite;
+  will-change: transform;
+}
+
 /* ── Mouse scroll indicator ── */
 .scroll-dot {
   animation: scroll-bounce 1.6s ease-in-out infinite;
