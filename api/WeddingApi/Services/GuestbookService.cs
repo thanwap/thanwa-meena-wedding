@@ -63,11 +63,13 @@ public class GuestbookService : IGuestbookService
         return ToDto(entry);
     }
 
-    public async Task<List<GuestbookDto>> ListPublicAsync()
+    public async Task<List<GuestbookDto>> ListPublicAsync(int count = 0)
     {
-        var entries = await _db.GuestbookEntries
-            .OrderByDescending(e => e.CreatedAt)
-            .ToListAsync();
+        IQueryable<GuestbookEntry> query = count > 0
+            ? _db.GuestbookEntries.OrderBy(e => EF.Functions.Random()).Take(count)
+            : _db.GuestbookEntries.OrderByDescending(e => e.CreatedAt);
+
+        var entries = await query.ToListAsync();
         return entries.Select(ToDto).ToList();
     }
 

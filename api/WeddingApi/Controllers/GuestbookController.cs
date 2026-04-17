@@ -52,9 +52,9 @@ public class GuestbookController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List([FromQuery] int count = 0)
     {
-        var entries = await _service.ListPublicAsync();
+        var entries = await _service.ListPublicAsync(count);
         return Ok(entries);
     }
 
