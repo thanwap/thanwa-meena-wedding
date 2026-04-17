@@ -15,20 +15,14 @@ const NAV_ITEMS = [
 
 export function NavMenu() {
   const [active, setActive]   = useState("hero")
-  const [visible, setVisible] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [open, setOpen]       = useState(false)
   const overlayRef            = useRef<HTMLDivElement>(null)
 
-  /* Show nav only after scrolling past hero */
+  /* Trigger entrance animation on first paint */
   useEffect(() => {
-    const hero = document.getElementById("hero")
-    if (!hero) return
-    const obs = new IntersectionObserver(
-      ([entry]) => setVisible(!entry.isIntersecting),
-      { threshold: 0.1 }
-    )
-    obs.observe(hero)
-    return () => obs.disconnect()
+    const raf = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(raf)
   }, [])
 
   /* Track active section */
@@ -76,9 +70,9 @@ export function NavMenu() {
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
           borderBottom: "1px solid rgba(232, 195, 190, 0.35)",
-          transform: visible ? "translateY(0)" : "translateY(-100%)",
-          transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-          pointerEvents: visible ? "auto" : "none",
+          transform: mounted ? "translateY(0)" : "translateY(-100%)",
+          opacity: mounted ? 1 : 0,
+          transition: "transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
         }}
       >
         <ul
@@ -153,10 +147,10 @@ export function NavMenu() {
           position: "fixed",
           bottom: 28,
           left: "50%",
-          transform: `translateX(-50%) translateY(${visible ? "0" : "80px"})`,
-          transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          transform: `translateX(-50%) translateY(${mounted ? "0" : "80px"})`,
+          opacity: mounted ? 1 : 0,
+          transition: "transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
           zIndex: 50,
-          pointerEvents: visible ? "auto" : "none",
         }}
       >
         <button

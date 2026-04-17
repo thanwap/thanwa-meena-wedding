@@ -4,6 +4,7 @@ import { RSVPForm } from "@/components/rsvp-form"
 import { NavMenu } from "@/components/nav-menu"
 import { GuestbookForm } from "@/components/guestbook-form"
 import { GuestbookWall } from "@/components/guestbook-wall"
+import { ScheduleTimeline } from "@/components/schedule-timeline"
 import { getRandomGuestbookEntries } from "@/app/actions/guestbook"
 
 /* ── Shared ornament components ────────────────── */
@@ -120,7 +121,7 @@ export default async function Page() {
           ══════════════════════════════ */}
       <section
         id="hero"
-        className="relative flex min-h-svh flex-col items-center justify-center px-6 pb-16 pt-14 text-center"
+        className="relative flex min-h-svh flex-col items-center justify-center px-6 pb-16 pt-20 text-center"
         style={{ background: "var(--c-ivory)" }}
       >
         {/* Grain texture overlay */}
@@ -134,7 +135,7 @@ export default async function Page() {
 
         {/* Floating botanical top */}
         <div
-          className="hero-1 float-anim pointer-events-none absolute top-8 left-1/2 -translate-x-1/2"
+          className="hero-1 float-anim pointer-events-none absolute top-16 left-1/2 -translate-x-1/2"
           style={{ color: "var(--c-sage)", width: 100 }}
         >
           <FloralAccent />
@@ -601,97 +602,7 @@ export default async function Page() {
           </div>
 
           {/* Schedule timeline */}
-          <div className="reveal">
-            <p
-              className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.5em] uppercase mb-8 text-center"
-              style={{ color: "var(--c-sage)" }}
-            >
-              Schedule
-            </p>
-
-            <div className="relative">
-              {/* Vertical connecting line */}
-              <div
-                className="absolute top-2 bottom-2"
-                style={{
-                  left: 68,
-                  width: 1,
-                  background:
-                    "linear-gradient(to bottom, transparent, var(--c-blush) 15%, var(--c-blush) 85%, transparent)",
-                }}
-              />
-
-              {[
-                {
-                  time: "14:00",
-                  thai: "พิธีแห่ขันหมากและรับไหว้",
-                  en: "Khan Mak Procession",
-                },
-                {
-                  time: "15:00",
-                  thai: "พิธีหลั่งน้ำสังข์",
-                  en: "Water Blessing Ceremony",
-                },
-                {
-                  time: "17:00",
-                  thai: "พิธีกล่าวคำสัญญา",
-                  en: "Vow Ceremony",
-                },
-                {
-                  time: "18:00",
-                  thai: "ร่วมรับประทานอาหาร",
-                  en: "Wedding Reception",
-                },
-                { time: "20:00", thai: "After Party", en: "After Party 🎉" },
-              ].map((item, i) => (
-                <div key={i} className="relative flex gap-0 mb-8 last:mb-0">
-                  {/* Time */}
-                  <div
-                    className="shrink-0 text-right"
-                    style={{ width: 60, paddingTop: 2 }}
-                  >
-                    <span
-                      className="font-[family-name:var(--font-josefin)] text-base"
-                      style={{ color: "var(--c-muted)" }}
-                    >
-                      {item.time}
-                    </span>
-                  </div>
-
-                  {/* Dot */}
-                  <div
-                    className="relative shrink-0 flex justify-center"
-                    style={{ width: 18, paddingTop: 4 }}
-                  >
-                    <div
-                      className="timeline-dot w-2.5 h-2.5 rounded-full"
-                      style={{
-                        background: "var(--c-ivory)",
-                        border: "1.5px solid var(--c-blush)",
-                        flexShrink: 0,
-                      }}
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="pl-3">
-                    <p
-                      className="font-[family-name:var(--font-sarabun)] text-base leading-tight"
-                      style={{ color: "var(--c-ink)" }}
-                    >
-                      {item.thai}
-                    </p>
-                    <p
-                      className="font-[family-name:var(--font-josefin)] text-[11px] tracking-wider mt-0.5"
-                      style={{ color: "var(--c-muted)" }}
-                    >
-                      {item.en}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ScheduleTimeline />
         </div>
       </section>
 
