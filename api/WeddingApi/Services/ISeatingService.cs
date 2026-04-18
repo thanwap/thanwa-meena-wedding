@@ -13,4 +13,6 @@ public interface ISeatingService
     Task<List<GuestDto>> GenerateAllGuestsAsync();
     Task<GuestDto?> UpdateGuestAsync(int id, GuestUpdateRequest request);
     Task<bool> UnassignGuestAsync(int id);
+    Task DeleteGuestsByRsvpAsync(int rsvpId);
+    Task<List<GuestDto>> RegenerateGuestsForRsvpAsync(int rsvpId);
 }

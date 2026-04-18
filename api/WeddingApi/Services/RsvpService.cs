@@ -9,10 +9,12 @@ namespace WeddingApi.Services;
 public class RsvpService : IRsvpService
 {
     private readonly AppDbContext _db;
+    private readonly ISeatingService _seating;
 
-    public RsvpService(AppDbContext db)
+    public RsvpService(AppDbContext db, ISeatingService seating)
     {
         _db = db;
+        _seating = seating;
     }
 
     public async Task<RsvpDto> CreateAsync(RsvpCreateRequest request)
@@ -42,6 +44,10 @@ public class RsvpService : IRsvpService
 
         _db.Rsvps.Add(rsvp);
         await _db.SaveChangesAsync();
+
+        if (rsvp.Attending)
+            await _seating.GenerateGuestsForRsvpAsync(rsvp.Id);
+
         return ToDto(rsvp);
     }
 
@@ -71,6 +77,10 @@ public class RsvpService : IRsvpService
 
         _db.Rsvps.Add(rsvp);
         await _db.SaveChangesAsync();
+
+        if (rsvp.Attending && status != "cancelled")
+            await _seating.GenerateGuestsForRsvpAsync(rsvp.Id);
+
         return ToDto(rsvp);
     }
 
@@ -124,12 +134,25 @@ public class RsvpService : IRsvpService
 
     public async Task<RsvpDto?> UpdateStatusAsync(int id, RsvpUpdateRequest request)
     {
-        var rsvp = await _db.Rsvps.FirstOrDefaultAsync(r => r.Id == id);
+        var rsvp = await _db.Rsvps
+            .Include(r => r.Guests)
+            .FirstOrDefaultAsync(r => r.Id == id);
         if (rsvp is null) return null;
 
+        var oldStatus = rsvp.Status;
         rsvp.Status = request.Status;
         rsvp.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+
+        if (request.Status == "cancelled" && oldStatus != "cancelled")
+        {
+            await _seating.DeleteGuestsByRsvpAsync(rsvp.Id);
+        }
+        else if (oldStatus == "cancelled" && request.Status != "cancelled" && rsvp.Attending)
+        {
+            await _seating.GenerateGuestsForRsvpAsync(rsvp.Id);
+        }
+
         return ToDto(rsvp);
     }
 
@@ -145,13 +168,28 @@ public class RsvpService : IRsvpService
 
     public async Task<int> BatchUpdateStatusAsync(List<int> ids, string status)
     {
-        var rsvps = await _db.Rsvps.Where(r => ids.Contains(r.Id)).ToListAsync();
+        var rsvps = await _db.Rsvps
+            .Include(r => r.Guests)
+            .Where(r => ids.Contains(r.Id))
+            .ToListAsync();
         var now = DateTime.UtcNow;
+
         foreach (var r in rsvps)
         {
+            var oldStatus = r.Status;
             r.Status = status;
             r.UpdatedAt = now;
+
+            if (status == "cancelled" && oldStatus != "cancelled")
+            {
+                await _seating.DeleteGuestsByRsvpAsync(r.Id);
+            }
+            else if (oldStatus == "cancelled" && status != "cancelled" && r.Attending)
+            {
+                await _seating.GenerateGuestsForRsvpAsync(r.Id);
+            }
         }
+
         await _db.SaveChangesAsync();
         return rsvps.Count;
     }

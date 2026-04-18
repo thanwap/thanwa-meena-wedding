@@ -14,7 +14,6 @@ import {
   updateTable,
   updateTablePosition,
   deleteTable,
-  generateAllGuests,
   updateGuest,
   unassignGuest,
 } from "../actions"
@@ -30,7 +29,6 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
   )
   const [selectedGuestIds, setSelectedGuestIds] = useState<Set<number>>(new Set())
   const [editingTable, setEditingTable] = useState<WeddingTableDto | null>(null)
-  const [isGenerating, startGenerating] = useTransition()
   const [, startTransition] = useTransition()
   const positionSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pendingPositions = useRef<Map<number, { x: number; y: number }>>(
@@ -268,30 +266,12 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
     })
   }
 
-  function handleGenerateAll() {
-    startGenerating(async () => {
-      try {
-        const guests = await generateAllGuests()
-        if (guests.length === 0) {
-          toast.info("No new guests to generate")
-          return
-        }
-        setUnassigned((prev) => [...prev, ...guests])
-        toast.success(`Generated ${guests.length} guests`)
-      } catch {
-        toast.error("Failed to generate guests")
-      }
-    })
-  }
-
   return (
     <div className="-mx-6 -mt-8 flex h-[calc(100svh-65px)] flex-col">
       <SeatingToolbar
         totalGuests={totalGuests}
         assignedGuests={assignedGuests}
         onCreateTable={handleCreateTable}
-        onGenerateAll={handleGenerateAll}
-        isGenerating={isGenerating}
       />
       <div className="flex flex-1 overflow-hidden">
         <DragDropProvider onDragEnd={handleDragEnd}>

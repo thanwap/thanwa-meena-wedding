@@ -26,9 +26,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -42,7 +39,7 @@ import {
 } from "@/components/ui/table"
 import { Pagination } from "@/components/pagination"
 import { Checkbox } from "@/components/ui/checkbox"
-import { updateRsvpStatus, deleteRsvp, createRsvp, batchUpdateStatus, batchDelete } from "./actions"
+import { deleteRsvp, createRsvp, batchDelete, regenerateGuests } from "./actions"
 import type { RsvpDto, RsvpStatsDto, RsvpStatus } from "./actions"
 
 // ── Status helpers ──────────────────────────────────────────────────────────
@@ -362,22 +359,6 @@ export function RsvpsClient({
   }
 
   // ── Actions ───────────────────────────────────────────────────────────────
-  function handleStatusChange(id: number, status: RsvpStatus) {
-    startTransition(async () => {
-      try {
-        await updateRsvpStatus(id, status)
-        setRsvps((prev) =>
-          prev.map((r) =>
-            r.id === id ? { ...r, status, updatedAt: new Date().toISOString() } : r,
-          ),
-        )
-        toast.success(`Status updated to ${STATUS_LABELS[status]}`)
-      } catch (e) {
-        toast.error((e as Error).message)
-      }
-    })
-  }
-
   function handleDelete(id: number, name: string) {
     setDeletingRsvp({ id, name })
   }
@@ -392,6 +373,17 @@ export function RsvpsClient({
         setRsvps((prev) => prev.filter((r) => r.id !== id))
         setStats((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }))
         toast.success("RSVP deleted")
+      } catch (e) {
+        toast.error((e as Error).message)
+      }
+    })
+  }
+
+  function handleRegenerateGuests(rsvp: RsvpDto) {
+    startTransition(async () => {
+      try {
+        await regenerateGuests(rsvp.id)
+        toast.success(`Guests regenerated for "${rsvp.name}"`)
       } catch (e) {
         toast.error((e as Error).message)
       }
@@ -443,24 +435,6 @@ export function RsvpsClient({
   }
 
   // ── Batch actions ─────────────────────────────────────────────────────────
-  function handleBatchStatusChange(status: RsvpStatus) {
-    const ids = [...selectedIds]
-    startTransition(async () => {
-      try {
-        await batchUpdateStatus(ids, status)
-        setRsvps((prev) =>
-          prev.map((r) =>
-            selectedIds.has(r.id) ? { ...r, status, updatedAt: new Date().toISOString() } : r,
-          ),
-        )
-        setSelectedIds(new Set())
-        toast.success(`Updated ${ids.length} RSVP${ids.length > 1 ? "s" : ""} to ${STATUS_LABELS[status]}`)
-      } catch (e) {
-        toast.error((e as Error).message)
-      }
-    })
-  }
-
   function confirmBatchDelete() {
     const ids = [...selectedIds]
     setBatchDeleteOpen(false)
@@ -560,21 +534,6 @@ export function RsvpsClient({
             {selectedIds.size} selected
           </span>
           <div className="flex gap-2 ml-auto">
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                disabled={isPending}
-                className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-              >
-                Change status
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {(["pending", "confirmed", "cancelled"] as RsvpStatus[]).map((s) => (
-                  <DropdownMenuItem key={s} onClick={() => handleBatchStatusChange(s)}>
-                    {STATUS_LABELS[s]}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button
               variant="destructive"
               size="sm"
@@ -663,30 +622,12 @@ export function RsvpsClient({
                         >
                           View details
                         </DropdownMenuItem>
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            Change status
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            {(
-                              [
-                                "pending",
-                                "confirmed",
-                                "cancelled",
-                              ] as RsvpStatus[]
-                            ).map((s) => (
-                              <DropdownMenuItem
-                                key={s}
-                                onClick={() =>
-                                  handleStatusChange(rsvp.id, s)
-                                }
-                                disabled={rsvp.status === s}
-                              >
-                                {STATUS_LABELS[s]}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
+                        <DropdownMenuItem
+                          onClick={() => handleRegenerateGuests(rsvp)}
+                          disabled={!rsvp.attending}
+                        >
+                          Regenerate guests
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           variant="destructive"

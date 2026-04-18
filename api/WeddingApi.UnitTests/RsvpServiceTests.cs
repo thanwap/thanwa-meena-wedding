@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
 using WeddingApi.Services;
@@ -15,11 +16,21 @@ public class RsvpServiceTests
         return new AppDbContext(options);
     }
 
+    private static ISeatingService CreateMockSeating()
+    {
+        var mock = new Mock<ISeatingService>();
+        mock.Setup(s => s.GenerateGuestsForRsvpAsync(It.IsAny<int>()))
+            .ReturnsAsync(new List<GuestDto>());
+        mock.Setup(s => s.DeleteGuestsByRsvpAsync(It.IsAny<int>()))
+            .Returns(Task.CompletedTask);
+        return mock.Object;
+    }
+
     [Fact]
     public async Task CreateAsync_WithValidData_ReturnsDto_WithStatusPending()
     {
         using var db = CreateInMemoryDb();
-        var service = new RsvpService(db);
+        var service = new RsvpService(db, CreateMockSeating());
 
         var request = new RsvpCreateRequest(
             Attending: true,
@@ -43,7 +54,7 @@ public class RsvpServiceTests
     public async Task CreateAsync_WithHoneypotFilled_ThrowsInvalidOperationException()
     {
         using var db = CreateInMemoryDb();
-        var service = new RsvpService(db);
+        var service = new RsvpService(db, CreateMockSeating());
 
         var request = new RsvpCreateRequest(
             Attending: true,
@@ -61,7 +72,7 @@ public class RsvpServiceTests
     public async Task DeleteAsync_SoftDeletes_SetsDeletedAt()
     {
         using var db = CreateInMemoryDb();
-        var service = new RsvpService(db);
+        var service = new RsvpService(db, CreateMockSeating());
 
         // Create an RSVP directly in the DB
         var rsvp = new WeddingApi.Entities.Rsvp
@@ -90,7 +101,7 @@ public class RsvpServiceTests
     public void GetStats_ComputesCorrectTotals_FromMixedList()
     {
         using var db = CreateInMemoryDb();
-        var service = new RsvpService(db);
+        var service = new RsvpService(db, CreateMockSeating());
 
         var rsvps = new List<RsvpDto>
         {

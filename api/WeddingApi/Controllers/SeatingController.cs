@@ -79,6 +79,24 @@ public class SeatingController : ControllerBase
         }
     }
 
+    [HttpPost("guests/regenerate")]
+    public async Task<IActionResult> RegenerateGuests([FromBody] GuestGenerateRequest request)
+    {
+        try
+        {
+            var guests = await _service.RegenerateGuestsForRsvpAsync(request.RsvpId);
+            return Ok(guests);
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpPost("guests/generate-all")]
     public async Task<IActionResult> GenerateAllGuests()
     {

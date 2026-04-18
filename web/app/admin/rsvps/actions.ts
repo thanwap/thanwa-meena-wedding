@@ -145,6 +145,20 @@ export async function batchUpdateStatus(ids: number[], status: RsvpStatus): Prom
   return data.updated
 }
 
+export async function regenerateGuests(rsvpId: number): Promise<void> {
+  const headers = await authHeaders()
+  const res = await fetch(`${API}/api/seating/guests/regenerate`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ rsvpId }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error ?? `Failed to regenerate guests: ${res.status}`)
+  }
+  revalidatePath("/admin/rsvps")
+}
+
 export async function batchDelete(ids: number[]): Promise<number> {
   const headers = await authHeaders()
   const res = await fetch(`${API}/api/rsvps/batch`, {

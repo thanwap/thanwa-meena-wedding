@@ -37,6 +37,12 @@ export default async function AdminLayout({
               Seating
             </Link>
             <Link
+              href="/admin/seating/manage"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              Seating List
+            </Link>
+            <Link
               href="/admin/guestbook"
               className="text-muted-foreground text-sm hover:text-foreground"
             >

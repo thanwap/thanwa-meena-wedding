@@ -82,32 +82,6 @@ export async function deleteTable(id: number): Promise<void> {
   revalidatePath("/admin/seating")
 }
 
-export async function generateGuests(rsvpId: number): Promise<GuestDto[]> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/seating/guests/generate`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ rsvpId }),
-  })
-  if (!res.ok) {
-    const body = await res.text().catch(() => "")
-    throw new Error(`Failed to generate guests: ${res.status} ${body}`)
-  }
-  revalidatePath("/admin/seating")
-  return res.json()
-}
-
-export async function generateAllGuests(): Promise<GuestDto[]> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/seating/guests/generate-all`, {
-    method: "POST",
-    headers,
-  })
-  if (!res.ok) throw new Error(`Failed to generate guests: ${res.status}`)
-  revalidatePath("/admin/seating")
-  return res.json()
-}
-
 export async function updateGuest(
   id: number,
   data: { name?: string; tableId?: number },

@@ -85,11 +85,19 @@ public class SeatingService : ISeatingService
 
     public async Task<bool> DeleteTableAsync(int id)
     {
-        var table = await _db.WeddingTables.FirstOrDefaultAsync(t => t.Id == id);
+        var table = await _db.WeddingTables
+            .Include(t => t.Guests)
+            .FirstOrDefaultAsync(t => t.Id == id);
         if (table is null) return false;
+
+        var affectedRsvpIds = table.Guests.Select(g => g.RsvpId).Distinct().ToList();
 
         _db.WeddingTables.Remove(table);
         await _db.SaveChangesAsync();
+
+        foreach (var rsvpId in affectedRsvpIds)
+            await SyncRsvpStatusAsync(rsvpId);
+
         return true;
     }
 
@@ -201,6 +209,9 @@ public class SeatingService : ISeatingService
 
         guest.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+
+        await SyncRsvpStatusAsync(guest.RsvpId);
+
         return ToGuestDto(guest);
     }
 
@@ -212,7 +223,45 @@ public class SeatingService : ISeatingService
         guest.TableId = null;
         guest.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+
+        await SyncRsvpStatusAsync(guest.RsvpId);
+
         return true;
+    }
+
+    public async Task DeleteGuestsByRsvpAsync(int rsvpId)
+    {
+        var guests = await _db.Guests.Where(g => g.RsvpId == rsvpId).ToListAsync();
+        if (guests.Count > 0)
+        {
+            _db.Guests.RemoveRange(guests);
+            await _db.SaveChangesAsync();
+        }
+    }
+
+    public async Task<List<GuestDto>> RegenerateGuestsForRsvpAsync(int rsvpId)
+    {
+        await DeleteGuestsByRsvpAsync(rsvpId);
+        var guests = await GenerateGuestsForRsvpAsync(rsvpId);
+        await SyncRsvpStatusAsync(rsvpId);
+        return guests;
+    }
+
+    private async Task SyncRsvpStatusAsync(int rsvpId)
+    {
+        var rsvp = await _db.Rsvps
+            .Include(r => r.Guests)
+            .FirstOrDefaultAsync(r => r.Id == rsvpId);
+        if (rsvp is null) return;
+
+        var allSeated = rsvp.Guests.Count > 0 && rsvp.Guests.All(g => g.TableId != null);
+        var newStatus = allSeated ? "confirmed" : "pending";
+        if (rsvp.Status != newStatus)
+        {
+            rsvp.Status = newStatus;
+            rsvp.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+        }
     }
 
     private static WeddingTableDto ToTableDto(WeddingTable t) =>
