@@ -156,7 +156,7 @@ export default async function Page() {
               width={960}
               height={460}
               priority
-              className="h-auto w-full max-w-[72vw] md:max-w-[min(88vw,960px)]"
+              className="h-auto w-full max-w-[72vw] md:max-w-[min(40vw,480px)]"
             />
           </span>
         </h1>
