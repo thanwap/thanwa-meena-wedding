@@ -239,7 +239,7 @@ export default async function Page() {
         className="px-8 py-20 text-center"
         style={{ background: "var(--c-ivory-dark)" }}
       >
-        <div className="mx-auto max-w-sm">
+        <div className="mx-auto max-w-lg">
           <Divider />
 
           <div className="mt-12 reveal">
@@ -281,7 +281,7 @@ export default async function Page() {
             </div>
           </div>
 
-          <div className="mt-10 space-y-8 text-left reveal">
+          <div className="mt-10 space-y-6 text-left reveal">
             {[
               "เขาเป็นโปรแกรมเมอร์ผู้หมกมุ่นอยู่กับ code วันๆ มีแต่งานกับการออกกำลังกาย ชีวิตเรียบง่ายแต่เต็มไปด้วยตรรกะและระบบ",
               "เธอเป็นพยาบาลห้องฉุกเฉิน คอยดูแลชีวิตผู้คนมากมาย ชีวิตก็มีแค่ ER กับหอพักพยาบาล ทุกวันคือการต่อสู้กับเวลาและความไม่แน่นอน",
