@@ -11,6 +11,7 @@ interface DroppableTableProps {
   onEditTable: (table: WeddingTableDto) => void
   onDeleteTable: (tableId: number) => void
   onClearTable: (tableId: number) => void
+  isSuperAdmin?: boolean
 }
 
 export const DroppableTable = memo(function DroppableTable({
@@ -19,10 +20,12 @@ export const DroppableTable = memo(function DroppableTable({
   onEditTable,
   onDeleteTable,
   onClearTable,
+  isSuperAdmin = false,
 }: DroppableTableProps) {
   const { ref, isDropTarget } = useDroppable({
     id: `table-${table.id}`,
     data: { type: "table", tableId: table.id },
+    disabled: !isSuperAdmin,
   })
 
   const isFull = table.guests.length >= table.capacity
@@ -58,44 +61,55 @@ export const DroppableTable = memo(function DroppableTable({
           isCircle ? "px-2 text-center" : ""
         }`}
       >
-        {table.guests.map((guest) => (
-          <button
-            key={guest.id}
-            onClick={() => onUnassignGuest(guest.id)}
-            className="text-muted-foreground hover:text-destructive block w-full cursor-pointer truncate text-[11px] transition-colors hover:line-through"
-            title={`Click to unassign ${guest.name}`}
-          >
-            {guest.name}
-          </button>
-        ))}
+        {table.guests.map((guest) =>
+          isSuperAdmin ? (
+            <button
+              key={guest.id}
+              onClick={() => onUnassignGuest(guest.id)}
+              className="text-muted-foreground hover:text-destructive block w-full cursor-pointer truncate text-[11px] transition-colors hover:line-through"
+              title={`Click to unassign ${guest.name}`}
+            >
+              {guest.name}
+            </button>
+          ) : (
+            <div
+              key={guest.id}
+              className="text-muted-foreground block w-full truncate text-[11px]"
+            >
+              {guest.name}
+            </div>
+          ),
+        )}
       </div>
 
-      <div className="mt-1 flex gap-1">
-        <button
-          onClick={() => onEditTable(table)}
-          className="text-muted-foreground hover:text-foreground cursor-pointer text-[10px]"
-        >
-          Edit
-        </button>
-        <span className="text-muted-foreground text-[10px]">·</span>
-        {table.guests.length > 0 && (
-          <>
-            <button
-              onClick={() => onClearTable(table.id)}
-              className="text-muted-foreground hover:text-orange-500 cursor-pointer text-[10px]"
-            >
-              Clear
-            </button>
-            <span className="text-muted-foreground text-[10px]">·</span>
-          </>
-        )}
-        <button
-          onClick={() => onDeleteTable(table.id)}
-          className="text-muted-foreground hover:text-destructive cursor-pointer text-[10px]"
-        >
-          Delete
-        </button>
-      </div>
+      {isSuperAdmin && (
+        <div className="mt-1 flex gap-1">
+          <button
+            onClick={() => onEditTable(table)}
+            className="text-muted-foreground hover:text-foreground cursor-pointer text-[10px]"
+          >
+            Edit
+          </button>
+          <span className="text-muted-foreground text-[10px]">·</span>
+          {table.guests.length > 0 && (
+            <>
+              <button
+                onClick={() => onClearTable(table.id)}
+                className="text-muted-foreground hover:text-orange-500 cursor-pointer text-[10px]"
+              >
+                Clear
+              </button>
+              <span className="text-muted-foreground text-[10px]">·</span>
+            </>
+          )}
+          <button
+            onClick={() => onDeleteTable(table.id)}
+            className="text-muted-foreground hover:text-destructive cursor-pointer text-[10px]"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   )
 })

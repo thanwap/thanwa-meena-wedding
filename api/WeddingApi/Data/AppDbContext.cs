@@ -105,6 +105,7 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Username);
             entity.Property(e => e.Username).HasMaxLength(50).IsRequired();
             entity.Property(e => e.PasswordHash).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Role).HasMaxLength(20).IsRequired().HasDefaultValue("viewer");
             entity.Property(e => e.UpdatedAt).IsRequired();
         });
 

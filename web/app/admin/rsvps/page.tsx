@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { auth } from "@/auth"
 import { getStats, getRsvps } from "./actions"
 import { RsvpsClient } from "./rsvps-table"
 
@@ -15,9 +16,10 @@ export default async function RsvpsPage({
   const search = params.search ?? ""
   const status = params.status ?? "all"
 
-  const [stats, rsvpResult] = await Promise.all([
+  const [stats, rsvpResult, session] = await Promise.all([
     getStats(),
     getRsvps(page, pageSize, search, status),
+    auth(),
   ])
 
   return (
@@ -31,6 +33,7 @@ export default async function RsvpsPage({
         totalCount={rsvpResult.totalCount}
         search={search}
         statusFilter={status}
+        isSuperAdmin={session?.role === "super_admin"}
       />
     </Suspense>
   )

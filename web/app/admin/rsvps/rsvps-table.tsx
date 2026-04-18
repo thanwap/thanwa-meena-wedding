@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/table"
 import { Pagination } from "@/components/pagination"
 import { Checkbox } from "@/components/ui/checkbox"
-import { deleteRsvp, createRsvp, batchDelete, regenerateGuests } from "./actions"
+import { deleteRsvp, createRsvp, batchDelete, regenerateGuests, updateGuestCount } from "./actions"
 import type { RsvpDto, RsvpStatsDto, RsvpStatus } from "./actions"
 
 // ── Status helpers ──────────────────────────────────────────────────────────
@@ -300,6 +300,7 @@ export function RsvpsClient({
   totalCount,
   search,
   statusFilter,
+  isSuperAdmin = false,
 }: {
   initialStats: RsvpStatsDto
   initialRsvps: RsvpDto[]
@@ -309,6 +310,7 @@ export function RsvpsClient({
   totalCount: number
   search: string
   statusFilter: string
+  isSuperAdmin?: boolean
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -322,6 +324,8 @@ export function RsvpsClient({
   const [addOpen, setAddOpen] = useState(false)
   const [deletingRsvp, setDeletingRsvp] = useState<{ id: number; name: string } | null>(null)
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false)
+  const [editingRsvp, setEditingRsvp] = useState<RsvpDto | null>(null)
+  const [editGuestCount, setEditGuestCount] = useState("")
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [isPending, startTransition] = useTransition()
 
@@ -373,6 +377,35 @@ export function RsvpsClient({
         setRsvps((prev) => prev.filter((r) => r.id !== id))
         setStats((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }))
         toast.success("RSVP deleted")
+      } catch (e) {
+        toast.error((e as Error).message)
+      }
+    })
+  }
+
+  function handleEditGuestCount(rsvp: RsvpDto) {
+    setEditingRsvp(rsvp)
+    setEditGuestCount(String(rsvp.guestCount))
+  }
+
+  function confirmEditGuestCount() {
+    if (!editingRsvp) return
+    const count = parseInt(editGuestCount, 10)
+    if (isNaN(count) || count < 1 || count > 10) {
+      toast.error("Guest count must be between 1 and 10.")
+      return
+    }
+    if (count === editingRsvp.guestCount) {
+      setEditingRsvp(null)
+      return
+    }
+    const rsvpId = editingRsvp.id
+    setEditingRsvp(null)
+    startTransition(async () => {
+      try {
+        const updated = await updateGuestCount(rsvpId, count)
+        setRsvps((prev) => prev.map((r) => (r.id === rsvpId ? updated : r)))
+        toast.success(`Guest count updated to ${count}`)
       } catch (e) {
         toast.error((e as Error).message)
       }
@@ -490,7 +523,9 @@ export function RsvpsClient({
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setAddOpen(true)}>Add Guest</Button>
+          {isSuperAdmin && (
+            <Button onClick={() => setAddOpen(true)}>Add Guest</Button>
+          )}
           <Button variant="outline" onClick={handleExportCsv}>
             Export CSV
           </Button>
@@ -528,7 +563,7 @@ export function RsvpsClient({
       </div>
 
       {/* Batch toolbar */}
-      {selectedIds.size > 0 && (
+      {isSuperAdmin && selectedIds.size > 0 && (
         <div className="flex items-center gap-3 rounded-md border bg-muted/50 px-4 py-2">
           <span className="text-sm font-medium">
             {selectedIds.size} selected
@@ -558,27 +593,31 @@ export function RsvpsClient({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[40px]">
-                <Checkbox
-                  checked={allSelected}
-                  indeterminate={someSelected}
-                  onCheckedChange={toggleSelectAll}
-                  aria-label="Select all"
-                />
-              </TableHead>
+              {isSuperAdmin && (
+                <TableHead className="w-[40px]">
+                  <Checkbox
+                    checked={allSelected}
+                    indeterminate={someSelected}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Select all"
+                  />
+                </TableHead>
+              )}
               <TableHead>Name</TableHead>
               <TableHead>Guests</TableHead>
               <TableHead>Dietary</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Submitted</TableHead>
-              <TableHead className="w-[60px] text-right">Actions</TableHead>
+              {isSuperAdmin && (
+                <TableHead className="w-[60px] text-right">Actions</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {rsvps.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={isSuperAdmin ? 7 : 5}
                   className="text-muted-foreground text-center"
                 >
                   No RSVPs found.
@@ -587,13 +626,15 @@ export function RsvpsClient({
             ) : (
               rsvps.map((rsvp) => (
                 <TableRow key={rsvp.id} data-state={selectedIds.has(rsvp.id) ? "selected" : undefined}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(rsvp.id)}
-                      onCheckedChange={() => toggleSelect(rsvp.id)}
-                      aria-label={`Select ${rsvp.name}`}
-                    />
-                  </TableCell>
+                  {isSuperAdmin && (
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIds.has(rsvp.id)}
+                        onCheckedChange={() => toggleSelect(rsvp.id)}
+                        aria-label={`Select ${rsvp.name}`}
+                      />
+                    </TableCell>
+                  )}
                   <TableCell className="font-medium">{rsvp.name}</TableCell>
                   <TableCell>{rsvp.guestCount}</TableCell>
                   <TableCell className="max-w-[160px] truncate">
@@ -607,37 +648,44 @@ export function RsvpsClient({
                   <TableCell className="text-muted-foreground text-sm">
                     {new Date(rsvp.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        disabled={isPending}
-                        aria-label="Row actions"
-                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                      >
-                        ⋯
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleViewDetail(rsvp)}
+                  {isSuperAdmin && (
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          disabled={isPending}
+                          aria-label="Row actions"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                         >
-                          View details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleRegenerateGuests(rsvp)}
-                          disabled={!rsvp.attending}
-                        >
-                          Regenerate guests
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => handleDelete(rsvp.id, rsvp.name)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                          ⋯
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleViewDetail(rsvp)}
+                          >
+                            View details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleEditGuestCount(rsvp)}
+                          >
+                            Edit guest count
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleRegenerateGuests(rsvp)}
+                            disabled={!rsvp.attending}
+                          >
+                            Regenerate guests
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => handleDelete(rsvp.id, rsvp.name)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}
@@ -698,6 +746,48 @@ export function RsvpsClient({
             </Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={isPending}>
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit guest count dialog */}
+      <Dialog open={!!editingRsvp} onOpenChange={(o) => !o && setEditingRsvp(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Edit Guest Count</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            {editingRsvp?.name} — currently {editingRsvp?.guestCount} guest{editingRsvp && editingRsvp.guestCount !== 1 ? "s" : ""}
+          </p>
+          <div className="space-y-1.5 pt-2">
+            <Label htmlFor="edit-guest-count">New guest count</Label>
+            <Input
+              id="edit-guest-count"
+              type="number"
+              min={1}
+              max={10}
+              value={editGuestCount}
+              onChange={(e) => setEditGuestCount(e.target.value)}
+              autoFocus
+            />
+          </div>
+          {editingRsvp && parseInt(editGuestCount, 10) < editingRsvp.guestCount && (
+            <p className="text-sm text-amber-600">
+              {editingRsvp.guestCount - parseInt(editGuestCount, 10)} guest(s) will be removed (last added first).
+            </p>
+          )}
+          {editingRsvp && parseInt(editGuestCount, 10) > editingRsvp.guestCount && (
+            <p className="text-muted-foreground text-sm">
+              {parseInt(editGuestCount, 10) - editingRsvp.guestCount} guest(s) will be added as unassigned.
+            </p>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingRsvp(null)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmEditGuestCount} disabled={isPending}>
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

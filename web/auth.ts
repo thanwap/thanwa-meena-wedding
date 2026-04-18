@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials"
 declare module "next-auth" {
   interface Session {
     idToken?: string
+    role?: string
     user?: {
       name?: string | null
       email?: string | null
@@ -12,11 +13,13 @@ declare module "next-auth" {
   }
   interface User {
     idToken?: string
+    role?: string
   }
 }
 declare module "@auth/core/jwt" {
   interface JWT {
     idToken?: string
+    role?: string
   }
 }
 
@@ -56,11 +59,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         if (!res.ok) return null
-        const data = (await res.json()) as { token: string; username: string }
+        const data = (await res.json()) as {
+          token: string
+          username: string
+          role: string
+        }
         return {
           id: data.username,
           name: data.username,
           idToken: data.token,
+          role: data.role,
         }
       },
     }),
@@ -71,10 +79,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     jwt({ token, user }) {
       if (user?.idToken) token.idToken = user.idToken
+      if (user?.role) token.role = user.role
       return token
     },
     session({ session, token }) {
       session.idToken = token.idToken
+      session.role = token.role
       if (session.user && typeof token.sub === "string") {
         session.user.name = token.sub
       }

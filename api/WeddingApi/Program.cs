@@ -103,6 +103,7 @@ if (args.Length > 0 && (args[0] == "seed-admins" || args[0] == "reset-admins"))
         if (existing is not null)
         {
             existing.PasswordHash = hash;
+            existing.Role = "super_admin";
             existing.UpdatedAt = DateTime.UtcNow;
             results.Add((username, password, "reset"));
         }
@@ -112,6 +113,7 @@ if (args.Length > 0 && (args[0] == "seed-admins" || args[0] == "reset-admins"))
             {
                 Username = username,
                 PasswordHash = hash,
+                Role = "super_admin",
                 UpdatedAt = DateTime.UtcNow,
             });
             results.Add((username, password, "created"));

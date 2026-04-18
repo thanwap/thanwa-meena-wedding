@@ -156,6 +156,55 @@ public class RsvpService : IRsvpService
         return ToDto(rsvp);
     }
 
+    public async Task<RsvpDto?> UpdateGuestCountAsync(int id, int guestCount)
+    {
+        if (guestCount < 1 || guestCount > 10)
+            throw new ArgumentOutOfRangeException(nameof(guestCount), "GuestCount must be between 1 and 10.");
+
+        var rsvp = await _db.Rsvps
+            .Include(r => r.Guests)
+            .FirstOrDefaultAsync(r => r.Id == id);
+        if (rsvp is null) return null;
+
+        var oldCount = rsvp.GuestCount;
+        rsvp.GuestCount = guestCount;
+        rsvp.UpdatedAt = DateTime.UtcNow;
+
+        if (guestCount > oldCount && rsvp.Attending)
+        {
+            // Add more companion guests
+            var now = DateTime.UtcNow;
+            var existingMax = rsvp.Guests.Count > 0
+                ? rsvp.Guests.Max(g => g.SortOrder)
+                : 0;
+
+            for (var i = oldCount; i < guestCount; i++)
+            {
+                var name = $"{rsvp.Name} (ผู้ติดตามคนที่ {i})";
+                _db.Guests.Add(new Entities.Guest
+                {
+                    RsvpId = rsvp.Id,
+                    Name = name,
+                    SortOrder = existingMax + (i - oldCount) + 1,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+            }
+        }
+        else if (guestCount < oldCount && rsvp.Guests.Count > 0)
+        {
+            // Remove excess guests (highest sort order first)
+            var toRemove = rsvp.Guests
+                .OrderByDescending(g => g.SortOrder)
+                .Take(oldCount - guestCount)
+                .ToList();
+            _db.Guests.RemoveRange(toRemove);
+        }
+
+        await _db.SaveChangesAsync();
+        return ToDto(rsvp);
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         var rsvp = await _db.Rsvps.FirstOrDefaultAsync(r => r.Id == id);

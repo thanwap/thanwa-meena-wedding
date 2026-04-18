@@ -18,6 +18,8 @@ public record AdminRsvpCreateRequest(
 
 public record RsvpUpdateRequest(string Status);
 
+public record RsvpUpdateGuestCountRequest(int GuestCount);
+
 public record BatchUpdateStatusRequest(List<int> Ids, string Status);
 
 public record BatchDeleteRequest(List<int> Ids);

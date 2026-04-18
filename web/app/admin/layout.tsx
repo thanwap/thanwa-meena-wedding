@@ -49,6 +49,12 @@ export default async function AdminLayout({
               Guestbook
             </Link>
             <Link
+              href="/admin/users"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              Users
+            </Link>
+            <Link
               href="/admin/change-password"
               className="text-muted-foreground text-sm hover:text-foreground"
             >
@@ -60,6 +66,11 @@ export default async function AdminLayout({
             {session?.user?.name && (
               <span className="text-muted-foreground text-sm">
                 {session.user.name}
+                {session.role && (
+                  <span className="ml-1 text-xs opacity-60">
+                    ({session.role === "super_admin" ? "Super Admin" : "Viewer"})
+                  </span>
+                )}
               </span>
             )}
             <form

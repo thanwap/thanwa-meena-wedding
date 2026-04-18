@@ -98,6 +98,23 @@ public class RsvpController : ControllerBase
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    [HttpPatch("{id:int}/guest-count")]
+    public async Task<IActionResult> UpdateGuestCount(int id, [FromBody] RsvpUpdateGuestCountRequest request)
+    {
+        if (request.GuestCount < 1 || request.GuestCount > 10)
+            return BadRequest(new { error = "GuestCount must be between 1 and 10." });
+
+        try
+        {
+            var updated = await _service.UpdateGuestCountAsync(id, request.GuestCount);
+            return updated is null ? NotFound() : Ok(updated);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

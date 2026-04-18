@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { auth } from "@/auth"
 import { getGuestbookEntries } from "./actions"
 import { GuestbookTable } from "./guestbook-table"
 
@@ -13,7 +14,10 @@ export default async function GuestbookAdminPage({
   const page = Math.max(1, Number(params.page) || 1)
   const pageSize = Math.min(50, Math.max(10, Number(params.pageSize) || 20))
   const search = params.search ?? ""
-  const result = await getGuestbookEntries(page, pageSize, search)
+  const [result, session] = await Promise.all([
+    getGuestbookEntries(page, pageSize, search),
+    auth(),
+  ])
 
   return (
     <div>
@@ -31,6 +35,7 @@ export default async function GuestbookAdminPage({
           totalPages={result.totalPages}
           totalCount={result.totalCount}
           search={search}
+          isSuperAdmin={session?.role === "super_admin"}
         />
       </Suspense>
     </div>

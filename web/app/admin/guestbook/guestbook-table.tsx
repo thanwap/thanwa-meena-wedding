@@ -77,6 +77,7 @@ export function GuestbookTable({
   totalPages,
   totalCount,
   search,
+  isSuperAdmin = false,
 }: {
   initialEntries: GuestbookAdminDto[]
   page: number
@@ -84,6 +85,7 @@ export function GuestbookTable({
   totalPages: number
   totalCount: number
   search: string
+  isSuperAdmin?: boolean
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -144,7 +146,7 @@ export function GuestbookTable({
               <TableHead>Message</TableHead>
               <TableHead className="w-52">Photos</TableHead>
               <TableHead className="w-28">Date</TableHead>
-              <TableHead className="w-20 text-right">Actions</TableHead>
+              {isSuperAdmin && <TableHead className="w-20 text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -172,15 +174,17 @@ export function GuestbookTable({
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(entry.createdAt)}
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteTarget(entry)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
+                {isSuperAdmin && (
+                  <TableCell className="text-right">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteTarget(entry)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

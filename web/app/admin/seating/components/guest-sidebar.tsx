@@ -10,9 +10,10 @@ interface GuestSidebarProps {
   selectedGuestIds: Set<number>
   onToggleSelect: (id: number) => void
   onSelectAll: (ids: number[], select: boolean) => void
+  isSuperAdmin?: boolean
 }
 
-export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect, onSelectAll }: GuestSidebarProps) {
+export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect, onSelectAll, isSuperAdmin = false }: GuestSidebarProps) {
   const [search, setSearch] = useState("")
 
   const filtered = search
@@ -31,7 +32,7 @@ export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect, onSelec
       <div className="border-b p-3">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-semibold">Unassigned ({guests.length})</h3>
-          {selectedCount > 0 && (
+          {isSuperAdmin && selectedCount > 0 && (
             <span className="rounded-full bg-blue-500 px-2 py-0.5 text-[11px] font-medium text-white">
               {selectedCount} selected
             </span>
@@ -44,7 +45,7 @@ export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect, onSelec
           className="h-8 text-sm"
         />
       </div>
-      {filtered.length > 0 && (
+      {isSuperAdmin && filtered.length > 0 && (
         <div className="border-b px-3 py-2">
           <button
             onClick={() => onSelectAll(filteredIds, !allFilteredSelected)}
@@ -80,6 +81,7 @@ export function GuestSidebar({ guests, selectedGuestIds, onToggleSelect, onSelec
             guest={guest}
             isSelected={selectedGuestIds.has(guest.id)}
             onToggleSelect={onToggleSelect}
+            isSuperAdmin={isSuperAdmin}
           />
         ))}
       </div>

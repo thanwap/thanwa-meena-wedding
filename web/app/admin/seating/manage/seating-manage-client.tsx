@@ -33,9 +33,10 @@ import type { SeatingOverviewDto, WeddingTableDto, GuestDto } from "../types"
 
 interface SeatingManageClientProps {
   initialData: SeatingOverviewDto
+  isSuperAdmin?: boolean
 }
 
-export function SeatingManageClient({ initialData }: SeatingManageClientProps) {
+export function SeatingManageClient({ initialData, isSuperAdmin = false }: SeatingManageClientProps) {
   const [data, setData] = useState(initialData)
   const [tableSearch, setTableSearch] = useState("")
   const [guestSearch, setGuestSearch] = useState("")
@@ -151,7 +152,7 @@ export function SeatingManageClient({ initialData }: SeatingManageClientProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Seating Management</h1>
-        <CreateTableDialog onCreateTable={handleCreateTable} />
+        {isSuperAdmin && <CreateTableDialog onCreateTable={handleCreateTable} />}
       </div>
 
       <div className="flex gap-4">
@@ -196,112 +197,116 @@ export function SeatingManageClient({ initialData }: SeatingManageClientProps) {
                 <Badge variant={table.guests.length >= table.capacity ? "destructive" : "secondary"}>
                   {table.guests.length}/{table.capacity} guests
                 </Badge>
-                <Dialog
-                  open={addGuestTableId === table.id}
-                  onOpenChange={(open) => {
-                    setAddGuestTableId(open ? table.id : null)
-                    if (!open) setAddGuestSearch("")
-                  }}
-                >
-                  <DialogTrigger render={
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={table.guests.length >= table.capacity}
-                    />
-                  }>
-                    Add Guest
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add Guest to {table.name}</DialogTitle>
-                    </DialogHeader>
-                    <Input
-                      placeholder="Search unassigned guests..."
-                      value={addGuestSearch}
-                      onChange={(e) => setAddGuestSearch(e.target.value)}
-                      autoFocus
-                    />
-                    {filteredUnassignedGuests.length === 0 ? (
-                      <p className="text-muted-foreground py-4 text-center text-sm">
-                        {data.unassignedGuests.length === 0
-                          ? "No unassigned guests available."
-                          : "No guests match your search."}
-                      </p>
-                    ) : (
-                      <div className="max-h-64 overflow-y-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Guest Name</TableHead>
-                              <TableHead>RSVP Name</TableHead>
-                              <TableHead className="w-20 text-right">Action</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredUnassignedGuests.map((guest) => (
-                              <TableRow key={guest.id}>
-                                <TableCell>{guest.name}</TableCell>
-                                <TableCell className="text-muted-foreground">
-                                  {guest.rsvpName}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={isPending}
-                                    onClick={() =>
-                                      handleAssignGuest(guest, table.id)
-                                    }
-                                  >
-                                    Add
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    )}
-                  </DialogContent>
-                </Dialog>
-                <Dialog
-                  open={deleteConfirmId === table.id}
-                  onOpenChange={(open) =>
-                    setDeleteConfirmId(open ? table.id : null)
-                  }
-                >
-                  <DialogTrigger render={
-                    <Button variant="destructive" size="sm" />
-                  }>
-                    Delete
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Delete Table</DialogTitle>
-                    </DialogHeader>
-                    <p className="text-muted-foreground text-sm">
-                      Are you sure you want to delete &quot;{table.name}&quot;?
-                      {table.guests.length > 0 &&
-                        ` ${table.guests.length} guest(s) will be unassigned.`}
-                    </p>
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => setDeleteConfirmId(null)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        disabled={isPending}
-                        onClick={() => handleDeleteTable(table)}
-                      >
+                {isSuperAdmin && (
+                  <>
+                    <Dialog
+                      open={addGuestTableId === table.id}
+                      onOpenChange={(open) => {
+                        setAddGuestTableId(open ? table.id : null)
+                        if (!open) setAddGuestSearch("")
+                      }}
+                    >
+                      <DialogTrigger render={
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={table.guests.length >= table.capacity}
+                        />
+                      }>
+                        Add Guest
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Add Guest to {table.name}</DialogTitle>
+                        </DialogHeader>
+                        <Input
+                          placeholder="Search unassigned guests..."
+                          value={addGuestSearch}
+                          onChange={(e) => setAddGuestSearch(e.target.value)}
+                          autoFocus
+                        />
+                        {filteredUnassignedGuests.length === 0 ? (
+                          <p className="text-muted-foreground py-4 text-center text-sm">
+                            {data.unassignedGuests.length === 0
+                              ? "No unassigned guests available."
+                              : "No guests match your search."}
+                          </p>
+                        ) : (
+                          <div className="max-h-64 overflow-y-auto">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Guest Name</TableHead>
+                                  <TableHead>RSVP Name</TableHead>
+                                  <TableHead className="w-20 text-right">Action</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {filteredUnassignedGuests.map((guest) => (
+                                  <TableRow key={guest.id}>
+                                    <TableCell>{guest.name}</TableCell>
+                                    <TableCell className="text-muted-foreground">
+                                      {guest.rsvpName}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={isPending}
+                                        onClick={() =>
+                                          handleAssignGuest(guest, table.id)
+                                        }
+                                      >
+                                        Add
+                                      </Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog
+                      open={deleteConfirmId === table.id}
+                      onOpenChange={(open) =>
+                        setDeleteConfirmId(open ? table.id : null)
+                      }
+                    >
+                      <DialogTrigger render={
+                        <Button variant="destructive" size="sm" />
+                      }>
                         Delete
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Delete Table</DialogTitle>
+                        </DialogHeader>
+                        <p className="text-muted-foreground text-sm">
+                          Are you sure you want to delete &quot;{table.name}&quot;?
+                          {table.guests.length > 0 &&
+                            ` ${table.guests.length} guest(s) will be unassigned.`}
+                        </p>
+                        <div className="flex justify-end gap-2 pt-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => setDeleteConfirmId(null)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            disabled={isPending}
+                            onClick={() => handleDeleteTable(table)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -316,7 +321,9 @@ export function SeatingManageClient({ initialData }: SeatingManageClientProps) {
                   <TableRow>
                     <TableHead>Guest Name</TableHead>
                     <TableHead>RSVP Name</TableHead>
-                    <TableHead className="w-24 text-right">Action</TableHead>
+                    {isSuperAdmin && (
+                      <TableHead className="w-24 text-right">Action</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -333,18 +340,20 @@ export function SeatingManageClient({ initialData }: SeatingManageClientProps) {
                         <TableCell className="text-muted-foreground">
                           {guest.rsvpName}
                         </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={isPending}
-                            onClick={() =>
-                              handleUnassignGuest(guest.id, guest.name)
-                            }
-                          >
-                            Remove
-                          </Button>
-                        </TableCell>
+                        {isSuperAdmin && (
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={isPending}
+                              onClick={() =>
+                                handleUnassignGuest(guest.id, guest.name)
+                              }
+                            >
+                              Remove
+                            </Button>
+                          </TableCell>
+                        )}
                       </TableRow>
                     )
                   })}

@@ -20,9 +20,10 @@ import {
 
 interface SeatingClientProps {
   initialData: SeatingOverviewDto
+  isSuperAdmin?: boolean
 }
 
-export function SeatingClient({ initialData }: SeatingClientProps) {
+export function SeatingClient({ initialData, isSuperAdmin = false }: SeatingClientProps) {
   const [tables, setTables] = useState<WeddingTableDto[]>(initialData.tables)
   const [unassigned, setUnassigned] = useState<GuestDto[]>(
     initialData.unassignedGuests,
@@ -272,6 +273,7 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
         totalGuests={totalGuests}
         assignedGuests={assignedGuests}
         onCreateTable={handleCreateTable}
+        isSuperAdmin={isSuperAdmin}
       />
       <div className="flex flex-1 overflow-hidden">
         <DragDropProvider onDragEnd={handleDragEnd}>
@@ -280,6 +282,7 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
             selectedGuestIds={selectedGuestIds}
             onToggleSelect={handleToggleGuestSelect}
             onSelectAll={handleSelectAllGuests}
+            isSuperAdmin={isSuperAdmin}
           />
           <SeatingCanvas
             tables={tables}
@@ -287,6 +290,7 @@ export function SeatingClient({ initialData }: SeatingClientProps) {
             onEditTable={setEditingTable}
             onDeleteTable={handleDeleteTable}
             onClearTable={handleClearTable}
+            isSuperAdmin={isSuperAdmin}
           />
           <DragOverlay dropAnimation={null}>
             {(source) => {

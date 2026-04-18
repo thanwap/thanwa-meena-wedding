@@ -159,6 +159,21 @@ export async function regenerateGuests(rsvpId: number): Promise<void> {
   revalidatePath("/admin/rsvps")
 }
 
+export async function updateGuestCount(id: number, guestCount: number): Promise<RsvpDto> {
+  const headers = await authHeaders()
+  const res = await fetch(`${API}/api/rsvps/${id}/guest-count`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ guestCount }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error ?? `Failed to update guest count: ${res.status}`)
+  }
+  revalidatePath("/admin/rsvps")
+  return res.json()
+}
+
 export async function batchDelete(ids: number[]): Promise<number> {
   const headers = await authHeaders()
   const res = await fetch(`${API}/api/rsvps/batch`, {

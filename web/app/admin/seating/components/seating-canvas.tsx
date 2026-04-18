@@ -9,6 +9,7 @@ interface SeatingCanvasProps {
   onEditTable: (table: WeddingTableDto) => void
   onDeleteTable: (tableId: number) => void
   onClearTable: (tableId: number) => void
+  isSuperAdmin?: boolean
 }
 
 export function SeatingCanvas({
@@ -17,6 +18,7 @@ export function SeatingCanvas({
   onEditTable,
   onDeleteTable,
   onClearTable,
+  isSuperAdmin = false,
 }: SeatingCanvasProps) {
   return (
     <div
@@ -37,6 +39,7 @@ export function SeatingCanvas({
             onEditTable={onEditTable}
             onDeleteTable={onDeleteTable}
             onClearTable={onClearTable}
+            isSuperAdmin={isSuperAdmin}
           />
         ))}
         {tables.length === 0 && (

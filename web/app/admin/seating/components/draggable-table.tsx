@@ -11,6 +11,7 @@ interface DraggableTableProps {
   onEditTable: (table: WeddingTableDto) => void
   onDeleteTable: (tableId: number) => void
   onClearTable: (tableId: number) => void
+  isSuperAdmin?: boolean
 }
 
 export const DraggableTable = memo(function DraggableTable({
@@ -19,10 +20,12 @@ export const DraggableTable = memo(function DraggableTable({
   onEditTable,
   onDeleteTable,
   onClearTable,
+  isSuperAdmin = false,
 }: DraggableTableProps) {
   const { ref, isDragging } = useDraggable({
     id: `move-table-${table.id}`,
     data: { type: "table-move", tableId: table.id },
+    disabled: !isSuperAdmin,
   })
 
   return (
@@ -32,7 +35,7 @@ export const DraggableTable = memo(function DraggableTable({
         position: "absolute",
         left: table.positionX,
         top: table.positionY,
-        cursor: "grab",
+        cursor: isSuperAdmin ? "grab" : "default",
         opacity: isDragging ? 0.5 : 1,
       }}
     >
@@ -42,6 +45,7 @@ export const DraggableTable = memo(function DraggableTable({
         onEditTable={onEditTable}
         onDeleteTable={onDeleteTable}
         onClearTable={onClearTable}
+        isSuperAdmin={isSuperAdmin}
       />
     </div>
   )
