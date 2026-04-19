@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
@@ -51,8 +52,8 @@ public class GuestbookService : IGuestbookService
         var now = DateTime.UtcNow;
         var entry = new GuestbookEntry
         {
-            Name = request.Name.Trim(),
-            Message = request.Message.Trim(),
+            Name = HtmlEncoder.Default.Encode(request.Name.Trim()),
+            Message = HtmlEncoder.Default.Encode(request.Message.Trim()),
             ImageUrls = imageUrls.Count > 0 ? JsonSerializer.Serialize(imageUrls) : null,
             CreatedAt = now,
             UpdatedAt = now,

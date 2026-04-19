@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Encodings.Web;
 using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
@@ -33,10 +34,10 @@ public class RsvpService : IRsvpService
         var rsvp = new Rsvp
         {
             Attending = request.Attending,
-            Name = request.Name.Trim(),
+            Name = HtmlEncoder.Default.Encode(request.Name.Trim()),
             GuestCount = request.GuestCount,
-            Dietary = request.Dietary,
-            Message = request.Message,
+            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : HtmlEncoder.Default.Encode(request.Dietary.Trim()),
+            Message = string.IsNullOrWhiteSpace(request.Message) ? null : HtmlEncoder.Default.Encode(request.Message.Trim()),
             Status = "pending",
             CreatedAt = now,
             UpdatedAt = now
@@ -66,10 +67,10 @@ public class RsvpService : IRsvpService
         var rsvp = new Rsvp
         {
             Attending = request.Attending,
-            Name = request.Name.Trim(),
+            Name = HtmlEncoder.Default.Encode(request.Name.Trim()),
             GuestCount = request.GuestCount,
-            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : request.Dietary.Trim(),
-            Message = string.IsNullOrWhiteSpace(request.Message) ? null : request.Message.Trim(),
+            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : HtmlEncoder.Default.Encode(request.Dietary.Trim()),
+            Message = string.IsNullOrWhiteSpace(request.Message) ? null : HtmlEncoder.Default.Encode(request.Message.Trim()),
             Status = status,
             CreatedAt = now,
             UpdatedAt = now
