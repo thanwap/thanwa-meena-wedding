@@ -12,6 +12,12 @@ export async function proxy(request: NextRequest) {
       new URL(`/admin/login?callbackUrl=${callbackUrl}`, request.url)
     )
   }
+
+  const isSuperAdminRoute = request.nextUrl.pathname.startsWith("/admin/users")
+  if (isSuperAdminRoute && session.role !== "super_admin") {
+    return NextResponse.redirect(new URL("/admin", request.url))
+  }
+
   return NextResponse.next()
 }
 
