@@ -110,10 +110,10 @@ public class AuthService : IAuthService
     private static string GeneratePassword(int length = 16)
     {
         const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-        var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        var bytes = new byte[length];
-        rng.GetBytes(bytes);
-        return new string(bytes.Select(b => chars[b % chars.Length]).ToArray());
+        var sb = new System.Text.StringBuilder(length);
+        for (var i = 0; i < length; i++)
+            sb.Append(chars[System.Security.Cryptography.RandomNumberGenerator.GetInt32(chars.Length)]);
+        return sb.ToString();
     }
 
     private string IssueToken(string username, string role)
