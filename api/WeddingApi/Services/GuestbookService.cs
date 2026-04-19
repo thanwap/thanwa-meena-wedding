@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
@@ -9,6 +10,10 @@ namespace WeddingApi.Services;
 
 public class GuestbookService : IGuestbookService
 {
+    // Encodes only HTML-dangerous chars (<, >, &, ", ') — leaves Thai/Unicode intact
+    private static readonly HtmlEncoder SafeEncoder =
+        HtmlEncoder.Create(new TextEncoderSettings(UnicodeRanges.All));
+
     private static readonly string[] AllowedMimeTypes =
         ["image/jpeg", "image/png", "image/webp", "image/heic"];
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
@@ -52,8 +57,8 @@ public class GuestbookService : IGuestbookService
         var now = DateTime.UtcNow;
         var entry = new GuestbookEntry
         {
-            Name = HtmlEncoder.Default.Encode(request.Name.Trim()),
-            Message = HtmlEncoder.Default.Encode(request.Message.Trim()),
+            Name = SafeEncoder.Encode(request.Name.Trim()),
+            Message = SafeEncoder.Encode(request.Message.Trim()),
             ImageUrls = imageUrls.Count > 0 ? JsonSerializer.Serialize(imageUrls) : null,
             CreatedAt = now,
             UpdatedAt = now,

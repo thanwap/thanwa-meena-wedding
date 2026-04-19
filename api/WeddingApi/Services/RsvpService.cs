@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
@@ -9,6 +10,10 @@ namespace WeddingApi.Services;
 
 public class RsvpService : IRsvpService
 {
+    // Encodes only HTML-dangerous chars (<, >, &, ", ') — leaves Thai/Unicode intact
+    private static readonly HtmlEncoder SafeEncoder =
+        HtmlEncoder.Create(new TextEncoderSettings(UnicodeRanges.All));
+
     private readonly AppDbContext _db;
     private readonly ISeatingService _seating;
 
@@ -34,10 +39,10 @@ public class RsvpService : IRsvpService
         var rsvp = new Rsvp
         {
             Attending = request.Attending,
-            Name = HtmlEncoder.Default.Encode(request.Name.Trim()),
+            Name = SafeEncoder.Encode(request.Name.Trim()),
             GuestCount = request.GuestCount,
-            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : HtmlEncoder.Default.Encode(request.Dietary.Trim()),
-            Message = string.IsNullOrWhiteSpace(request.Message) ? null : HtmlEncoder.Default.Encode(request.Message.Trim()),
+            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : SafeEncoder.Encode(request.Dietary.Trim()),
+            Message = string.IsNullOrWhiteSpace(request.Message) ? null : SafeEncoder.Encode(request.Message.Trim()),
             Status = "pending",
             CreatedAt = now,
             UpdatedAt = now
@@ -67,10 +72,10 @@ public class RsvpService : IRsvpService
         var rsvp = new Rsvp
         {
             Attending = request.Attending,
-            Name = HtmlEncoder.Default.Encode(request.Name.Trim()),
+            Name = SafeEncoder.Encode(request.Name.Trim()),
             GuestCount = request.GuestCount,
-            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : HtmlEncoder.Default.Encode(request.Dietary.Trim()),
-            Message = string.IsNullOrWhiteSpace(request.Message) ? null : HtmlEncoder.Default.Encode(request.Message.Trim()),
+            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : SafeEncoder.Encode(request.Dietary.Trim()),
+            Message = string.IsNullOrWhiteSpace(request.Message) ? null : SafeEncoder.Encode(request.Message.Trim()),
             Status = status,
             CreatedAt = now,
             UpdatedAt = now
