@@ -52,6 +52,7 @@ public class GuestbookController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
+    [EnableRateLimiting("guestbook-get")]
     public async Task<IActionResult> List([FromQuery] int count = 0)
     {
         var entries = await _service.ListPublicAsync(count);
