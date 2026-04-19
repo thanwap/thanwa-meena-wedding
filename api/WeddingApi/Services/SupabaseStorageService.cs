@@ -8,14 +8,14 @@ public class SupabaseStorageService : IStorageService
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _baseUrl;
-    private readonly string _serviceKey;
+    private readonly string _anonKey;
 
     public SupabaseStorageService(IConfiguration config, IHttpClientFactory httpClientFactory)
     {
         _baseUrl = (config["Supabase:Url"]
             ?? throw new InvalidOperationException("Supabase:Url is not configured")).TrimEnd('/');
-        _serviceKey = config["Supabase:ServiceKey"]
-            ?? throw new InvalidOperationException("Supabase:ServiceKey is not configured");
+        _anonKey = config["Supabase:AnonKey"]
+            ?? throw new InvalidOperationException("Supabase:AnonKey is not configured");
         _httpClientFactory = httpClientFactory;
     }
 
@@ -30,8 +30,8 @@ public class SupabaseStorageService : IStorageService
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"{_baseUrl}/storage/v1/object/{Bucket}/{uniqueName}");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _serviceKey);
-        request.Headers.Add("apikey", _serviceKey);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _anonKey);
+        request.Headers.Add("apikey", _anonKey);
         request.Content = content;
 
         var client = _httpClientFactory.CreateClient();
