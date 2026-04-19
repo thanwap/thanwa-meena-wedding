@@ -40,3 +40,12 @@ public record GuestGenerateRequest(int RsvpId);
 public record GuestUpdateRequest(
     string? Name,
     int? TableId);
+
+// Public DTOs (no auth required)
+public record TableSearchResultDto(
+    string TableName,
+    List<string> Guests);
+
+public record GuestSearchResponseDto(
+    string GuestName,
+    TableSearchResultDto? Table);

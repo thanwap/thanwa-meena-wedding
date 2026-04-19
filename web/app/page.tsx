@@ -208,6 +208,27 @@ export default async function Page() {
           <Countdown />
         </div>
 
+        {/* Find Your Table link */}
+        <div className="hero-5 mt-8">
+          <a
+            href="/table"
+            className="inline-flex items-center gap-2"
+            style={{
+              fontFamily: "var(--font-josefin)",
+              fontSize: 10,
+              letterSpacing: "0.32em",
+              textTransform: "uppercase",
+              color: "var(--c-sage)",
+              textDecoration: "none",
+              borderBottom: "1px solid var(--c-sage-light)",
+              paddingBottom: 3,
+              transition: "color 0.2s ease, border-color 0.2s ease",
+            }}
+          >
+            ค้นหาโต๊ะของคุณ
+          </a>
+        </div>
+
         {/* Scroll indicator */}
         <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2">
           <svg

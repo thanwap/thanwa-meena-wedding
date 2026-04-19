@@ -264,6 +264,29 @@ public class SeatingService : ISeatingService
         }
     }
 
+    public async Task<List<GuestSearchResponseDto>> SearchGuestsAsync(string name)
+    {
+        var trimmed = name.Trim();
+        if (string.IsNullOrEmpty(trimmed))
+            return [];
+
+        var matchingGuests = await _db.Guests
+            .Include(g => g.Table!)
+                .ThenInclude(t => t.Guests)
+            .Where(g => g.Name.Contains(trimmed))
+            .OrderBy(g => g.SortOrder)
+            .ToListAsync();
+
+        return matchingGuests.Select(g => new GuestSearchResponseDto(
+            g.Name,
+            g.Table is null
+                ? null
+                : new TableSearchResultDto(
+                    g.Table.Name,
+                    g.Table.Guests.OrderBy(tg => tg.SortOrder).Select(tg => tg.Name).ToList())
+        )).ToList();
+    }
+
     private static WeddingTableDto ToTableDto(WeddingTable t) =>
         new(t.Id, t.Name, t.Capacity, t.Shape, t.PositionX, t.PositionY,
             t.Guests.OrderBy(g => g.SortOrder).Select(ToGuestDto).ToList());

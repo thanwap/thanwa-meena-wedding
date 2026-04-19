@@ -56,10 +56,10 @@ export function NavMenu() {
 
   return (
     <>
-      {/* ── Desktop top bar (md+) ─────────────────── */}
+      {/* ── Desktop top bar (lg+) ─────────────────── */}
       <nav
         aria-label="Page sections"
-        className="hidden md:block"
+        className="hidden lg:block"
         style={{
           position: "fixed",
           top: 0,
@@ -140,9 +140,9 @@ export function NavMenu() {
         </ul>
       </nav>
 
-      {/* ── Mobile floating pill (< md) ──────────── */}
+      {/* ── Mobile floating pill (< lg) ──────────── */}
       <div
-        className="md:hidden"
+        className="lg:hidden"
         style={{
           position: "fixed",
           bottom: 28,
@@ -204,7 +204,7 @@ export function NavMenu() {
       {/* ── Mobile overlay ────────────────────────── */}
       <div
         ref={overlayRef}
-        className="md:hidden"
+        className="lg:hidden"
         onClick={(e) => { if (e.target === overlayRef.current) setOpen(false) }}
         style={{
           position: "fixed",

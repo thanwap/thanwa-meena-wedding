@@ -15,4 +15,5 @@ public interface ISeatingService
     Task<bool> UnassignGuestAsync(int id);
     Task DeleteGuestsByRsvpAsync(int rsvpId);
     Task<List<GuestDto>> RegenerateGuestsForRsvpAsync(int rsvpId);
+    Task<List<GuestSearchResponseDto>> SearchGuestsAsync(string name);
 }
