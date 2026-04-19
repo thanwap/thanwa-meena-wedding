@@ -68,7 +68,8 @@ npm run build        # next build
 
 ```bash
 dotnet build
-dotnet test                                # unit + integration (Testcontainers)
+dotnet test                                # unit + integration (Testcontainers — requires Docker running)
+dotnet test --filter "Category!=Integration"  # unit tests only (no Docker needed)
 dotnet run                                 # local API
 dotnet run -- seed-admins                  # create thanwa/meena with random passwords
 dotnet run -- reset-admins                 # regenerate passwords for existing users
@@ -91,6 +92,13 @@ npm run lint && npm test && npm run build
 ```bash
 dotnet build && dotnet test
 ```
+
+- **Unit tests** (`WeddingApi.UnitTests`) — always required, no dependencies, run anywhere.
+- **Integration tests** (`WeddingApi.IntegrationTests`) — require Docker running (Testcontainers spins up Postgres). If Docker is not available locally, run unit tests only:
+  ```bash
+  dotnet test --filter "Category!=Integration"
+  ```
+- CI always runs the full suite (Docker is available). Both must pass before tagging.
 
 Only tag after the relevant checklist passes locally. CI runs the same commands on
 tag push; failure blocks the deploy.
