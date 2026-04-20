@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { TableSearch } from "./table-search"
 
 export const metadata: Metadata = {
@@ -84,6 +85,20 @@ export default function TablePage() {
 
         {/* Search */}
         <TableSearch />
+
+        {/* Back link */}
+        <div className="mt-10 text-center">
+          <Link
+            href="/"
+            className="font-[family-name:var(--font-josefin)] inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase"
+            style={{ color: "var(--c-muted)" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            กลับหน้าหลัก
+          </Link>
+        </div>
       </div>
     </main>
   )

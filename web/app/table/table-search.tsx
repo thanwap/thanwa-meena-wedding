@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { searchTable } from "./actions"
 
 interface TableSearchResult {
@@ -20,50 +20,55 @@ export function TableSearch() {
   const [isPending, startTransition] = useTransition()
   const [hasSearched, setHasSearched] = useState(false)
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
+  useEffect(() => {
     if (query.trim().length < 2) return
-
-    startTransition(async () => {
-      setError(null)
-      const res = await searchTable(query)
-      setHasSearched(true)
-      if ("error" in res) {
-        setError(res.error)
-        setResults(null)
-      } else {
-        setResults(res.results)
+    const timer = setTimeout(() => {
+      startTransition(async () => {
         setError(null)
-      }
-    })
-  }
+        const res = await searchTable(query)
+        setHasSearched(true)
+        if ("error" in res) {
+          setError(res.error)
+          setResults(null)
+        } else {
+          setResults(res.results)
+          setError(null)
+        }
+      })
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [query])
 
   return (
     <div>
-      {/* Search Form */}
-      <form onSubmit={handleSearch} className="flex gap-2">
+      {/* Search Input */}
+      <div className="relative">
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value
+            setQuery(val)
+            if (val.trim().length < 2) {
+              setResults(null)
+              setHasSearched(false)
+              setError(null)
+            }
+          }}
           placeholder="พิมพ์ชื่อของคุณ..."
-          className="rsvp-input flex-1"
+          className="rsvp-input w-full"
           autoComplete="off"
           autoFocus
         />
-        <button
-          type="submit"
-          disabled={isPending || query.trim().length < 2}
-          className="shrink-0 rounded-none border px-5 py-2 font-[family-name:var(--font-josefin)] text-xs tracking-[0.15em] uppercase transition-colors disabled:opacity-40"
-          style={{
-            borderColor: "var(--c-sage)",
-            color: isPending ? "var(--c-muted)" : "var(--c-sage)",
-            background: "transparent",
-          }}
-        >
-          {isPending ? "กำลังค้นหา..." : "ค้นหา"}
-        </button>
-      </form>
+        {isPending && (
+          <span
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-[family-name:var(--font-josefin)] text-[10px] tracking-[0.2em] uppercase"
+            style={{ color: "var(--c-muted)" }}
+          >
+            กำลังค้นหา...
+          </span>
+        )}
+      </div>
 
       {/* Error */}
       {error && (
