@@ -246,24 +246,6 @@ export function RSVPForm() {
             )}
           </div>
 
-          {/* Message */}
-          <div>
-            <label style={LABEL} htmlFor="rsvp-msg">
-              ข้อความถึงบ่าวสาว
-            </label>
-            <textarea
-              id="rsvp-msg"
-              name="message"
-              rows={3}
-              className="rsvp-textarea"
-              placeholder="ส่งคำอวยพร หรือข้อความพิเศษถึงบ่าวสาว..."
-              value={form.message}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, message: e.target.value }))
-              }
-            />
-          </div>
-
           {/* Inline error */}
           {formError && (
             <p

@@ -1,9 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { auth } from "@/auth"
-
-const API = process.env.DOTNET_API_URL!
+import { adminFetch } from "@/lib/admin-fetch"
 
 export type RsvpStatus = "pending" | "confirmed" | "cancelled"
 
@@ -38,26 +36,8 @@ export interface PagedResult<T> {
   totalPages: number
 }
 
-async function getIdToken(): Promise<string> {
-  const session = await auth()
-  if (!session?.idToken) throw new Error("Not authenticated")
-  return session.idToken
-}
-
-async function authHeaders() {
-  const token = await getIdToken()
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  }
-}
-
 export async function getStats(): Promise<RsvpStatsDto> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/stats`, {
-    headers,
-    cache: "no-store",
-  })
+  const res = await adminFetch("/api/rsvps/stats", { cache: "no-store" })
   if (!res.ok) throw new Error(`Failed to fetch RSVP stats: ${res.status}`)
   return res.json()
 }
@@ -68,23 +48,17 @@ export async function getRsvps(
   search = "",
   status = "",
 ): Promise<PagedResult<RsvpDto>> {
-  const headers = await authHeaders()
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) })
   if (search) params.set("search", search)
   if (status && status !== "all") params.set("status", status)
-  const res = await fetch(`${API}/api/rsvps?${params}`, { headers, cache: "no-store" })
+  const res = await adminFetch(`/api/rsvps?${params}`, { cache: "no-store" })
   if (!res.ok) throw new Error(`Failed to fetch RSVPs: ${res.status}`)
   return res.json()
 }
 
-export async function updateRsvpStatus(
-  id: number,
-  status: RsvpStatus,
-): Promise<void> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/${id}`, {
+export async function updateRsvpStatus(id: number, status: RsvpStatus): Promise<void> {
+  const res = await adminFetch(`/api/rsvps/${id}`, {
     method: "PATCH",
-    headers,
     body: JSON.stringify({ status }),
   })
   if (!res.ok) throw new Error(`Failed to update RSVP status: ${res.status}`)
@@ -101,10 +75,8 @@ export interface CreateRsvpInput {
 }
 
 export async function createRsvp(input: CreateRsvpInput): Promise<RsvpDto> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/admin`, {
+  const res = await adminFetch("/api/rsvps/admin", {
     method: "POST",
-    headers,
     body: JSON.stringify({
       name: input.name,
       attending: input.attending,
@@ -123,20 +95,14 @@ export async function createRsvp(input: CreateRsvpInput): Promise<RsvpDto> {
 }
 
 export async function deleteRsvp(id: number): Promise<void> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/${id}`, {
-    method: "DELETE",
-    headers,
-  })
+  const res = await adminFetch(`/api/rsvps/${id}`, { method: "DELETE" })
   if (!res.ok) throw new Error(`Failed to delete RSVP: ${res.status}`)
   revalidatePath("/admin/rsvps")
 }
 
 export async function batchUpdateStatus(ids: number[], status: RsvpStatus): Promise<number> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/batch-status`, {
+  const res = await adminFetch("/api/rsvps/batch-status", {
     method: "POST",
-    headers,
     body: JSON.stringify({ ids, status }),
   })
   if (!res.ok) throw new Error(`Failed to batch update status: ${res.status}`)
@@ -146,10 +112,8 @@ export async function batchUpdateStatus(ids: number[], status: RsvpStatus): Prom
 }
 
 export async function regenerateGuests(rsvpId: number): Promise<void> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/seating/guests/regenerate`, {
+  const res = await adminFetch("/api/seating/guests/regenerate", {
     method: "POST",
-    headers,
     body: JSON.stringify({ rsvpId }),
   })
   if (!res.ok) {
@@ -160,10 +124,8 @@ export async function regenerateGuests(rsvpId: number): Promise<void> {
 }
 
 export async function updateGuestCount(id: number, guestCount: number): Promise<RsvpDto> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/${id}/guest-count`, {
+  const res = await adminFetch(`/api/rsvps/${id}/guest-count`, {
     method: "PATCH",
-    headers,
     body: JSON.stringify({ guestCount }),
   })
   if (!res.ok) {
@@ -175,10 +137,8 @@ export async function updateGuestCount(id: number, guestCount: number): Promise<
 }
 
 export async function batchDelete(ids: number[]): Promise<number> {
-  const headers = await authHeaders()
-  const res = await fetch(`${API}/api/rsvps/batch`, {
+  const res = await adminFetch("/api/rsvps/batch", {
     method: "DELETE",
-    headers,
     body: JSON.stringify({ ids }),
   })
   if (!res.ok) throw new Error(`Failed to batch delete: ${res.status}`)
