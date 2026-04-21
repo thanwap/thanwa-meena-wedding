@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server"
 
 const API = process.env.DOTNET_API_URL!
 
-const ALLOWED_ORIGIN = (process.env.AUTH_URL ?? "http://localhost:3000").replace(/\/$/, "")
-
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin")
-  if (!origin || origin !== ALLOWED_ORIGIN) {
+  const expectedOrigin = request.nextUrl.origin
+  if (!origin || origin !== expectedOrigin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
