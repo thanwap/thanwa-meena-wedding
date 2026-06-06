@@ -1,3 +1,4 @@
+import Script from "next/script"
 import { PhotoGallery } from "@/components/photo-booth/photo-gallery"
 
 export const metadata = {
@@ -6,5 +7,10 @@ export const metadata = {
 }
 
 export default function GalleryPage() {
-  return <PhotoGallery />
+  return (
+    <>
+      <Script src="/pixels.js" strategy="afterInteractive" />
+      <PhotoGallery />
+    </>
+  )
 }

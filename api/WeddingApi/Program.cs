@@ -84,7 +84,7 @@ builder.Services.AddRateLimiter(options =>
     });
     options.AddFixedWindowLimiter("photos-upload", opt =>
     {
-        opt.PermitLimit = 12; // slightly above 10-photo limit to allow retries
+        opt.PermitLimit = 100;
         opt.Window = TimeSpan.FromHours(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;

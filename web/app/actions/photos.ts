@@ -61,14 +61,32 @@ export async function getPhotos(options?: {
 export async function uploadPhoto(
   formData: FormData,
 ): Promise<PhotoRecord | { error: string }> {
-  const res = await fetch(`${API}/api/photos/upload`, {
-    method: "POST",
-    body: formData,
-  })
+  let res: Response
+  try {
+    res = await fetch(`${API}/api/photos/upload`, {
+      method: "POST",
+      body: formData,
+    })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("[uploadPhoto] network error:", msg)
+    return { error: `ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (${msg})` }
+  }
 
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    return { error: body.error ?? "Upload failed, please try again" }
+    const text = await res.text().catch(() => "")
+    console.error("[uploadPhoto]", res.status, text)
+    let detail = ""
+    try {
+      const body = JSON.parse(text)
+      detail = body.error ?? body.message ?? body.title ?? ""
+    } catch {
+      detail = text.slice(0, 300)
+    }
+    const message = detail
+      ? `อัปโหลดไม่สำเร็จ (HTTP ${res.status}): ${detail}`
+      : `อัปโหลดไม่สำเร็จ (HTTP ${res.status})`
+    return { error: message }
   }
 
   const dto: ApiPhotoDto = await res.json()

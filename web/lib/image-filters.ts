@@ -1,3 +1,13 @@
+declare global {
+  interface Window {
+    pixelsJS: {
+      filterImgData(imageData: ImageData, filter: string): ImageData
+      filterImg(img: HTMLImageElement, filter: string): void
+      getFilterList(): string[]
+    }
+  }
+}
+
 export type FilterName = "none" | "warm-vintage" | "cool-film" | "bw-classic"
 
 export interface FilterPreset {
@@ -35,11 +45,27 @@ export const FILTER_PRESETS: FilterPreset[] = [
   },
 ]
 
+/** Maps our filter IDs to pixels.js filter names */
+export const PIXELS_JS_FILTER: Record<Exclude<FilterName, "none">, string> = {
+  "warm-vintage": "vintage",
+  "cool-film": "cool_twilight",
+  "bw-classic": "greyscale",
+}
+
 function clamp(v: number): number {
   return Math.max(0, Math.min(255, Math.round(v)))
 }
 
-/** Apply pixel-level filter to a canvas. Call after drawing image/video frame. */
+function addGrain(data: Uint8ClampedArray): void {
+  for (let i = 0; i < data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 22
+    data[i] = clamp(data[i] + noise)
+    data[i + 1] = clamp(data[i + 1] + noise)
+    data[i + 2] = clamp(data[i + 2] + noise)
+  }
+}
+
+/** Apply pixel-level filter to a canvas using pixels.js. Call after drawing image/video frame. */
 export function applyFilterToCanvas(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -49,63 +75,18 @@ export function applyFilterToCanvas(
 ): void {
   if (filter === "none") return
 
+  const pixelsFilterName = PIXELS_JS_FILTER[filter]
   const imageData = ctx.getImageData(0, 0, width, height)
-  const d = imageData.data
 
-  for (let i = 0; i < d.length; i += 4) {
-    let r = d[i]
-    let g = d[i + 1]
-    let b = d[i + 2]
+  if (typeof window !== "undefined" && window.pixelsJS) {
+    window.pixelsJS.filterImgData(imageData, pixelsFilterName)
+  }
 
-    if (filter === "warm-vintage") {
-      // Warm tones: boost red, reduce blue, lift shadows
-      const luma = 0.299 * r + 0.587 * g + 0.114 * b
-      const lift = Math.max(0, (80 - luma) * 0.2) // lift shadows only
-      r = clamp(r * 1.08 + lift)
-      g = clamp(g * 1.02 + lift)
-      b = clamp(b * 0.82 + lift)
-      // Sepia blend at 40%
-      const sr = clamp(r * 0.393 + g * 0.769 + b * 0.189)
-      const sg = clamp(r * 0.349 + g * 0.686 + b * 0.168)
-      const sb = clamp(r * 0.272 + g * 0.534 + b * 0.131)
-      r = clamp(r * 0.6 + sr * 0.4)
-      g = clamp(g * 0.6 + sg * 0.4)
-      b = clamp(b * 0.6 + sb * 0.4)
-    } else if (filter === "cool-film") {
-      // Filmic fade: lift blacks, slight blue cast in shadows
-      r = clamp(r * 0.88 + 20)
-      g = clamp(g * 0.88 + 20)
-      b = clamp(b * 0.9 + 28)
-      // Desaturate slightly
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b
-      r = clamp(r * 0.8 + gray * 0.2)
-      g = clamp(g * 0.8 + gray * 0.2)
-      b = clamp(b * 0.8 + gray * 0.2)
-    } else if (filter === "bw-classic") {
-      // Luminance grayscale with boosted contrast
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b
-      const contrasted = clamp((gray - 128) * 1.25 + 128)
-      r = contrasted
-      g = contrasted
-      b = contrasted
-    }
-
-    // Grain
-    if (withGrain) {
-      const noise = (Math.random() - 0.5) * 22
-      r = clamp(r + noise)
-      g = clamp(g + noise)
-      b = clamp(b + noise)
-    }
-
-    d[i] = r
-    d[i + 1] = g
-    d[i + 2] = b
+  if (withGrain) {
+    addGrain(imageData.data)
   }
 
   ctx.putImageData(imageData, 0, 0)
-
-  // Vignette
   addVignette(ctx, width, height, filter)
 }
 

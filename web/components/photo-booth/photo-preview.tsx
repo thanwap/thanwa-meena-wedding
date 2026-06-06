@@ -135,16 +135,29 @@ export function PhotoPreview({
         )}
 
         {error && (
-          <p
+          <div
             style={{
-              fontFamily: "var(--font-sarabun)",
-              fontSize: 13,
-              color: "#f87171",
-              margin: 0,
+              background: "rgba(248,113,113,0.12)",
+              border: "1px solid rgba(248,113,113,0.4)",
+              borderRadius: 10,
+              padding: "10px 14px",
+              maxHeight: 120,
+              overflowY: "auto",
             }}
           >
-            {error}
-          </p>
+            <p
+              style={{
+                fontFamily: "var(--font-sarabun)",
+                fontSize: 12,
+                color: "#f87171",
+                margin: 0,
+                lineHeight: 1.6,
+                wordBreak: "break-all",
+              }}
+            >
+              {error}
+            </p>
+          </div>
         )}
 
         <div style={{ display: "flex", gap: 12 }}>

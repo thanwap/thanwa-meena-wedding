@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { FILTER_PRESETS, applyFilterToCanvas, type FilterName } from "@/lib/image-filters"
+import { PIXELS_JS_FILTER, applyFilterToCanvas, type FilterName } from "@/lib/image-filters"
 import { compressToBlob } from "@/lib/image-compress"
 import { FilterSelector } from "./filter-selector"
 
@@ -24,12 +24,15 @@ interface Props {
 
 export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null)
+  const uploadCanvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [facing, setFacing] = useState<"environment" | "user">("environment")
   const [filter, setFilter] = useState<FilterName>("none")
   const [error, setError] = useState<string | null>(null)
   const [capturing, setCapturing] = useState(false)
+  const [pendingUpload, setPendingUpload] = useState<{ file: File; previewUrl: string } | null>(null)
   const atLimit = photoCount >= maxPhotos
 
   const startCamera = useCallback(async (facingMode: "environment" | "user") => {
@@ -60,6 +63,71 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
       stream?.getTracks().forEach((t) => t.stop())
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Live preview: draw video → canvas with pixels.js filter every animation frame
+  useEffect(() => {
+    if (!stream || pendingUpload) return
+    const canvas = previewCanvasRef.current
+    const video = videoRef.current
+    if (!canvas || !video) return
+
+    let frameId: number
+    let sized = false
+
+    const draw = () => {
+      if (video.readyState >= 2 && video.videoWidth > 0) {
+        if (!sized) {
+          // Cap preview resolution for performance
+          const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight))
+          canvas.width = Math.round(video.videoWidth * scale)
+          canvas.height = Math.round(video.videoHeight * scale)
+          sized = true
+        }
+        const { width: w, height: h } = canvas
+        const ctx = canvas.getContext("2d")!
+        // Mirror front camera in canvas draw rather than CSS transform
+        if (facing === "user") {
+          ctx.save()
+          ctx.scale(-1, 1)
+          ctx.drawImage(video, -w, 0, w, h)
+          ctx.restore()
+        } else {
+          ctx.drawImage(video, 0, 0, w, h)
+        }
+        if (filter !== "none" && typeof window !== "undefined" && window.pixelsJS) {
+          const imageData = ctx.getImageData(0, 0, w, h)
+          window.pixelsJS.filterImgData(imageData, PIXELS_JS_FILTER[filter])
+          ctx.putImageData(imageData, 0, 0)
+        }
+      }
+      frameId = requestAnimationFrame(draw)
+    }
+
+    frameId = requestAnimationFrame(draw)
+    return () => cancelAnimationFrame(frameId)
+  }, [stream, filter, facing, pendingUpload])
+
+  // Upload preview: draw image to canvas with pixels.js filter (re-runs when filter changes)
+  useEffect(() => {
+    if (!pendingUpload) return
+    const canvas = uploadCanvasRef.current
+    if (!canvas) return
+
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight))
+      canvas.width = Math.round(img.naturalWidth * scale)
+      canvas.height = Math.round(img.naturalHeight * scale)
+      const ctx = canvas.getContext("2d")!
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      if (filter !== "none" && typeof window !== "undefined" && window.pixelsJS) {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        window.pixelsJS.filterImgData(imageData, PIXELS_JS_FILTER[filter])
+        ctx.putImageData(imageData, 0, 0)
+      }
+    }
+    img.src = pendingUpload.previewUrl
+  }, [pendingUpload, filter])
 
   const flipCamera = () => {
     const next = facing === "environment" ? "user" : "environment"
@@ -99,12 +167,19 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
     }
   }
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || atLimit) return
+    const previewUrl = URL.createObjectURL(file)
+    setPendingUpload({ file, previewUrl })
+    e.target.value = ""
+  }
+
+  const handleConfirmUpload = async () => {
+    if (!pendingUpload || capturing || atLimit) return
     setCapturing(true)
     try {
-      const bmp = await createImageBitmap(file)
+      const bmp = await createImageBitmap(pendingUpload.file)
       const scale = Math.min(1, MAX_CAPTURE_PX / Math.max(bmp.width, bmp.height))
       const w = Math.round(bmp.width * scale)
       const h = Math.round(bmp.height * scale)
@@ -122,18 +197,23 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
         compressToBlob(canvas, THUMB_PX, 0.75),
       ])
 
-      const previewUrl = URL.createObjectURL(fullBlob)
-      onCapture({ fullBlob, thumbBlob, filterName: filter, previewUrl })
+      URL.revokeObjectURL(pendingUpload.previewUrl)
+      setPendingUpload(null)
+      const finalPreviewUrl = URL.createObjectURL(fullBlob)
+      onCapture({ fullBlob, thumbBlob, filterName: filter, previewUrl: finalPreviewUrl })
     } catch {
       setError("Could not process this image.")
     } finally {
       setCapturing(false)
-      e.target.value = ""
     }
   }
 
-  // CSS filter for real-time video preview
-  const videoFilter = FILTER_PRESETS.find((p) => p.id === filter)?.css ?? "none"
+  const handleCancelUpload = () => {
+    if (pendingUpload) {
+      URL.revokeObjectURL(pendingUpload.previewUrl)
+      setPendingUpload(null)
+    }
+  }
 
   return (
     <div
@@ -223,9 +303,19 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
         </button>
       </div>
 
-      {/* Video / error area */}
+      {/* Video / upload preview / error area */}
       <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
-        {error ? (
+        {pendingUpload ? (
+          <canvas
+            ref={uploadCanvasRef}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        ) : error ? (
           <div
             style={{
               position: "absolute",
@@ -254,19 +344,22 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
             </p>
           </div>
         ) : (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              filter: videoFilter === "none" ? undefined : videoFilter,
-              transform: facing === "user" ? "scaleX(-1)" : undefined,
-            }}
-          />
+          <>
+            {/* Hidden video — source for canvas drawing and for capture */}
+            <video ref={videoRef} autoPlay playsInline muted style={{ display: "none" }} />
+            {/* Canvas renders filtered live preview */}
+            <canvas
+              ref={previewCanvasRef}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </>
         )}
       </div>
 
@@ -278,95 +371,150 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
           paddingTop: 12,
         }}
       >
-        {/* Filter strip */}
+        {/* Filter strip — always visible */}
         <FilterSelector current={filter} onChange={setFilter} />
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 40,
-            paddingTop: 16,
-            paddingBottom: 8,
-          }}
-        >
-          {/* Upload from gallery */}
-          <label
+        {pendingUpload ? (
+          /* Upload confirm / cancel buttons */
+          <div
             style={{
-              cursor: atLimit ? "not-allowed" : "pointer",
-              opacity: atLimit ? 0.4 : 1,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
-              gap: 4,
+              justifyContent: "center",
+              gap: 12,
+              paddingTop: 16,
+              paddingBottom: 8,
+              paddingLeft: 24,
+              paddingRight: 24,
             }}
           >
-            <div
+            <button
+              onClick={handleCancelUpload}
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: "rgba(255,255,255,0.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-              }}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5" />
-                <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M3 15l5-5 4 4 3-3 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <span
-              style={{
+                flex: 1,
+                padding: "13px 0",
+                borderRadius: 12,
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "rgba(255,255,255,0.8)",
                 fontFamily: "var(--font-josefin)",
-                fontSize: 8,
-                letterSpacing: "0.15em",
+                fontSize: 11,
+                letterSpacing: "0.25em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,0.55)",
+                cursor: "pointer",
               }}
             >
-              คลัง
-            </span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              disabled={atLimit}
-              onChange={handleFileUpload}
-              style={{ display: "none" }}
-            />
-          </label>
-
-          {/* Shutter */}
-          <button
-            onClick={capture}
-            disabled={capturing || atLimit || !!error}
+              ยกเลิก
+            </button>
+            <button
+              onClick={handleConfirmUpload}
+              disabled={capturing}
+              style={{
+                flex: 2,
+                padding: "13px 0",
+                borderRadius: 12,
+                background: capturing ? "rgba(232,195,190,0.35)" : "rgba(232,195,190,0.9)",
+                border: "none",
+                color: capturing ? "rgba(0,0,0,0.4)" : "#2d1b1a",
+                fontFamily: "var(--font-josefin)",
+                fontSize: 11,
+                letterSpacing: "0.25em",
+                textTransform: "uppercase",
+                cursor: capturing ? "not-allowed" : "pointer",
+                transition: "background 0.2s ease",
+              }}
+            >
+              {capturing ? "กำลังประมวลผล…" : "ใช้รูปนี้"}
+            </button>
+          </div>
+        ) : (
+          <div
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              background: atLimit ? "rgba(255,255,255,0.2)" : "#fff",
-              border: "4px solid rgba(255,255,255,0.4)",
-              cursor: capturing || atLimit || !!error ? "not-allowed" : "pointer",
-              opacity: capturing ? 0.6 : 1,
-              transition: "opacity 0.15s ease, transform 0.1s ease",
-              boxShadow: "0 0 0 2px rgba(255,255,255,0.15)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 40,
+              paddingTop: 16,
+              paddingBottom: 8,
             }}
-            onMouseDown={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.transform = "scale(0.93)")
-            }
-            onMouseUp={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.transform = "scale(1)")
-            }
-          />
+          >
+            {/* Upload from gallery */}
+            <label
+              style={{
+                cursor: atLimit ? "not-allowed" : "pointer",
+                opacity: atLimit ? 0.4 : 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: "rgba(255,255,255,0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                }}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M3 15l5-5 4 4 3-3 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span
+                style={{
+                  fontFamily: "var(--font-josefin)",
+                  fontSize: 8,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
+                คลัง
+              </span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                disabled={atLimit}
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
+            </label>
 
-          {/* Spacer to balance layout */}
-          <div style={{ width: 44 }} />
-        </div>
+            {/* Shutter */}
+            <button
+              onClick={capture}
+              disabled={capturing || atLimit || !!error}
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                background: atLimit ? "rgba(255,255,255,0.2)" : "#fff",
+                border: "4px solid rgba(255,255,255,0.4)",
+                cursor: capturing || atLimit || !!error ? "not-allowed" : "pointer",
+                opacity: capturing ? 0.6 : 1,
+                transition: "opacity 0.15s ease, transform 0.1s ease",
+                boxShadow: "0 0 0 2px rgba(255,255,255,0.15)",
+              }}
+              onMouseDown={(e) =>
+                ((e.currentTarget as HTMLButtonElement).style.transform = "scale(0.93)")
+              }
+              onMouseUp={(e) =>
+                ((e.currentTarget as HTMLButtonElement).style.transform = "scale(1)")
+              }
+            />
+
+            {/* Spacer to balance layout */}
+            <div style={{ width: 44 }} />
+          </div>
+        )}
       </div>
     </div>
   )
