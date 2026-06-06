@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 
-const NAV_ITEMS = [
+const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }> = [
   { id: "hero",      label: "Home",      th: "หน้าแรก" },
   { id: "story",     label: "Our Story", th: "เรื่องของเรา" },
   { id: "couple",    label: "The Couple",th: "บ่าวสาว" },
@@ -11,6 +12,7 @@ const NAV_ITEMS = [
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
   { id: "guestbook", label: "Guestbook", th: "ข้อความ" },
   { id: "dress",     label: "Dress Code",th: "การแต่งกาย" },
+  { id: "gallery",   label: "Gallery",   th: "รูปภาพ", href: "/gallery" },
 ]
 
 export function NavMenu() {
@@ -85,7 +87,7 @@ export function NavMenu() {
             listStyle: "none",
           }}
         >
-          {NAV_ITEMS.map(({ id, label }, i) => (
+          {NAV_ITEMS.map(({ id, label, href }, i) => (
             <li key={id} style={{ display: "flex", alignItems: "center" }}>
               {i > 0 && (
                 <span
@@ -102,39 +104,59 @@ export function NavMenu() {
                   }}
                 />
               )}
-              <button
-                onClick={() => scrollTo(id)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "14px 12px",
-                  fontFamily: "var(--font-josefin)",
-                  fontSize: 10,
-                  letterSpacing: "0.32em",
-                  textTransform: "uppercase",
-                  color: active === id ? "var(--c-blush-deep)" : "var(--c-muted)",
-                  position: "relative",
-                  transition: "color 0.25s ease",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {label}
-                {active === id && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      bottom: 8,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: 3,
-                      height: 3,
-                      borderRadius: "50%",
-                      background: "var(--c-blush-deep)",
-                    }}
-                  />
-                )}
-              </button>
+              {href ? (
+                <Link
+                  href={href}
+                  style={{
+                    display: "block",
+                    padding: "14px 12px",
+                    fontFamily: "var(--font-josefin)",
+                    fontSize: 10,
+                    letterSpacing: "0.32em",
+                    textTransform: "uppercase",
+                    color: "var(--c-muted)",
+                    textDecoration: "none",
+                    whiteSpace: "nowrap",
+                    transition: "color 0.25s ease",
+                  }}
+                >
+                  {label}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => scrollTo(id)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "14px 12px",
+                    fontFamily: "var(--font-josefin)",
+                    fontSize: 10,
+                    letterSpacing: "0.32em",
+                    textTransform: "uppercase",
+                    color: active === id ? "var(--c-blush-deep)" : "var(--c-muted)",
+                    position: "relative",
+                    transition: "color 0.25s ease",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label}
+                  {active === id && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        bottom: 8,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: 3,
+                        height: 3,
+                        borderRadius: "50%",
+                        background: "var(--c-blush-deep)",
+                      }}
+                    />
+                  )}
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -267,7 +289,7 @@ export function NavMenu() {
 
           {/* Nav items */}
           <ul style={{ listStyle: "none", margin: 0, padding: "0 32px" }}>
-            {NAV_ITEMS.map(({ id, label, th }, i) => (
+            {NAV_ITEMS.map(({ id, label, th, href }, i) => (
               <li key={id}>
                 {i > 0 && (
                   <div
@@ -279,57 +301,106 @@ export function NavMenu() {
                     }}
                   />
                 )}
-                <button
-                  onClick={() => scrollTo(id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "16px 0",
-                    textAlign: "left",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    {/* Active dot */}
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: active === id ? "var(--c-blush-deep)" : "transparent",
-                        border: `1.5px solid ${active === id ? "var(--c-blush-deep)" : "var(--c-blush)"}`,
-                        flexShrink: 0,
-                        transition: "background 0.2s ease",
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontFamily: "var(--font-cormorant)",
-                        fontSize: 26,
-                        fontStyle: "italic",
-                        fontWeight: 300,
-                        color: active === id ? "var(--c-ink)" : "var(--c-ink-2)",
-                        transition: "color 0.2s ease",
-                      }}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                  <span
+                {href ? (
+                  <Link
+                    href={href}
+                    onClick={() => setOpen(false)}
                     style={{
-                      fontFamily: "var(--font-sarabun)",
-                      fontSize: 13,
-                      color: "var(--c-muted)",
-                      opacity: 0.7,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      padding: "16px 0",
+                      textDecoration: "none",
                     }}
                   >
-                    {th}
-                  </span>
-                </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: "transparent",
+                          border: "1.5px solid var(--c-blush)",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-cormorant)",
+                          fontSize: 26,
+                          fontStyle: "italic",
+                          fontWeight: 300,
+                          color: "var(--c-ink-2)",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-sarabun)",
+                        fontSize: 13,
+                        color: "var(--c-muted)",
+                        opacity: 0.7,
+                      }}
+                    >
+                      {th}
+                    </span>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => scrollTo(id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "16px 0",
+                      textAlign: "left",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      {/* Active dot */}
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: active === id ? "var(--c-blush-deep)" : "transparent",
+                          border: `1.5px solid ${active === id ? "var(--c-blush-deep)" : "var(--c-blush)"}`,
+                          flexShrink: 0,
+                          transition: "background 0.2s ease",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-cormorant)",
+                          fontSize: 26,
+                          fontStyle: "italic",
+                          fontWeight: 300,
+                          color: active === id ? "var(--c-ink)" : "var(--c-ink-2)",
+                          transition: "color 0.2s ease",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-sarabun)",
+                        fontSize: 13,
+                        color: "var(--c-muted)",
+                        opacity: 0.7,
+                      }}
+                    >
+                      {th}
+                    </span>
+                  </button>
+                )}
               </li>
             ))}
           </ul>

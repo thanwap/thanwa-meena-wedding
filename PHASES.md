@@ -32,6 +32,6 @@
 - [x] .NET 10 API secrets → GitHub Secrets & Render
 
 ### Phase 4: Full Wedding Features
-- [ ] RSVP system (Next.js + Supabase-js)
-- [ ] Guestbook / wishwall
+- [x] RSVP system (Next.js + Supabase-js) — form on landing page, admin `/admin/rsvps` with CSV export
+- [x] Guestbook / wishwall — public form + wall on landing page, admin `/admin/guestbook`, landscape scenes
 - [ ] Photo gallery (optimized for fast load)

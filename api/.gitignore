@@ -4,3 +4,4 @@ obj/
 .vs/
 *.suo
 .DS_Store
+appsettings.Development.json
