@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Guest> Guests => Set<Guest>();
     public DbSet<WeddingTable> WeddingTables => Set<WeddingTable>();
     public DbSet<GuestbookEntry> GuestbookEntries => Set<GuestbookEntry>();
+    public DbSet<Photo> Photos => Set<Photo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -133,6 +134,48 @@ public class AppDbContext : DbContext
 
             entity.HasQueryFilter(e => e.DeletedAt == null);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<Photo>(entity =>
+        {
+            entity.ToTable("photos");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()");
+
+            entity.Property(e => e.DeviceId)
+                .HasColumnName("device_id")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(e => e.DisplayName)
+                .HasColumnName("display_name")
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(e => e.FilePath)
+                .HasColumnName("file_path")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(e => e.ThumbPath)
+                .HasColumnName("thumb_path")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(e => e.FilterName)
+                .HasColumnName("filter_name")
+                .HasMaxLength(30)
+                .IsRequired()
+                .HasDefaultValue("none");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired()
+                .HasDefaultValueSql("now()");
+
+            entity.HasIndex(e => e.DeviceId).HasDatabaseName("idx_photos_device_id");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("idx_photos_created_at").IsDescending();
         });
     }
 }

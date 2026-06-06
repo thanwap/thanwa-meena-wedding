@@ -49,6 +49,12 @@ export default async function AdminLayout({
               Guestbook
             </Link>
             <Link
+              href="/admin/photos"
+              className="text-muted-foreground text-sm hover:text-foreground"
+            >
+              Photos
+            </Link>
+            <Link
               href="/admin/users"
               className="text-muted-foreground text-sm hover:text-foreground"
             >

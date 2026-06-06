@@ -20,6 +20,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRsvpService, RsvpService>();
 builder.Services.AddScoped<ISeatingService, SeatingService>();
 builder.Services.AddScoped<IGuestbookService, GuestbookService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 // ─── CORS ──────────────────────────────────────────────────────────────────
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -71,6 +72,20 @@ builder.Services.AddRateLimiter(options =>
     {
         opt.PermitLimit = 60;
         opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("photos-get", opt =>
+    {
+        opt.PermitLimit = 60;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("photos-upload", opt =>
+    {
+        opt.PermitLimit = 12; // slightly above 10-photo limit to allow retries
+        opt.Window = TimeSpan.FromHours(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;
     });
