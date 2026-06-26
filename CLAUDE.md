@@ -23,7 +23,7 @@ Monorepo with a Next.js frontend (`web/`) and a .NET 10 admin API (`api/`).
 │   ├── components/              # Shared UI
 │   └── __tests__/               # Vitest unit tests
 │
-├── api/WeddingApi/              # .NET 10 admin API (deployed to Render)
+├── api/WeddingApi/              # .NET 10 admin API (deployed to Railway)
 │   ├── Program.cs               # Bootstrap + one-off `seed-admins` CLI
 │   ├── Controllers/             # AuthController, ConfigController
 │   ├── Services/                # AuthService (bcrypt + HS256 JWT), ConfigService
@@ -44,7 +44,7 @@ Monorepo with a Next.js frontend (`web/`) and a .NET 10 admin API (`api/`).
 |-----------------|------------------------------------------|
 | DNS / CDN / SSL | Cloudflare                               |
 | Frontend host   | Vercel (Next.js SSR/ISR)                 |
-| API host        | Render (Docker, .NET 10)                 |
+| API host        | Railway (Docker, .NET 10)                |
 | Database        | Supabase (Postgres)                      |
 | CI/CD           | GitHub Actions on version tags `v*.*.*`  |
 
@@ -134,16 +134,18 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 AUTH_SECRET
 AUTH_URL=https://frommeenatothanwaforever.com
-DOTNET_API_URL=https://<render-host>
+DOTNET_API_URL=https://<railway-host>.up.railway.app
 ```
 
-### Render (production) — set on the .NET service
+### Railway (production) — set on the .NET service
 
 ```
 ConnectionStrings__DefaultConnection   # Supabase pooler URL
 Jwt__Key
 Jwt__Issuer=wedding-api
 Jwt__Audience=wedding-web
+Supabase__Url
+Supabase__ServiceKey
 ```
 
 ---
