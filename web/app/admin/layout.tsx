@@ -1,8 +1,6 @@
-import Link from "next/link"
 import { auth, signOut } from "@/auth"
-import { Button } from "@/components/ui/button"
-import { Toaster } from "@/components/ui/sonner"
-import { ThemeToggle } from "@/components/theme-toggle"
+
+import { AdminShell } from "./admin-shell"
 
 export default async function AdminLayout({
   children,
@@ -16,84 +14,18 @@ export default async function AdminLayout({
     return <>{children}</>
   }
 
+  async function signOutAction() {
+    "use server"
+    await signOut({ redirectTo: "/" })
+  }
+
   return (
-    <div className="min-h-svh bg-background">
-      <header className="border-b">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <nav className="flex items-center gap-6">
-            <Link href="/admin" className="font-medium">
-              Admin
-            </Link>
-            <Link
-              href="/admin/rsvps"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              RSVPs
-            </Link>
-            <Link
-              href="/admin/seating"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Seating
-            </Link>
-            <Link
-              href="/admin/seating/manage"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Seating List
-            </Link>
-            <Link
-              href="/admin/guestbook"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Guestbook
-            </Link>
-            <Link
-              href="/admin/photos"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Photos
-            </Link>
-            <Link
-              href="/admin/users"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Users
-            </Link>
-            <Link
-              href="/admin/change-password"
-              className="text-muted-foreground text-sm hover:text-foreground"
-            >
-              Change password
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            {session?.user?.name && (
-              <span className="text-muted-foreground text-sm">
-                {session.user.name}
-                {session.role && (
-                  <span className="ml-1 text-xs opacity-60">
-                    ({session.role === "super_admin" ? "Super Admin" : "Viewer"})
-                  </span>
-                )}
-              </span>
-            )}
-            <form
-              action={async () => {
-                "use server"
-                await signOut({ redirectTo: "/" })
-              }}
-            >
-              <Button type="submit" variant="outline" size="sm">
-                Sign out
-              </Button>
-            </form>
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
-      <Toaster />
-    </div>
+    <AdminShell
+      userName={session.user?.name}
+      userRole={session.role}
+      signOutAction={signOutAction}
+    >
+      {children}
+    </AdminShell>
   )
 }
