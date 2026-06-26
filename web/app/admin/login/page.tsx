@@ -2,6 +2,15 @@ import { redirect } from "next/navigation"
 import { signIn, auth } from "@/auth"
 import { AuthError } from "next-auth"
 import { SubmitButton } from "@/components/submit-button"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default async function LoginPage({
   searchParams,
@@ -38,54 +47,53 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-4">
-      <form
-        action={login}
-        className="w-full max-w-sm space-y-4 rounded-lg border p-6 shadow-sm"
-      >
-        <h1 className="text-xl font-semibold">Admin login</h1>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Admin login</CardTitle>
+        </CardHeader>
 
-        {params.error === "invalid" && (
-          <p className="text-sm text-red-600">Invalid username or password.</p>
-        )}
-        {params.error === "unavailable" && (
-          <p className="text-sm text-red-600">Service unavailable. Please try again shortly.</p>
-        )}
+        <form action={login}>
+          <CardContent className="space-y-4">
+            {params.error === "invalid" && (
+              <p className="text-sm text-destructive">Invalid username or password.</p>
+            )}
+            {params.error === "unavailable" && (
+              <p className="text-sm text-destructive">Service unavailable. Please try again shortly.</p>
+            )}
 
-        <input
-          type="hidden"
-          name="callbackUrl"
-          value={params.callbackUrl ?? "/admin"}
-        />
+            <input
+              type="hidden"
+              name="callbackUrl"
+              value={params.callbackUrl ?? "/admin"}
+            />
 
-        <div className="space-y-1">
-          <label htmlFor="username" className="text-sm font-medium">
-            Username
-          </label>
-          <input
-            id="username"
-            name="username"
-            required
-            autoComplete="username"
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-        </div>
+            <div className="space-y-1">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                required
+                autoComplete="username"
+              />
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-        </div>
+            <div className="space-y-1">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+          </CardContent>
 
-        <SubmitButton label="Sign in" loadingLabel="Signing in…" />
-      </form>
+          <CardFooter>
+            <SubmitButton label="Sign in" loadingLabel="Signing in…" />
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   )
 }

@@ -1,6 +1,15 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
 import { SubmitButton } from "@/components/submit-button"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const API = process.env.DOTNET_API_URL!
 
@@ -46,71 +55,70 @@ export default async function ChangePasswordPage({
   }
 
   return (
-    <div className="mx-auto max-w-md space-y-4">
-      <h1 className="text-xl font-semibold">Change password</h1>
+    <div className="mx-auto max-w-md">
+      <Card>
+        <CardHeader>
+          <CardTitle>Change password</CardTitle>
+        </CardHeader>
 
-      {params.status === "ok" && (
-        <p className="text-sm text-green-600">Password updated.</p>
-      )}
-      {params.status === "failed" && (
-        <p className="text-sm text-red-600">Current password incorrect.</p>
-      )}
-      {params.status === "mismatch" && (
-        <p className="text-sm text-red-600">New passwords do not match.</p>
-      )}
-      {params.status === "invalid" && (
-        <p className="text-sm text-red-600">
-          New password must be at least 8 characters.
-        </p>
-      )}
+        <form action={changePassword}>
+          <CardContent className="space-y-4">
+            {params.status === "ok" && (
+              <p className="text-sm text-green-600">Password updated.</p>
+            )}
+            {params.status === "failed" && (
+              <p className="text-sm text-destructive">Current password incorrect.</p>
+            )}
+            {params.status === "mismatch" && (
+              <p className="text-sm text-destructive">New passwords do not match.</p>
+            )}
+            {params.status === "invalid" && (
+              <p className="text-sm text-destructive">
+                New password must be at least 8 characters.
+              </p>
+            )}
 
-      <form action={changePassword} className="space-y-4 rounded-lg border p-6">
-        <div className="space-y-1">
-          <label htmlFor="currentPassword" className="text-sm font-medium">
-            Current password
-          </label>
-          <input
-            id="currentPassword"
-            name="currentPassword"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-        </div>
+            <div className="space-y-1">
+              <Label htmlFor="currentPassword">Current password</Label>
+              <Input
+                id="currentPassword"
+                name="currentPassword"
+                type="password"
+                required
+                autoComplete="current-password"
+              />
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="newPassword" className="text-sm font-medium">
-            New password
-          </label>
-          <input
-            id="newPassword"
-            name="newPassword"
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-        </div>
+            <div className="space-y-1">
+              <Label htmlFor="newPassword">New password</Label>
+              <Input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="confirmPassword" className="text-sm font-medium">
-            Confirm new password
-          </label>
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-        </div>
+            <div className="space-y-1">
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
+            </div>
+          </CardContent>
 
-        <SubmitButton label="Update password" loadingLabel="Updating…" />
-      </form>
+          <CardFooter>
+            <SubmitButton label="Update password" loadingLabel="Updating…" />
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   )
 }
