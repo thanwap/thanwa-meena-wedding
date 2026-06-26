@@ -136,6 +136,7 @@ export function AdminShell({
                   <DropdownMenuSeparator />
                   <form action={signOutAction}>
                     <DropdownMenuItem
+                      nativeButton
                       render={<button type="submit" className="w-full cursor-pointer" />}
                     >
                       Sign out
