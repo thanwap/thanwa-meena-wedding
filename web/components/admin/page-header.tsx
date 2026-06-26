@@ -1,0 +1,23 @@
+import * as React from "react"
+
+export function PageHeader({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string
+  subtitle?: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div className="mb-6 flex items-start justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        {subtitle && (
+          <p className="text-muted-foreground mt-1 text-sm">{subtitle}</p>
+        )}
+      </div>
+      {children && <div className="flex items-center gap-2">{children}</div>}
+    </div>
+  )
+}
