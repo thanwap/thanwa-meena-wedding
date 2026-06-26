@@ -11,6 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
+import { PageHeader } from "@/components/admin/page-header"
 
 export default function AdminPhotosPage() {
   const [photos, setPhotos] = useState<AdminPhotoRecord[]>([])
@@ -94,13 +95,10 @@ export default function AdminPhotosPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Photos</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {total} {total === 1 ? "photo" : "photos"}
-          </p>
-        </div>
+      <PageHeader
+        title="Photos"
+        subtitle={`${total} ${total === 1 ? "photo" : "photos"}`}
+      >
         {selected.size > 0 && (
           <Button
             variant="destructive"
@@ -109,29 +107,19 @@ export default function AdminPhotosPage() {
             Delete {selected.size} selected
           </Button>
         )}
-      </div>
+      </PageHeader>
 
       {/* Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-          gap: 8,
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2">
         {photos.map((photo) => {
           const isSelected = selected.has(photo.id)
           return (
             <div
               key={photo.id}
-              style={{
-                position: "relative",
-                borderRadius: 8,
-                overflow: "hidden",
-                cursor: "pointer",
-                border: isSelected ? "2px solid hsl(var(--destructive))" : "2px solid transparent",
-                transition: "border-color 0.15s ease",
-              }}
+              className={[
+                "group relative rounded-lg overflow-hidden cursor-pointer border-2 transition-colors duration-150",
+                isSelected ? "border-destructive" : "border-transparent",
+              ].join(" ")}
               onClick={() => toggleSelect(photo.id)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -139,25 +127,12 @@ export default function AdminPhotosPage() {
                 src={photo.thumbUrl}
                 alt={photo.displayName}
                 loading="lazy"
-                style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }}
+                className="w-full aspect-square object-cover block"
               />
 
               {/* Selection indicator */}
               {isSelected && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 6,
-                    right: 6,
-                    width: 20,
-                    height: 20,
-                    borderRadius: "50%",
-                    background: "hsl(var(--destructive))",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+                <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-destructive flex items-center justify-center">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                     <path d="M2 5l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -165,45 +140,19 @@ export default function AdminPhotosPage() {
               )}
 
               {/* Info overlay */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: "16px 6px 5px",
-                  background: "linear-gradient(to top, rgba(0,0,0,0.65), transparent)",
-                }}
-              >
-                <p style={{ color: "#fff", fontSize: 11, margin: 0, fontWeight: 500, lineHeight: 1.3 }}>
+              <div className="absolute bottom-0 left-0 right-0 px-1.5 pb-1.5 pt-4 bg-gradient-to-t from-black/65 to-transparent">
+                <p className="text-white text-[11px] font-medium leading-snug m-0">
                   {photo.displayName}
                 </p>
-                <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 10, margin: 0 }}>
+                <p className="text-white/55 text-[10px] m-0">
                   {new Date(photo.createdAt).toLocaleDateString("th-TH")}
                 </p>
               </div>
 
-              {/* Quick delete (single) */}
+              {/* Quick delete (single) — hidden until hover via group-hover */}
               <button
                 onClick={(e) => { e.stopPropagation(); setConfirmDelete([photo.id]) }}
-                style={{
-                  position: "absolute",
-                  top: 6,
-                  left: 6,
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.5)",
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  color: "#fff",
-                  opacity: 0,
-                  transition: "opacity 0.15s ease",
-                }}
-                className="delete-btn"
+                className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full bg-black/50 border-0 flex items-center justify-center cursor-pointer text-white opacity-0 group-hover:opacity-100 transition-opacity duration-150"
               >
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                   <path d="M2 2l6 6M8 2L2 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
@@ -217,7 +166,7 @@ export default function AdminPhotosPage() {
       {loading && (
         <div className="text-center py-8 text-muted-foreground text-sm">Loading…</div>
       )}
-      <div ref={sentinelRef} style={{ height: 1 }} />
+      <div ref={sentinelRef} className="h-px" />
 
       {/* Confirm delete dialog */}
       <Dialog open={confirmDelete.length > 0} onOpenChange={() => setConfirmDelete([])}>
@@ -243,16 +192,6 @@ export default function AdminPhotosPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <style>{`
-        .delete-btn { opacity: 0; }
-        @media (hover: hover) {
-          div:hover > .delete-btn { opacity: 1; }
-        }
-        @media (hover: none) {
-          .delete-btn { display: none; }
-        }
-      `}</style>
     </div>
   )
 }
