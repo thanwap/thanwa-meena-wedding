@@ -46,6 +46,7 @@ import {
   getUsers,
   resetPassword,
 } from "./actions"
+import { PageHeader } from "@/components/admin/page-header"
 
 export function UsersClient({
   initialUsers,
@@ -153,13 +154,7 @@ export function UsersClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-          <p className="text-muted-foreground text-sm">
-            Manage admin accounts and roles.
-          </p>
-        </div>
+      <PageHeader title="Users" subtitle="Manage admin accounts and roles.">
         {isSuperAdmin && (
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
             <DialogTrigger render={<Button />}>Add User</DialogTrigger>
@@ -212,7 +207,7 @@ export function UsersClient({
             </DialogContent>
           </Dialog>
         )}
-      </div>
+      </PageHeader>
 
       <Card>
         <CardHeader>

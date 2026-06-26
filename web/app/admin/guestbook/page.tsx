@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { auth } from "@/auth"
 import { getGuestbookEntries } from "./actions"
 import { GuestbookTable } from "./guestbook-table"
+import { PageHeader } from "@/components/admin/page-header"
 
 export const dynamic = "force-dynamic"
 
@@ -21,12 +22,10 @@ export default async function GuestbookAdminPage({
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Guestbook</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {result.totalCount} {result.totalCount === 1 ? "entry" : "entries"}
-        </p>
-      </div>
+      <PageHeader
+        title="Guestbook"
+        subtitle={`${result.totalCount} ${result.totalCount === 1 ? "entry" : "entries"}`}
+      />
       <Suspense>
         <GuestbookTable
           initialEntries={result.items}

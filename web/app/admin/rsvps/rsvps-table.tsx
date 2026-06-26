@@ -41,6 +41,7 @@ import { Pagination } from "@/components/pagination"
 import { Checkbox } from "@/components/ui/checkbox"
 import { deleteRsvp, createRsvp, batchDelete, regenerateGuests, updateGuestCount } from "./actions"
 import type { RsvpDto, RsvpStatsDto, RsvpStatus } from "./actions"
+import { PageHeader } from "@/components/admin/page-header"
 
 // ── Status helpers ──────────────────────────────────────────────────────────
 
@@ -515,22 +516,10 @@ export function RsvpsClient({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">RSVPs</h1>
-          <p className="text-muted-foreground text-sm">
-            Manage guest responses and attendance.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {isSuperAdmin && (
-            <Button onClick={() => setAddOpen(true)}>Add Guest</Button>
-          )}
-          <Button variant="outline" onClick={handleExportCsv}>
-            Export CSV
-          </Button>
-        </div>
-      </div>
+      <PageHeader title="RSVPs" subtitle="Manage guest responses and attendance.">
+        {isSuperAdmin && <Button onClick={() => setAddOpen(true)}>Add Guest</Button>}
+        <Button variant="outline" onClick={handleExportCsv}>Export CSV</Button>
+      </PageHeader>
 
       {/* Stats */}
       <StatsBar stats={stats} />
