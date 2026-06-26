@@ -126,8 +126,11 @@ if (args.Length > 0 && (args[0] == "seed-admins" || args[0] == "reset-admins"))
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
+    var fixedPassword = Environment.GetEnvironmentVariable("SEED_PASSWORD");
+
     string GeneratePassword()
     {
+        if (fixedPassword is not null) return fixedPassword;
         const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
         var bytes = new byte[16];
         System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
