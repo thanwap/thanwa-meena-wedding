@@ -24,9 +24,3 @@ jobs:
       - name: Run tests
         run: dotnet test api/WeddingApi.sln --verbosity normal
 
-      - name: Deploy to Railway
-        run: npx @railway/cli@latest up --service ${{ secrets.RAILWAY_SERVICE_ID }} --detach
-        working-directory: api
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
