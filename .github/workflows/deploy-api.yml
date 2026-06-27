@@ -24,3 +24,12 @@ jobs:
       - name: Run tests
         run: dotnet test api/WeddingApi.sln --verbosity normal
 
+      - name: Deploy to Railway
+        run: |
+          curl -sf https://backboard.railway.app/graphql/v2 \
+            -H "Authorization: Bearer $RAILWAY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"mutation{serviceInstanceRedeploy(serviceId:\"31db35db-4d43-4776-95bd-ab23722afc7e\",environmentId:\"7dd9d131-a611-40ec-9f74-f0d54c3b9c4e\")}"}'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
