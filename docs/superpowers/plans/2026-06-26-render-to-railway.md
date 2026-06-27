@@ -1,12 +1,14 @@
 # Render → Railway Migration Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Move the live .NET API backend from Render to Railway, updating CI/CD and all env-var references.
 
-**Architecture:** Railway can build from the `api/Dockerfile` directly — no GHCR push needed. The GitHub Actions workflow currently pushes to GHCR then calls a Render deploy hook; replace that with a Railway deploy hook (Railway generates one per service). The Next.js frontend's `DOTNET_API_URL` in Vercel must be updated to the Railway service URL.
+**Architecture:** Railway builds from the `api/Dockerfile` directly via GitHub source — no GHCR push needed. The GitHub Actions workflow triggers Railway deployment via the Railway GraphQL API (`serviceInstanceRedeploy` mutation) after tests pass. Railway token is a UUID stored as `RAILWAY_TOKEN` GitHub secret. The Next.js frontend's `DOTNET_API_URL` in Vercel points to the Railway service URL.
 
-**Tech Stack:** Railway (Docker web service via deploy hook), GitHub Actions, Vercel environment variables.
+**Tech Stack:** Railway (Docker web service, GitHub source deploy), GitHub Actions, Railway GraphQL API, Vercel environment variables.
+
+**Completed:** 2026-06-27. Live at `https://thanwa-meena-wedding-production.up.railway.app`.
 
 ## Global Constraints
 
@@ -22,13 +24,13 @@
 
 **Files:** none — all steps in the Railway dashboard.
 
-- [ ] **Step 1: Create a new project / service**
+- [x] **Step 1: Create a new project / service**
 
   Go to [railway.app](https://railway.app) → **New Project** → **Empty Project**.
 
   Inside the project → **New Service** → **Empty Service** (we'll configure it manually, not via GitHub connect, so CI controls deploys).
 
-- [ ] **Step 2: Configure the service to deploy from a Docker image**
+- [x] **Step 2: Configure the service to deploy from a Docker image**
 
   Railway supports two modes:
   - **Source deploy** (Railway pulls GitHub and runs `docker build`) — simplest, no GHCR needed.
@@ -40,7 +42,7 @@
 
   Railway will auto-detect the `Dockerfile` in `api/`.
 
-- [ ] **Step 3: Set the port**
+- [x] **Step 3: Set the port**
 
   Railway → service → **Settings** → **Networking** → set **Port** to `8080`.
 
@@ -51,7 +53,7 @@
   | `PORT` | `8080` |
   | `ASPNETCORE_URLS` | `http://+:8080` |
 
-- [ ] **Step 4: Set environment variables**
+- [x] **Step 4: Set environment variables**
 
   Railway → service → **Variables** tab → add:
 
@@ -67,11 +69,11 @@
 
   > **Do this before deleting the Render service.** Go to Render → your service → Environment tab and copy all values now.
 
-- [ ] **Step 5: Disable auto-deploy on push**
+- [x] **Step 5: Disable auto-deploy on push**
 
   Railway → service → **Settings** → **Deploy** → disable **Auto Deploy** (so only the deploy hook triggers a deploy, not every push to GitHub).
 
-- [ ] **Step 6: Generate a deploy hook**
+- [x] **Step 6: Generate a deploy hook**
 
   Railway → service → **Settings** → **Deploy** → **Deploy Hook** → generate.
 
@@ -79,7 +81,7 @@
 
   Save it — you'll add it as a GitHub secret in Task 2.
 
-- [ ] **Step 7: Note the Railway service URL**
+- [x] **Step 7: Note the Railway service URL**
 
   Railway → service → **Settings** → **Networking** → **Public Networking** → generate a public domain if not already present.
 
@@ -96,7 +98,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 **Files:**
 - Modify: `.github/workflows/deploy-api.yml`
 
-- [ ] **Step 1: Replace the workflow content**
+- [x] **Step 1: Replace the workflow content**
 
   Current file (`.github/workflows/deploy-api.yml`):
   ```yaml
@@ -183,7 +185,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
   Changes: removed `packages: write` permission, removed GHCR login, removed Docker build/push, replaced Render hook with Railway hook.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
   ```bash
   git add .github/workflows/deploy-api.yml
@@ -194,7 +196,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
 ### Task 3: Add GitHub Secret + Update Vercel
 
-- [ ] **Step 1: Add GitHub secrets**
+- [x] **Step 1: Add GitHub secrets**
 
   Go to `github.com/thanwap/thanwa-meena-wedding` → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
 
@@ -203,7 +205,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
   | `RAILWAY_TOKEN` | Railway → top-right avatar → **Account Settings** → **Tokens** → **New Token** |
   | `RAILWAY_SERVICE_ID` | Railway → your service → **Settings** → **Service ID** (copy the UUID) |
 
-- [ ] **Step 2: Update `DOTNET_API_URL` in Vercel**
+- [x] **Step 2: Update `DOTNET_API_URL` in Vercel**
 
   Go to [vercel.com](https://vercel.com) → `thanwa-meena-wedding` project → **Settings** → **Environment Variables**.
 
@@ -219,7 +221,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 **Files:**
 - Modify: `CLAUDE.md`
 
-- [ ] **Step 1: Update the infrastructure table**
+- [x] **Step 1: Update the infrastructure table**
 
   Find the infrastructure table in `CLAUDE.md`. Change:
 
@@ -233,7 +235,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
   | API host        | Railway (Docker, .NET 10)                |
   ```
 
-- [ ] **Step 2: Update the Render env var section**
+- [x] **Step 2: Update the Render env var section**
 
   Find the `### Render (production)` block. Replace:
 
@@ -263,7 +265,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
   ```
   ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
   ```bash
   git add CLAUDE.md
@@ -274,7 +276,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
 ### Task 5: End-to-End Verification Deploy
 
-- [ ] **Step 1: Run the pre-commit checklist locally**
+- [x] **Step 1: Run the pre-commit checklist locally**
 
   From `web/`:
   ```bash
@@ -288,7 +290,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
   Both must pass.
 
-- [ ] **Step 2: Push a version tag**
+- [x] **Step 2: Push a version tag**
 
   ```bash
   git push && git tag 1.X.Y && git push --tags
@@ -296,7 +298,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
   (Use the next version number, e.g. `1.2.3`.)
 
-- [ ] **Step 3: Watch GitHub Actions**
+- [x] **Step 3: Watch GitHub Actions**
 
   `Deploy API` job should:
   1. Run tests ✓
@@ -304,7 +306,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
   The GHCR push steps are gone — the job should be noticeably faster.
 
-- [ ] **Step 4: Watch Railway deploy**
+- [x] **Step 4: Watch Railway deploy**
 
   Go to Railway → `wedding-api` → **Deployments** tab.
 
@@ -315,7 +317,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
   Now listening on: http://[::]:8080
   ```
 
-- [ ] **Step 5: Smoke-test the API directly**
+- [x] **Step 5: Smoke-test the API directly**
 
   ```bash
   curl https://wedding-api-production-xxxx.up.railway.app/api/configs
@@ -323,7 +325,7 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
   Expected: `401 Unauthorized` (proves the service is up and auth is active).
 
-- [ ] **Step 6: Smoke-test end-to-end**
+- [x] **Step 6: Smoke-test end-to-end**
 
   Visit `https://frommeenatothanwaforever.com/admin/login`.
 
@@ -338,10 +340,10 @@ The current `deploy-api.yml` builds a Docker image, pushes to GHCR, then calls t
 
 Only after Task 5 verification passes.
 
-- [ ] **Step 1: Remove the Render service**
+- [x] **Step 1: Remove the Render service**
 
   Go to Render → your service → **Settings** → **Delete Web Service**.
 
-- [ ] **Step 2: Remove the stale GitHub secret**
+- [x] **Step 2: Remove the stale GitHub secret**
 
   `github.com/thanwap/thanwa-meena-wedding` → **Settings** → **Secrets and variables** → **Actions** → delete `RENDER_DEPLOY_HOOK_URL`.
