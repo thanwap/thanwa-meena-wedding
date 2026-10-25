@@ -8,16 +8,20 @@ import type { PreweddingPhoto, TileSize } from "@/lib/prewedding"
 /*
  * Tile sizes in the bento grid (2 columns on mobile, 4 on desktop):
  *   large — 2×2   tall — 1×2   wide — 2×1   small — 1×1
- * Photos without a tileSize follow LAYOUT_PATTERN, which tiles 8 photos with
- * no gaps on both breakpoints. Admins can pin a size per photo.
+ * Photos without a tileSize get one from their aspect ratio (autoTileSize), so
+ * portraits land in tall tiles and faces aren't cropped away. grid-flow-dense
+ * back-fills any holes. Admins can pin a size per photo.
  *
  * Images are pre-optimised WebP from the API (thumb for tiles, full for the
  * lightbox), so next/image optimisation is skipped.
  */
-const LAYOUT_PATTERN: TileSize[] = [
-  "large", "tall", "small", "small",
-  "tall", "small", "large", "small",
-]
+export function autoTileSize(photo: Pick<PreweddingPhoto, "width" | "height">, index: number): TileSize {
+  const ratio = photo.width / photo.height
+  if (index === 0 && ratio >= 0.7) return "large"  // hero shot (3:4 or wider survives a ~square crop)
+  if (ratio < 0.85) return "tall"                    // portrait → 1×2
+  if (ratio >= 1.6) return "wide"                    // panorama / 16:9 → 2×1
+  return "small"                                     // square-ish / 4:3 → 1×1
+}
 
 const SIZE_CLASS: Record<TileSize, string> = {
   large: "col-span-2 row-span-2",
@@ -37,7 +41,7 @@ export function PreweddingGallery({ photos }: { photos: PreweddingPhoto[] }) {
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense auto-rows-[150px] md:auto-rows-[210px] gap-2 md:gap-3">
         {photos.map((photo, i) => {
-          const size = photo.tileSize ?? LAYOUT_PATTERN[i % LAYOUT_PATTERN.length]
+          const size = photo.tileSize ?? autoTileSize(photo, i)
           return (
             <button
               key={photo.id}

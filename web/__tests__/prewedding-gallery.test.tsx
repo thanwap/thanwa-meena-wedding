@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
-import { PreweddingGallery } from "../components/prewedding-gallery"
+import { PreweddingGallery, autoTileSize } from "../components/prewedding-gallery"
 import type { PreweddingPhoto } from "../lib/prewedding"
 
 const photo = (id: string, title: string | null, sortOrder: number): PreweddingPhoto => ({
@@ -71,5 +71,26 @@ describe("PreweddingGallery", () => {
     openPhoto(0)
     fireEvent.click(screen.getByRole("button", { name: "Close" }))
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+  })
+})
+
+describe("autoTileSize", () => {
+  const dims = (width: number, height: number) => ({ width, height })
+
+  it("gives portraits a tall tile so faces are not cropped", () => {
+    expect(autoTileSize(dims(1350, 2400), 3)).toBe("tall")
+    expect(autoTileSize(dims(1800, 2400), 1)).toBe("tall")
+  })
+
+  it("keeps the first photo as the large hero unless it is very tall", () => {
+    expect(autoTileSize(dims(1800, 2400), 0)).toBe("large")
+    expect(autoTileSize(dims(2400, 1800), 0)).toBe("large")
+    expect(autoTileSize(dims(1350, 2400), 0)).toBe("tall")
+  })
+
+  it("uses small tiles for 4:3 / square and wide tiles for panoramas", () => {
+    expect(autoTileSize(dims(2400, 1800), 2)).toBe("small")
+    expect(autoTileSize(dims(2000, 2000), 2)).toBe("small")
+    expect(autoTileSize(dims(2400, 1350), 2)).toBe("wide")
   })
 })

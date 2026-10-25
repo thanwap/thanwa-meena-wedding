@@ -227,7 +227,7 @@ export function PreweddingManager({ initialPhotos }: { initialPhotos: Prewedding
       ) : (
         <>
           <p className="mb-3 text-xs text-muted-foreground">
-            Drag to reorder. #1 is the hero shot. Tiles without a size follow the automatic bento pattern.
+            Drag to reorder. #1 is the hero shot. Tiles set to auto are sized from the photo&apos;s shape (portraits get tall tiles).
           </p>
           <DragDropProvider
             onDragEnd={(event) => {
