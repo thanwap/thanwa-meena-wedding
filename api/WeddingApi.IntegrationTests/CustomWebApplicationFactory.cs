@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Testcontainers.PostgreSql;
 using WeddingApi.Data;
+using WeddingApi.Services;
 
 namespace WeddingApi.IntegrationTests;
 
@@ -16,6 +18,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
         .WithImage("postgres:16-alpine")
         .Build();
+
+    public FakePhotoStorage PhotoStorage { get; } = new();
 
     public async Task InitializeAsync()
     {
@@ -54,6 +58,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(_postgres.GetConnectionString()));
+
+            // Swap Supabase Storage for an in-memory fake
+            services.RemoveAll<IPhotoStorage>();
+            services.AddSingleton<IPhotoStorage>(PhotoStorage);
 
             // Replace Google JWT auth with test scheme that always succeeds
             services.AddAuthentication(options =>

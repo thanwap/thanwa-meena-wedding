@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<WeddingTable> WeddingTables => Set<WeddingTable>();
     public DbSet<GuestbookEntry> GuestbookEntries => Set<GuestbookEntry>();
     public DbSet<Photo> Photos => Set<Photo>();
+    public DbSet<PreweddingPhoto> PreweddingPhotos => Set<PreweddingPhoto>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -176,6 +177,53 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => e.DeviceId).HasDatabaseName("idx_photos_device_id");
             entity.HasIndex(e => e.CreatedAt).HasDatabaseName("idx_photos_created_at").IsDescending();
+        });
+
+        modelBuilder.Entity<PreweddingPhoto>(entity =>
+        {
+            entity.ToTable("prewedding_photos");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()");
+
+            entity.Property(e => e.FullPath)
+                .HasColumnName("full_path")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(e => e.ThumbPath)
+                .HasColumnName("thumb_path")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(e => e.Width).HasColumnName("width").IsRequired();
+            entity.Property(e => e.Height).HasColumnName("height").IsRequired();
+
+            entity.Property(e => e.Title)
+                .HasColumnName("title")
+                .HasMaxLength(200)
+                .IsRequired(false);
+
+            entity.Property(e => e.Caption)
+                .HasColumnName("caption")
+                .HasMaxLength(200)
+                .IsRequired(false);
+
+            entity.Property(e => e.TileSize)
+                .HasColumnName("tile_size")
+                .HasMaxLength(10)
+                .IsRequired(false);
+
+            entity.Property(e => e.SortOrder)
+                .HasColumnName("sort_order")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired()
+                .HasDefaultValueSql("now()");
+
+            entity.HasIndex(e => e.SortOrder).HasDatabaseName("idx_prewedding_photos_sort_order");
         });
     }
 }

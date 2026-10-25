@@ -21,6 +21,9 @@ builder.Services.AddScoped<IRsvpService, RsvpService>();
 builder.Services.AddScoped<ISeatingService, SeatingService>();
 builder.Services.AddScoped<IGuestbookService, GuestbookService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddSingleton<IPhotoStorage, SupabasePhotoStorage>();
+builder.Services.AddSingleton<IImageProcessor, ImageSharpProcessor>();
+builder.Services.AddScoped<IPreweddingPhotoService, PreweddingPhotoService>();
 
 // ─── CORS ──────────────────────────────────────────────────────────────────
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(',', StringSplitOptions.RemoveEmptyEntries)
