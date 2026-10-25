@@ -7,7 +7,6 @@ const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }>
   { id: "hero",      label: "Home",      th: "หน้าแรก" },
   { id: "story",     label: "Our Story", th: "เรื่องของเรา" },
   { id: "couple",    label: "The Couple",th: "บ่าวสาว" },
-  { id: "beginning", label: "Beginning", th: "จุดเริ่มต้น" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
   { id: "guestbook", label: "Guestbook", th: "ข้อความ" },

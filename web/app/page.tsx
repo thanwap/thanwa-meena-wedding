@@ -423,126 +423,12 @@ export default async function Page() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 4 — FIRST CONNECTION
-          ══════════════════════════════ */}
-      <section
-        id="beginning"
-        className="px-6 py-20 text-center"
-        style={{ background: "var(--c-ivory-dark)" }}
-      >
-        <div className="mx-auto max-w-sm reveal">
-          <SectionLabel>Where It All Began</SectionLabel>
-
-          {/* Stylised Tinder match card */}
-          <div className="relative mx-auto mt-10 w-52">
-            {/* Back cards (stacked illusion) */}
-            <div
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: "var(--c-lavender)",
-                transform: "rotate(5deg) translateY(6px)",
-                opacity: 0.45,
-              }}
-            />
-            <div
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: "var(--c-blush)",
-                transform: "rotate(2.5deg) translateY(3px)",
-                opacity: 0.6,
-              }}
-            />
-            {/* Main card */}
-            <div
-              className="relative rounded-2xl overflow-hidden"
-              style={{
-                background: "var(--c-ivory)",
-                boxShadow:
-                  "0 8px 32px -8px rgba(28,42,24,0.12), 0 2px 8px -2px rgba(28,42,24,0.06)",
-              }}
-            >
-              {/* Gradient top band */}
-              <div
-                style={{
-                  height: 6,
-                  background:
-                    "linear-gradient(90deg, #FF4458 0%, #FF7854 100%)",
-                }}
-              />
-              <div className="flex flex-col items-center px-6 py-8 gap-4">
-                {/* Tinder flame */}
-                <svg
-                  width="38"
-                  height="44"
-                  viewBox="0 0 38 44"
-                  fill="none"
-                >
-                  <path
-                    d="M19 2C19 2 30 13 30 22C30 28.07 25.07 33 19 33C12.93 33 8 28.07 8 22C8 16.5 11 13.5 11 13.5C11 13.5 11 18.5 15.5 19.5C15.5 19.5 13 10 19 2Z"
-                    fill="#FF4458"
-                  />
-                  <path
-                    d="M19 17C19 17 23 21 23 24.5C23 26.43 21.43 28 19.5 28C17.57 28 16 26.43 16 24.5C16 21.5 18 20 18 20C18 20 18 22 19.5 22.5C19.5 22.5 18 19.5 19 17Z"
-                    fill="#FF7854"
-                  />
-                </svg>
-
-                <div>
-                  <p
-                    className="font-[family-name:var(--font-cormorant)] text-2xl italic"
-                    style={{ color: "var(--c-ink)" }}
-                  >
-                    It&apos;s a Match!
-                  </p>
-                </div>
-
-                <div
-                  className="font-[family-name:var(--font-josefin)] text-[12px] tracking-[0.3em]"
-                  style={{ color: "var(--c-muted)" }}
-                >
-                  Meena &amp; Thanwa
-                </div>
-
-                {/* Mock CTA button */}
-                <div
-                  className="mt-1 w-full rounded-full py-2.5 font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.35em] uppercase text-center"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #FF4458 0%, #FF7854 100%)",
-                    color: "#fff",
-                  }}
-                >
-                  Send Message
-                </div>
-
-                <p
-                  className="font-[family-name:var(--font-josefin)] text-[12px] tracking-wider"
-                  style={{ color: "var(--c-muted)", opacity: 0.6 }}
-                >
-                  The rest is history ✦
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <p
-            className="font-[family-name:var(--font-cormorant)] text-2xl italic mt-10 leading-relaxed"
-            style={{ color: "var(--c-ink-2)" }}
-          >
-            &ldquo;Where it all began &mdash;
-            <br />
-            Our first match on Tinder&rdquo;
-          </p>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════
-          SECTION 5 — EVENT DETAILS
+          SECTION 4 — EVENT DETAILS
           ══════════════════════════════ */}
       <section
         id="details"
         className="px-6 py-20"
-        style={{ background: "var(--c-ivory)" }}
+        style={{ background: "var(--c-ivory-dark)" }}
       >
         <div className="mx-auto max-w-sm">
           {/* Header */}
@@ -630,12 +516,12 @@ export default async function Page() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 6 — RSVP
+          SECTION 5 — RSVP
           ══════════════════════════════ */}
       <section
         id="rsvp"
         className="px-6 py-20"
-        style={{ background: "var(--c-ivory-dark)" }}
+        style={{ background: "var(--c-ivory)" }}
       >
         <div className="mx-auto max-w-sm">
           <div className="reveal mb-10 text-center">
@@ -667,12 +553,12 @@ export default async function Page() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 7 — GUESTBOOK
+          SECTION 6 — GUESTBOOK
           ══════════════════════════════ */}
       <section
         id="guestbook"
         className="px-6 py-20"
-        style={{ background: "var(--c-ivory)" }}
+        style={{ background: "var(--c-ivory-dark)" }}
       >
         <div className="mx-auto max-w-sm">
           <div className="reveal mb-10 text-center">
@@ -702,12 +588,12 @@ export default async function Page() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 8 — DRESS CODE
+          SECTION 7 — DRESS CODE
           ══════════════════════════════ */}
       <section
         id="dress"
         className="px-6 py-20 text-center"
-        style={{ background: "var(--c-ivory-dark)" }}
+        style={{ background: "var(--c-ivory)" }}
       >
         <div className="mx-auto max-w-sm reveal">
           <SectionLabel>Dress Code</SectionLabel>
