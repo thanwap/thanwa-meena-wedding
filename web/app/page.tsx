@@ -213,10 +213,10 @@ export default async function Page() {
           <Countdown />
         </div>
 
-        {/* Find Your Table link */}
+        {/* RSVP link */}
         <div className="hero-5 mt-8">
           <a
-            href="/table"
+            href="#rsvp"
             className="inline-flex items-center gap-2"
             style={{
               fontFamily: "var(--font-josefin)",
@@ -230,30 +230,8 @@ export default async function Page() {
               transition: "color 0.2s ease, border-color 0.2s ease",
             }}
           >
-            ค้นหาโต๊ะของคุณ
+            ตอบรับคำเชิญ
           </a>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2">
-          <svg
-            width="20"
-            height="32"
-            viewBox="0 0 20 32"
-            fill="none"
-            style={{ color: "var(--c-muted)", opacity: 0.5 }}
-          >
-            <rect
-              x="1"
-              y="1"
-              width="18"
-              height="30"
-              rx="9"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-            <circle cx="10" cy="9" r="2.5" fill="currentColor" className="scroll-dot" />
-          </svg>
         </div>
       </section>
 

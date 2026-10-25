@@ -149,6 +149,11 @@
   --c-muted:        #877A6A;
 }
 
+/* Smooth in-page jumps (e.g. hero → #rsvp), skipped for reduced-motion users */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
 /* ── Keyframes ── */
 @keyframes hero-up {
   from { opacity: 0; transform: translateY(22px); }
@@ -157,10 +162,6 @@
 @keyframes hero-in {
   from { opacity: 0; }
   to   { opacity: 1; }
-}
-@keyframes scroll-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(7px); }
 }
 /* Landing sections alternate ivory / ivory-dark by position, so hiding one
    (e.g. an empty pre-wedding gallery) never puts two same-colour sections together */
@@ -191,7 +192,6 @@
 .hero-3 { animation: hero-up 1.0s cubic-bezier(0.16,1,0.3,1) 0.58s both; }
 .hero-4 { animation: hero-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.85s both; }
 .hero-5 { animation: hero-in  0.9s ease                       1.10s both; }
-.hero-scroll { animation: hero-in 0.8s ease 1.5s both; }
 
 /* ── Scroll-driven reveal (Chrome 115+, Safari 18+) ── */
 @supports (animation-timeline: scroll()) {
@@ -220,11 +220,6 @@
   display: block;
   animation: logo-breathe 7s cubic-bezier(0.45, 0, 0.55, 1) 1.5s infinite;
   will-change: transform;
-}
-
-/* ── Mouse scroll indicator ── */
-.scroll-dot {
-  animation: scroll-bounce 1.6s ease-in-out infinite;
 }
 
 /* ── Timeline dot pulse ── */
