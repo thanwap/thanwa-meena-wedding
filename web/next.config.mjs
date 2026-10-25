@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // Admin pre-wedding uploads: browser pre-shrinks to ≤4 MB, leave headroom
+    serverActions: { bodySizeLimit: "5mb" },
+  },
   async headers() {
+    // Dev only: lets a local stand-in for Supabase Storage serve images
+    const devImg = process.env.NODE_ENV === "development" ? " http://localhost:*" : ""
     const csp = [
       "default-src 'self'",
       // Next.js requires unsafe-inline for hydration scripts
@@ -10,7 +16,7 @@ const nextConfig = {
       // next/font/google serves fonts locally from /_next/static/
       "font-src 'self'",
       // Guestbook photos served from Supabase public bucket
-      "img-src 'self' data: blob: https://*.supabase.co",
+      `img-src 'self' data: blob: https://*.supabase.co${devImg}`,
       // .NET API calls from the browser (if any)
       "connect-src 'self' https://*.supabase.co",
       "object-src 'none'",

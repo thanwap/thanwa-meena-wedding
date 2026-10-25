@@ -9,11 +9,14 @@ export async function adminFetch(path: string, options?: RequestInit): Promise<R
     redirect("/api/auth/force-signout")
   }
 
+  // Multipart bodies need fetch to set Content-Type itself (it adds the boundary)
+  const isFormData = options?.body instanceof FormData
+
   const res = await fetch(`${API}${path}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${session.idToken}`,
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(options?.headers ?? {}),
     },
   })

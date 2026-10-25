@@ -6,7 +6,7 @@ import Link from "next/link"
 const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }> = [
   { id: "hero",      label: "Home",      th: "หน้าแรก" },
   { id: "story",     label: "Our Story", th: "เรื่องของเรา" },
-  { id: "couple",    label: "The Couple",th: "บ่าวสาว" },
+  { id: "prewedding", label: "Pre-wedding", th: "พรีเวดดิ้ง" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
   { id: "guestbook", label: "Guestbook", th: "ข้อความ" },
@@ -14,7 +14,9 @@ const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }>
   { id: "gallery",   label: "Gallery",   th: "รูปภาพ", href: "/gallery" },
 ]
 
-export function NavMenu() {
+/** `hiddenIds` drops items whose section isn't rendered (e.g. an empty gallery). */
+export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
+  const items = NAV_ITEMS.filter(({ id }) => !hiddenIds.includes(id))
   const [active, setActive]   = useState("hero")
   const [mounted, setMounted] = useState(false)
   const [open, setOpen]       = useState(false)
@@ -86,7 +88,7 @@ export function NavMenu() {
             listStyle: "none",
           }}
         >
-          {NAV_ITEMS.map(({ id, label, href }, i) => (
+          {items.map(({ id, label, href }, i) => (
             <li key={id} style={{ display: "flex", alignItems: "center" }}>
               {i > 0 && (
                 <span
@@ -217,7 +219,7 @@ export function NavMenu() {
               opacity: 0.8,
             }}
           >
-            · {NAV_ITEMS.find(n => n.id === active)?.label ?? ""}
+            · {items.find(n => n.id === active)?.label ?? ""}
           </span>
         </button>
       </div>
@@ -288,7 +290,7 @@ export function NavMenu() {
 
           {/* Nav items */}
           <ul style={{ listStyle: "none", margin: 0, padding: "0 32px" }}>
-            {NAV_ITEMS.map(({ id, label, th, href }, i) => (
+            {items.map(({ id, label, th, href }, i) => (
               <li key={id}>
                 {i > 0 && (
                   <div

@@ -5,7 +5,9 @@ import { NavMenu } from "@/components/nav-menu"
 import { GuestbookForm } from "@/components/guestbook-form"
 import { GuestbookWall } from "@/components/guestbook-wall"
 import { ScheduleTimeline } from "@/components/schedule-timeline"
+import { PreweddingGallery } from "@/components/prewedding-gallery"
 import { getRandomGuestbookEntries } from "@/app/actions/guestbook"
+import { getPreweddingPhotos } from "@/app/actions/prewedding"
 
 /* ── Shared ornament components ────────────────── */
 
@@ -106,23 +108,26 @@ function FloralAccent({ className = "" }: { className?: string }) {
    ═══════════════════════════════════════════════ */
 
 export default async function Page() {
-  const guestbookEntries = await getRandomGuestbookEntries(5)
+  const [guestbookEntries, preweddingPhotos] = await Promise.all([
+    getRandomGuestbookEntries(5),
+    getPreweddingPhotos(),
+  ])
   return (
     <main
+      className="landing-sections"
       style={{
         background: "var(--c-ivory)",
         color: "var(--c-ink)",
         overflowX: "hidden",
       }}
     >
-      <NavMenu />
+      <NavMenu hiddenIds={preweddingPhotos.length === 0 ? ["prewedding"] : []} />
       {/* ══════════════════════════════
           SECTION 1 — HERO
           ══════════════════════════════ */}
       <section
         id="hero"
         className="relative flex min-h-svh flex-col items-center justify-center px-6 pb-16 pt-20 text-center"
-        style={{ background: "var(--c-ivory)" }}
       >
         {/* Grain texture overlay */}
         <div
@@ -258,7 +263,6 @@ export default async function Page() {
       <section
         id="story"
         className="px-8 py-20 text-center"
-        style={{ background: "var(--c-ivory-dark)" }}
       >
         <div className="mx-auto max-w-lg">
           <Divider />
@@ -324,103 +328,29 @@ export default async function Page() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 3 — THE COUPLE
+          SECTION 3 — PRE-WEDDING GALLERY
+          (hidden until admins upload photos)
           ══════════════════════════════ */}
-      <section
-        id="couple"
-        className="px-6 py-20"
-        style={{ background: "var(--c-ivory)" }}
-      >
-        <div className="mx-auto max-w-sm">
-          <div className="reveal mb-14 text-center">
-            <SectionLabel>The Couple</SectionLabel>
-            <h2
-              className="font-[family-name:var(--font-cormorant)] font-light italic mt-3"
-              style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
-            >
-              He &amp; She
-            </h2>
-          </div>
+      {preweddingPhotos.length > 0 && (
+        <section
+          id="prewedding"
+          className="px-4 md:px-6 py-20"
+        >
+          <div className="mx-auto max-w-sm md:max-w-4xl">
+            <div className="reveal mb-14 text-center">
+              <SectionLabel>Photo Gallery</SectionLabel>
+              <h2
+                className="font-[family-name:var(--font-cormorant)] font-light italic mt-3"
+                style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+              >
+                Pre-wedding
+              </h2>
+            </div>
 
-          {/* Groom */}
-          <div className="reveal mb-14">
-            <div
-              className="relative w-full overflow-hidden"
-              style={{ aspectRatio: "3 / 4" }}
-            >
-              <Image
-                src="/thanwa.jpg"
-                alt="Thanwa — The Groom"
-                fill
-                sizes="(max-width: 640px) 100vw, 384px"
-                className="object-cover object-top"
-              />
-            </div>
-            <div className="mt-6 text-center">
-              <p
-                className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.5em] uppercase mb-2"
-                style={{ color: "var(--c-sage)" }}
-              >
-                The Groom
-              </p>
-              <h3
-                className="font-[family-name:var(--font-cormorant)] font-light mb-3"
-                style={{ fontSize: 38 }}
-              >
-                Thanwa
-              </h3>
-              <p
-                className="font-[family-name:var(--font-sarabun)] text-base leading-relaxed"
-                style={{ color: "var(--c-ink-2)" }}
-              >
-                เขาเป็นโปรแกรมเมอร์ผู้หมกมุ่นอยู่กับ code
-                <br />
-                วันๆ มีแต่งานกับการออกกำลังกาย
-              </p>
-            </div>
+            <PreweddingGallery photos={preweddingPhotos} />
           </div>
-
-          <Divider />
-
-          {/* Bride */}
-          <div className="reveal mt-14">
-            <div
-              className="relative w-full overflow-hidden"
-              style={{ aspectRatio: "3 / 4" }}
-            >
-              <Image
-                src="/meena.jpg"
-                alt="Meena — The Bride"
-                fill
-                sizes="(max-width: 640px) 100vw, 384px"
-                className="object-cover object-top"
-              />
-            </div>
-            <div className="mt-6 text-center">
-              <p
-                className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.5em] uppercase mb-2"
-                style={{ color: "var(--c-blush-deep)" }}
-              >
-                The Bride
-              </p>
-              <h3
-                className="font-[family-name:var(--font-cormorant)] font-light mb-3"
-                style={{ fontSize: 38 }}
-              >
-                Meena
-              </h3>
-              <p
-                className="font-[family-name:var(--font-sarabun)] text-base leading-relaxed"
-                style={{ color: "var(--c-ink-2)" }}
-              >
-                เธอเป็นพยาบาลห้องฉุกเฉิน คอยดูแลชีวิตผู้คนมากมาย
-                <br />
-                ชีวิตก็มีแค่ ER กับหอพักพยาบาล
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════════════════════════
           SECTION 4 — EVENT DETAILS
@@ -428,7 +358,6 @@ export default async function Page() {
       <section
         id="details"
         className="px-6 py-20"
-        style={{ background: "var(--c-ivory-dark)" }}
       >
         <div className="mx-auto max-w-sm">
           {/* Header */}
@@ -521,7 +450,6 @@ export default async function Page() {
       <section
         id="rsvp"
         className="px-6 py-20"
-        style={{ background: "var(--c-ivory)" }}
       >
         <div className="mx-auto max-w-sm">
           <div className="reveal mb-10 text-center">
@@ -558,7 +486,6 @@ export default async function Page() {
       <section
         id="guestbook"
         className="px-6 py-20"
-        style={{ background: "var(--c-ivory-dark)" }}
       >
         <div className="mx-auto max-w-sm">
           <div className="reveal mb-10 text-center">
@@ -593,7 +520,6 @@ export default async function Page() {
       <section
         id="dress"
         className="px-6 py-20 text-center"
-        style={{ background: "var(--c-ivory)" }}
       >
         <div className="mx-auto max-w-sm reveal">
           <SectionLabel>Dress Code</SectionLabel>

@@ -34,4 +34,4 @@
 ### Phase 4: Full Wedding Features
 - [x] RSVP system (Next.js + Supabase-js) — form on landing page, admin `/admin/rsvps` with CSV export
 - [x] Guestbook / wishwall — public form + wall on landing page, admin `/admin/guestbook`, landscape scenes
-- [ ] Photo gallery (optimized for fast load)
+- [x] Photo gallery (optimized for fast load) — admin-managed pre-wedding bento gallery, WebP via API

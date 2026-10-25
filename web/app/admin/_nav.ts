@@ -4,6 +4,7 @@ import {
   RiTable2,
   RiChatQuoteLine,
   RiImageLine,
+  RiGalleryLine,
   RiUserLine,
 } from "@remixicon/react"
 import type { RemixiconComponentType } from "@remixicon/react"
@@ -48,6 +49,11 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/admin/guestbook",
         label: "Guestbook",
         icon: RiChatQuoteLine,
+      },
+      {
+        href: "/admin/prewedding",
+        label: "Pre-wedding",
+        icon: RiGalleryLine,
       },
       {
         href: "/admin/photos",
