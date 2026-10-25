@@ -8,9 +8,9 @@ const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }>
   { id: "story",     label: "Our Story", th: "เรื่องของเรา" },
   { id: "prewedding", label: "Our Gallery", th: "แกลเลอรี่ของเรา" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
+  { id: "dress",     label: "Dress Code",th: "การแต่งกาย" },
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
   { id: "guestbook", label: "Guestbook", th: "ข้อความ" },
-  { id: "dress",     label: "Dress Code",th: "การแต่งกาย" },
   { id: "gallery",   label: "Gallery",   th: "รูปภาพ", href: "/gallery" },
 ]
 

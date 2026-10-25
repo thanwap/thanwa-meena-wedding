@@ -103,6 +103,36 @@ function FloralAccent({ className = "" }: { className?: string }) {
   )
 }
 
+/* ─── Dress code palette ─────────────────────── */
+const DRESS_PALETTE = [
+  { hex: "#D4A5A8", name: "Dusty Rose" },
+  { hex: "#D8955A", name: "Apricot" },
+  { hex: "#B2AECB", name: "Lavender" },
+  { hex: "#A0965E", name: "Olive" },
+  { hex: "#A86B45", name: "Cinnamon" },
+]
+
+/** Colours each character with the next palette colour. Splits on grapheme
+    clusters so Thai vowels and tone marks stay attached to their consonant. */
+function PaletteText({ text }: { text: string }) {
+  const graphemes = Array.from(
+    new Intl.Segmenter("th", { granularity: "grapheme" }).segment(text),
+    (s) => s.segment,
+  )
+  return (
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden>
+        {graphemes.map((g, i) => (
+          <span key={i} style={{ color: DRESS_PALETTE[i % DRESS_PALETTE.length].hex }}>
+            {g}
+          </span>
+        ))}
+      </span>
+    </>
+  )
+}
+
 /* ═══════════════════════════════════════════════
    PAGE
    ═══════════════════════════════════════════════ */
@@ -324,7 +354,7 @@ export default async function Page() {
             </h2>
 
             {/* Date */}
-            <div className="mb-5">
+            <div className="mb-9">
               <p
                 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl"
                 style={{ color: "var(--c-ink)" }}
@@ -354,7 +384,7 @@ export default async function Page() {
                 THE COP Seminar &amp; Resort
               </p>
               <p
-                className="font-[family-name:var(--font-label)] text-[13px] md:text-[15px] tracking-[0.35em] mb-4"
+                className="font-[family-name:var(--font-label)] text-[13px] md:text-[15px] tracking-[0.35em] mt-1 mb-6"
                 style={{ color: "var(--c-muted)" }}
               >
                 PATTAYA
@@ -394,6 +424,83 @@ export default async function Page() {
 
           {/* Schedule timeline */}
           <ScheduleTimeline />
+
+          {/* Dress code */}
+          <div
+            id="dress"
+            className="reveal mt-20 md:mt-24 rounded-[28px] px-6 pt-12 pb-11 md:px-12 text-center"
+            style={{
+              background: "var(--c-ivory)",
+              border: "1px solid color-mix(in srgb, var(--c-blush) 55%, transparent)",
+              boxShadow: "0 18px 40px -28px rgba(184,132,126,0.45)",
+            }}
+          >
+            <SectionLabel>Dress Code</SectionLabel>
+
+            <h2
+              className="font-[family-name:var(--font-display)] font-light italic mt-3"
+              style={{ fontSize: "clamp(36px, 10vw, 56px)", lineHeight: 1.1 }}
+            >
+              Garden Whimsical
+            </h2>
+            <p
+              className="font-[family-name:var(--font-script)] -mt-1"
+              style={{
+                fontSize: 48,
+                color: "var(--c-blush-deep)",
+                lineHeight: 1.3,
+              }}
+            >
+              Pastel
+            </p>
+            <p
+              className="font-[family-name:var(--font-script-thai)] text-[26px] md:text-[30px] mt-1 mb-9"
+            >
+              <PaletteText text="สีสันสดใสในสวน" />
+            </p>
+
+            {/* Colour swatches — fixed-width columns so labels never shift spacing */}
+            <ul className="mx-auto mb-10 grid w-fit grid-cols-5 gap-x-1.5 md:gap-x-4">
+              {DRESS_PALETTE.map((s) => (
+                <li key={s.hex} className="flex w-14 md:w-16 flex-col items-center gap-2.5">
+                  <span
+                    aria-hidden
+                    className="block h-10 w-10 md:h-11 md:w-11 rounded-full"
+                    style={{
+                      background: s.hex,
+                      boxShadow: `0 0 0 3px var(--c-ivory), 0 0 0 4px color-mix(in srgb, ${s.hex} 45%, transparent), 0 6px 14px -6px ${s.hex}`,
+                    }}
+                  />
+                  <span
+                    className="font-[family-name:var(--font-label)] text-[11px] md:text-[12px] leading-tight tracking-[0.06em]"
+                    style={{ color: "var(--c-muted)" }}
+                  >
+                    {s.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <Divider />
+
+            {/* Thai has no spaces between words, so each phrase is kept whole
+                and lines only break between phrases */}
+            <p
+              className="mt-7 font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
+              style={{ color: "var(--c-ink-2)" }}
+            >
+              <span className="inline-block">เป็นงานแต่งงานในสวน</span>{" "}
+              <span className="inline-block">ใต้ต้นไม้ใหญ่</span>{" "}
+              <span className="inline-block">แต่งตัวตามสบาย</span>
+            </p>
+            <p
+              className="mt-2 font-[family-name:var(--font-thai)] text-[15px] md:text-base leading-relaxed"
+              style={{ color: "var(--c-muted)" }}
+            >
+              <span className="inline-block">อาจมียุง</span>{" "}
+              <span className="inline-block">และลมเย็นจากทะเล</span>
+            </p>
+          </div>
         </div>
       </section>
 
@@ -464,83 +571,27 @@ export default async function Page() {
           <div className="reveal">
             <GuestbookWall entries={guestbookEntries} />
           </div>
-        </div>
-      </section>
 
-      {/* ══════════════════════════════
-          SECTION 7 — DRESS CODE
-          ══════════════════════════════ */}
-      <section
-        id="dress"
-        className="px-6 py-20 text-center"
-      >
-        <div className="mx-auto max-w-sm md:max-w-xl reveal">
-          <SectionLabel>Dress Code</SectionLabel>
-
-          <h2
-            className="font-[family-name:var(--font-display)] font-light italic mt-3"
-            style={{ fontSize: "clamp(36px, 10vw, 60px)" }}
-          >
-            Garden Whimsical
-          </h2>
-          <p
-            className="font-[family-name:var(--font-script)] mt-1 mb-10"
-            style={{
-              fontSize: 48,
-              color: "var(--c-blush-deep)",
-              lineHeight: 1.3,
-            }}
-          >
-            Pastel
-          </p>
-
-          {/* Colour swatches */}
-          <div className="flex justify-center gap-5 mb-10">
-            {[
-              { hex: "#D4A5A8", name: "Dusty\nRose" },
-              { hex: "#D8955A", name: "Apricot" },
-              { hex: "#B2AECB", name: "Lavender" },
-              { hex: "#A0965E", name: "Olive" },
-              { hex: "#A86B45", name: "Cinnamon" },
-            ].map((s) => (
-              <div key={s.hex} className="flex flex-col items-center gap-2">
-                <div
-                  className="w-10 h-10 rounded-full"
-                  style={{
-                    background: s.hex,
-                    border: `1.5px solid ${s.hex}`,
-                    boxShadow: "0 2px 8px -2px rgba(28,42,24,0.1)",
-                  }}
-                />
-                <span
-                  className="font-[family-name:var(--font-label)] text-center leading-tight whitespace-pre-line"
-                  style={{
-                    fontSize: 12,
-                    letterSpacing: "0.06em",
-                    color: "var(--c-muted)",
-                    maxWidth: 40,
-                  }}
-                >
-                  {s.name}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <Divider />
-
-          <div className="mt-8 space-y-3">
+          {/* Digital gift envelope — PromptPay QR */}
+          <div className="reveal mt-16 flex flex-col items-center text-center">
+            <Divider />
+            <div className="mt-10 w-full max-w-[260px] md:max-w-[300px] overflow-hidden rounded-2xl shadow-[0_10px_30px_-14px_rgba(184,132,126,0.55)]">
+              <Image
+                src="/promptpay-qr.jpg"
+                alt="PromptPay QR code สำหรับโอนเงิน"
+                width={885}
+                height={1200}
+                unoptimized
+                className="h-auto w-full"
+              />
+            </div>
             <p
-              className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
+              className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed mt-6"
               style={{ color: "var(--c-ink-2)" }}
             >
-              แต่งกายให้เข้ากับบรรยากาศสวนที่ดูโรแมนติกและสดใส
-            </p>
-            <p
-              className="font-[family-name:var(--font-thai)] text-base md:text-lg"
-              style={{ color: "var(--c-muted)" }}
-            >
-              ขอสงวนสีขาวและสีดำล้วนไว้สำหรับบ่าวสาว
+              กล่องใส่ซองดิจิทัล...
+              <br />
+              ขอบคุณสำหรับทุกความรักและคำอวยพร ✨
             </p>
           </div>
         </div>

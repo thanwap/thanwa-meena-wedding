@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Cormorant_Garamond, Josefin_Sans, Great_Vibes, Taviraj, Geist } from "next/font/google"
+import { Cormorant_Garamond, Josefin_Sans, Great_Vibes, Taviraj, Mali, Geist } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -30,6 +30,13 @@ const taviraj = Taviraj({
   weight: ["300", "400", "500"],
   style: ["normal", "italic"],
   variable: "--font-taviraj",
+})
+
+// Rounded Thai handwriting — playful counterpart to Great Vibes
+const mali = Mali({
+  subsets: ["thai"],
+  weight: ["600"],
+  variable: "--font-script-thai",
 })
 
 // Keep Geist for admin UI (shadcn components)
@@ -67,6 +74,7 @@ export default function RootLayout({
         cormorant.variable,
         josefin.variable,
         greatVibes.variable,
+        mali.variable,
         taviraj.variable,
         geist.variable,
       )}
