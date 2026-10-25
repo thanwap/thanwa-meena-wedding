@@ -497,18 +497,18 @@ export default async function Page() {
           {/* Colour swatches */}
           <div className="flex justify-center gap-5 mb-10">
             {[
-              { hex: "#E8C3BE", name: "Blush\nPink" },
-              { hex: "#8AA882", name: "Sage\nGreen" },
-              { hex: "#C2B3D2", name: "Lavender" },
-              { hex: "#FAF7F0", name: "Ivory", border: "#C2B3D2" },
-              { hex: "#DEC89C", name: "Champagne" },
+              { hex: "#D4A5A8", name: "Dusty\nRose" },
+              { hex: "#D8955A", name: "Apricot" },
+              { hex: "#B2AECB", name: "Lavender" },
+              { hex: "#A0965E", name: "Olive" },
+              { hex: "#A86B45", name: "Cinnamon" },
             ].map((s) => (
               <div key={s.hex} className="flex flex-col items-center gap-2">
                 <div
                   className="w-10 h-10 rounded-full"
                   style={{
                     background: s.hex,
-                    border: `1.5px solid ${s.border ?? s.hex}`,
+                    border: `1.5px solid ${s.hex}`,
                     boxShadow: "0 2px 8px -2px rgba(28,42,24,0.1)",
                   }}
                 />
