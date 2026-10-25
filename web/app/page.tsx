@@ -422,10 +422,10 @@ export default async function Page() {
               โปรดแจ้งความประสงค์ในการเข้าร่วมงาน
             </p>
             <p
-              className="font-[family-name:var(--font-label)] text-[12px] md:text-[14px] tracking-[0.3em] mt-3"
+              className="font-[family-name:var(--font-thai)] text-sm md:text-base tracking-wide mt-3"
               style={{ color: "var(--c-blush-deep)" }}
             >
-              BEFORE 12 DECEMBER 2026
+              ภายในวันที่ 12 ธันวาคม 2026
             </p>
           </div>
 
@@ -453,7 +453,7 @@ export default async function Page() {
               className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
               style={{ color: "var(--c-ink-2)" }}
             >
-              ฝากคำอวยพรและความประทับใจให้กับคู่บ่าวสาว
+              ฝากคำอวยพรให้กับคู่บ่าวสาว
             </p>
           </div>
 

@@ -35,8 +35,11 @@ const TOGGLE_BASE: React.CSSProperties = {
   color: "var(--c-ink-2)",
 }
 
+type HeartPop = { id: number; x: number; y: number }
+
 export function RSVPForm() {
   const [attending, setAttending] = useState<boolean | null>(null)
+  const [heart, setHeart] = useState<HeartPop | null>(null)
   const [submitted, setSubmitted] = useState(false)
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -108,36 +111,62 @@ export function RSVPForm() {
 
       {/* ── Attendance toggle ── */}
       <div>
-        <label style={LABEL}>จะมาร่วมงานไหม?</label>
-        <div className="flex gap-3 mt-3">
+        <div className="flex gap-3">
           {(
             [
-              { v: true, label: "ยืนยันเข้าร่วม ✓" },
-              { v: false, label: "ไม่สะดวก" },
+              { v: true, label: "ยืนยันเข้าร่วม" },
+              { v: false, label: "ขอส่งใจไปแทนนะ" },
             ] as const
           ).map(({ v, label }) => (
             <button
               key={String(v)}
               type="button"
-              onClick={() => setAttending(v)}
+              onClick={(e) => {
+                setAttending(v)
+                if (!v) {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  // Keyboard activation has no pointer position — pop from center
+                  const x = e.clientX ? e.clientX - rect.left : rect.width / 2
+                  const y = e.clientY ? e.clientY - rect.top : rect.height / 2
+                  const pop = { id: Date.now(), x, y }
+                  setHeart(pop)
+                  setTimeout(
+                    () => setHeart((cur) => (cur === pop ? null : cur)),
+                    1500,
+                  )
+                }
+              }}
               style={{
                 ...TOGGLE_BASE,
-                borderColor:
-                  attending === v
-                    ? v
-                      ? "var(--c-sage)"
-                      : "var(--c-blush-deep)"
-                    : "var(--c-blush)",
+                position: "relative",
+                padding: "14px 8px",
+                fontFamily: "var(--font-thai)",
+                fontSize: "16px",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+                border: `1.5px solid ${v ? "var(--c-sage)" : "var(--c-blush-deep)"}`,
                 background:
                   attending === v
                     ? v
                       ? "var(--c-sage)"
                       : "var(--c-blush-deep)"
-                    : "transparent",
-                color: attending === v ? "#fff" : "var(--c-ink-2)",
+                    : v
+                      ? "color-mix(in srgb, var(--c-sage-light) 35%, transparent)"
+                      : "color-mix(in srgb, var(--c-blush) 30%, transparent)",
+                color: attending === v ? "#fff" : "var(--c-ink)",
               }}
             >
               {label}
+              {!v && heart && (
+                <span
+                  key={heart.id}
+                  aria-hidden="true"
+                  className="heart-pop"
+                  style={{ left: heart.x, top: heart.y }}
+                >
+                  ❤️
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -168,7 +197,7 @@ export function RSVPForm() {
           {/* Guest count */}
           <div>
             <label style={LABEL} htmlFor="rsvp-guests">
-              จำนวนผู้เข้าร่วม (รวมท่าน)
+              จำนวนผู้เข้าร่วม (รวมคุณด้วย)
             </label>
             <div className="relative">
               <select
@@ -294,15 +323,15 @@ export function RSVPForm() {
               className="font-[family-name:var(--font-display)] text-2xl italic"
               style={{ color: "var(--c-ink-2)" }}
             >
-              เราเข้าใจค่ะ 💗
+              ขอบคุณนะ 💗
             </p>
             <p
               className="font-[family-name:var(--font-thai)] text-base leading-relaxed"
               style={{ color: "var(--c-muted)" }}
             >
-              ขอบคุณที่แจ้งให้ทราบ
+              ส่งใจมาก็ดีใจแล้ว
               <br />
-              และขอบคุณสำหรับความรักที่มีให้เราเสมอ
+              หากสะดวกฝากคำอวยพรถึงเราได้นะ
             </p>
           </div>
         </>

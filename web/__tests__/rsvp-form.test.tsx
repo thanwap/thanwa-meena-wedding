@@ -20,7 +20,7 @@ describe("RSVPForm", () => {
   it("renders attendance toggle buttons", () => {
     render(<RSVPForm />)
     expect(screen.getByText(/ยืนยันเข้าร่วม/)).toBeInTheDocument()
-    expect(screen.getByText(/ไม่สะดวก/)).toBeInTheDocument()
+    expect(screen.getByText(/ขอส่งใจไปแทนนะ/)).toBeInTheDocument()
   })
 
   it("shows form fields when attending is confirmed", () => {
@@ -32,8 +32,8 @@ describe("RSVPForm", () => {
 
   it("shows decline message when not attending", () => {
     render(<RSVPForm />)
-    fireEvent.click(screen.getByText(/ไม่สะดวก/))
-    expect(screen.getByText(/เราเข้าใจ/)).toBeInTheDocument()
+    fireEvent.click(screen.getByText(/ขอส่งใจไปแทนนะ/))
+    expect(screen.getByText(/ส่งใจมาก็ดีใจแล้ว/)).toBeInTheDocument()
   })
 
   it("shows dietary input when 'มี' is selected", () => {
