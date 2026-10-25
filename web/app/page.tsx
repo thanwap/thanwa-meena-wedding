@@ -617,7 +617,7 @@ export default async function Page() {
               style={{ color: "var(--c-ink)" }}
             >
               <span className="inline-block">ธันวา พัวมณี</span>{" "}
-              <span className="inline-block">&amp; จิตตินันท์ พรหมลิ</span>
+              <span className="inline-block">&amp; จิตตินันทน์ พรหมลิ</span>
             </p>
 
             <SaveQrButton
