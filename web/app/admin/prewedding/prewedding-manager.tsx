@@ -39,7 +39,6 @@ import {
   adminDeletePreweddingPhoto,
   adminReorderPreweddingPhotos,
   adminUpdatePreweddingPhoto,
-  adminUploadPreweddingPhoto,
 } from "./actions"
 
 type UploadStatus = "waiting" | "optimising" | "uploading" | "done" | "error"
@@ -50,6 +49,8 @@ interface UploadItem {
   status: UploadStatus
   error?: string
 }
+
+const MAX_CONCURRENT_UPLOADS = 3
 
 const STATUS_LABEL: Record<UploadStatus, string> = {
   waiting: "Waiting",
@@ -66,16 +67,21 @@ export function PreweddingManager({ initialPhotos }: { initialPhotos: Prewedding
   const [editing, setEditing] = useState<PreweddingPhoto | null>(null)
   const [deleting, setDeleting] = useState<PreweddingPhoto | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const uploadingRef = useRef(false)
+  const activeRef = useRef(0)
   const pendingRef = useRef<{ key: string; file: File }[]>([])
 
   const setItem = (key: string, patch: Partial<UploadItem>) =>
     setQueue((q) => q.map((item) => (item.key === key ? { ...item, ...patch } : item)))
 
-  /* Uploads run one at a time so each request stays under the body limit */
-  async function drain() {
-    if (uploadingRef.current) return
-    uploadingRef.current = true
+  /* A few uploads run side by side — more would just queue on the API's small CPU */
+  function drain() {
+    while (activeRef.current < MAX_CONCURRENT_UPLOADS && pendingRef.current.length > 0) {
+      activeRef.current++
+      worker().finally(() => activeRef.current--)
+    }
+  }
+
+  async function worker() {
     let next
     while ((next = pendingRef.current.shift())) {
       const { key, file } = next
@@ -86,19 +92,19 @@ export function PreweddingManager({ initialPhotos }: { initialPhotos: Prewedding
         setItem(key, { status: "uploading" })
         const form = new FormData()
         form.append("file", blob, file.name)
-        const result = await adminUploadPreweddingPhoto(form)
+        const res = await fetch("/api/admin/prewedding-photos", { method: "POST", body: form })
+        const body = await res.json().catch(() => ({}))
 
-        if (result.success) {
+        if (res.ok) {
           setItem(key, { status: "done" })
-          setPhotos((p) => [...p, result.data])
+          setPhotos((p) => insertBySortOrder(p, body as PreweddingPhoto))
         } else {
-          setItem(key, { status: "error", error: result.error })
+          setItem(key, { status: "error", error: body.error ?? `Upload failed (HTTP ${res.status})` })
         }
       } catch (err) {
         setItem(key, { status: "error", error: err instanceof Error ? err.message : String(err) })
       }
     }
-    uploadingRef.current = false
   }
 
   function addFiles(files: FileList | File[]) {
@@ -267,6 +273,16 @@ export function PreweddingManager({ initialPhotos }: { initialPhotos: Prewedding
       </Dialog>
     </div>
   )
+}
+
+/**
+ * Parallel uploads can finish out of order. Place the new photo before any later
+ * upload instead of re-sorting the list — local sortOrders go stale after a drag.
+ */
+export function insertBySortOrder(photos: PreweddingPhoto[], photo: PreweddingPhoto): PreweddingPhoto[] {
+  const index = photos.findIndex((p) => p.sortOrder > photo.sortOrder)
+  if (index === -1) return [...photos, photo]
+  return [...photos.slice(0, index), photo, ...photos.slice(index)]
 }
 
 function StatusIcon({ status }: { status: UploadStatus }) {

@@ -20,14 +20,6 @@ export async function adminGetPreweddingPhotos(): Promise<PreweddingPhoto[]> {
   return res.json()
 }
 
-export async function adminUploadPreweddingPhoto(formData: FormData): Promise<Result<PreweddingPhoto>> {
-  const res = await adminFetch("/api/prewedding-photos", { method: "POST", body: formData })
-  if (!res.ok) return { success: false, error: await errorFrom(res, "Upload failed") }
-
-  updateTag(PREWEDDING_CACHE_TAG)
-  return { success: true, data: await res.json() }
-}
-
 export async function adminUpdatePreweddingPhoto(
   id: string,
   fields: { title: string | null; caption: string | null; tileSize: TileSize | null },

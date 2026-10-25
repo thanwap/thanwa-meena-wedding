@@ -13,18 +13,26 @@ public class ImageSharpProcessor : IImageProcessor
     public const int ThumbMaxEdge = 900;
     private const int MaxInputEdge = 12000; // guards against decompression bombs
 
+    // Level4 (the default) — Level6 is several times slower for a few % smaller files
     private static readonly WebpEncoder FullEncoder = new()
     {
         FileFormat = WebpFileFormatType.Lossy,
         Quality = 82,
-        Method = WebpEncodingMethod.Level6,
+        Method = WebpEncodingMethod.Level4,
     };
 
     private static readonly WebpEncoder ThumbEncoder = new()
     {
         FileFormat = WebpFileFormatType.Lossy,
         Quality = 78,
-        Method = WebpEncodingMethod.Level6,
+        Method = WebpEncodingMethod.Level4,
+    };
+
+    // JPEG decodes straight at reduced scale instead of full resolution then resizing.
+    // Only for oversized input — TargetSize would upscale smaller images.
+    private static readonly DecoderOptions DownscaleOnDecode = new()
+    {
+        TargetSize = new Size(FullMaxEdge, FullMaxEdge),
     };
 
     public async Task<ProcessedImage> ToWebpAsync(Stream input, CancellationToken ct = default)
@@ -56,7 +64,8 @@ public class ImageSharpProcessor : IImageProcessor
         Image image;
         try
         {
-            image = await Image.LoadAsync(buffer, ct);
+            var oversized = info.Width > FullMaxEdge || info.Height > FullMaxEdge;
+            image = await Image.LoadAsync(oversized ? DownscaleOnDecode : new DecoderOptions(), buffer, ct);
         }
         catch (InvalidImageContentException)
         {
@@ -72,14 +81,17 @@ public class ImageSharpProcessor : IImageProcessor
             image.Metadata.XmpProfile = null;
             image.Metadata.IptcProfile = null;
 
-            using var full = image.Clone(x => FitWithin(x, FullMaxEdge));
+            image.Mutate(x => FitWithin(x, FullMaxEdge));
             using var thumb = image.Clone(x => FitWithin(x, ThumbMaxEdge));
 
+            var fullBytes = Task.Run(() => EncodeAsync(image, FullEncoder, ct), ct);
+            var thumbBytes = Task.Run(() => EncodeAsync(thumb, ThumbEncoder, ct), ct);
+
             return new ProcessedImage(
-                await EncodeAsync(full, FullEncoder, ct),
-                await EncodeAsync(thumb, ThumbEncoder, ct),
-                full.Width,
-                full.Height);
+                await fullBytes,
+                await thumbBytes,
+                image.Width,
+                image.Height);
         }
     }
 

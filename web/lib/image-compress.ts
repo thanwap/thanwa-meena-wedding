@@ -28,6 +28,7 @@ export function compressToBlob(
   canvas.width = w
   canvas.height = h
   const ctx = canvas.getContext("2d")!
+  ctx.imageSmoothingQuality = "high"
   ctx.drawImage(source as CanvasImageSource, 0, 0, w, h)
 
   return new Promise<Blob>((resolve, reject) => {

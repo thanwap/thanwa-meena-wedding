@@ -15,8 +15,12 @@ function fileOfSize(bytes: number, name = "photo.jpg", type = "image/jpeg") {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  vi.stubGlobal("createImageBitmap", vi.fn().mockResolvedValue({ close: vi.fn() }))
+  stubBitmap(6000, 4000)
 })
+
+function stubBitmap(width: number, height: number) {
+  vi.stubGlobal("createImageBitmap", vi.fn().mockResolvedValue({ width, height, close: vi.fn() }))
+}
 
 describe("isAcceptedImage", () => {
   it("accepts jpeg and png by MIME type", () => {
@@ -35,18 +39,27 @@ describe("isAcceptedImage", () => {
 })
 
 describe("prepareForUpload", () => {
-  it("sends small files untouched", async () => {
+  it("sends files already within 2400px and the size limit untouched", async () => {
+    stubBitmap(2400, 1600)
     const file = fileOfSize(PASSTHROUGH_BYTES)
     expect(await prepareForUpload(file)).toBe(file)
     expect(mockCompress).not.toHaveBeenCalled()
   })
 
-  it("pre-shrinks large files to 3000px JPEG", async () => {
+  it("pre-shrinks small files with more than 2400px to 2400px JPEG", async () => {
+    const shrunk = new Blob(["y"])
+    mockCompress.mockResolvedValueOnce(shrunk)
+
+    expect(await prepareForUpload(fileOfSize(3 * 1024 * 1024))).toBe(shrunk)
+    expect(mockCompress).toHaveBeenCalledWith(expect.anything(), 2400, 0.92)
+  })
+
+  it("pre-shrinks large files to 2400px JPEG", async () => {
     const shrunk = new Blob(["y"])
     mockCompress.mockResolvedValueOnce(shrunk)
 
     expect(await prepareForUpload(fileOfSize(12 * 1024 * 1024))).toBe(shrunk)
-    expect(mockCompress).toHaveBeenCalledWith(expect.anything(), 3000, 0.92)
+    expect(mockCompress).toHaveBeenCalledWith(expect.anything(), 2400, 0.92)
   })
 
   it("steps quality down until the result fits", async () => {
@@ -55,7 +68,7 @@ describe("prepareForUpload", () => {
     mockCompress.mockResolvedValueOnce(tooBig).mockResolvedValueOnce(fits)
 
     expect(await prepareForUpload(fileOfSize(20 * 1024 * 1024))).toBe(fits)
-    expect(mockCompress).toHaveBeenLastCalledWith(expect.anything(), 3000, 0.85)
+    expect(mockCompress).toHaveBeenLastCalledWith(expect.anything(), 2400, 0.85)
   })
 
   it("throws when even the lowest quality is too large", async () => {
