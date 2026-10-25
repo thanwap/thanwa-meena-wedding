@@ -24,12 +24,19 @@ jobs:
       - name: Run tests
         run: dotnet test api/WeddingApi.sln --verbosity normal
 
+      # serviceInstanceRedeploy only restarts the current build; DeployV2 builds this tag's commit.
+      # GraphQL errors come back as HTTP 200, so check the body as well as the status.
       - name: Deploy to Railway
         run: |
-          curl -sf https://backboard.railway.app/graphql/v2 \
+          response=$(curl -sS --fail-with-body https://backboard.railway.app/graphql/v2 \
             -H "Authorization: Bearer $RAILWAY_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"query":"mutation{serviceInstanceRedeploy(serviceId:\"31db35db-4d43-4776-95bd-ab23722afc7e\",environmentId:\"7dd9d131-a611-40ec-9f74-f0d54c3b9c4e\")}"}'
+            -d "{\"query\":\"mutation{serviceInstanceDeployV2(serviceId:\\\"31db35db-4d43-4776-95bd-ab23722afc7e\\\",environmentId:\\\"7dd9d131-a611-40ec-9f74-f0d54c3b9c4e\\\",commitSha:\\\"${GITHUB_SHA}\\\")}\"}")
+          echo "$response"
+          if echo "$response" | grep -q '"errors"'; then
+            echo "::error::Railway deploy failed"
+            exit 1
+          fi
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
