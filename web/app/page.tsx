@@ -572,26 +572,81 @@ export default async function Page() {
             <GuestbookWall entries={guestbookEntries} />
           </div>
 
-          {/* Digital gift envelope — PromptPay QR */}
-          <div className="reveal mt-16 flex flex-col items-center text-center">
-            <Divider />
-            <div className="mt-10 w-full max-w-[260px] md:max-w-[300px] overflow-hidden rounded-2xl shadow-[0_10px_30px_-14px_rgba(184,132,126,0.55)]">
+          {/* Digital gift envelope — PromptPay QR. The page shows only the
+              code; "save" hands over the full bank slip so banking apps can
+              read it from the photo library (guests can't scan their own screen). */}
+          <div
+            className="reveal mt-20 rounded-[28px] px-6 pt-12 pb-11 md:px-12 text-center"
+            style={{
+              background: "var(--c-ivory)",
+              border: "1px solid color-mix(in srgb, var(--c-blush) 55%, transparent)",
+              boxShadow: "0 18px 40px -28px rgba(184,132,126,0.45)",
+            }}
+          >
+            <SectionLabel>Wedding Gift</SectionLabel>
+            <h3
+              className="font-[family-name:var(--font-display)] font-light italic mt-3"
+              style={{ fontSize: "clamp(30px, 8vw, 44px)", lineHeight: 1.2 }}
+            >
+              กล่องใส่ซองดิจิทัล
+            </h3>
+
+            <div
+              className="mx-auto mt-8 w-full max-w-[220px] md:max-w-[240px] rounded-2xl bg-white p-3"
+              style={{ boxShadow: "0 0 0 1px color-mix(in srgb, var(--c-blush) 60%, transparent), 0 10px 24px -16px rgba(184,132,126,0.6)" }}
+            >
               <Image
-                src="/promptpay-qr.jpg"
-                alt="PromptPay QR code สำหรับโอนเงิน"
-                width={885}
-                height={1200}
+                src="/promptpay-qr-code.jpg"
+                alt="PromptPay QR code สำหรับโอนเงินให้บ่าวสาว"
+                width={455}
+                height={455}
                 unoptimized
                 className="h-auto w-full"
               />
+            </div>
+
+            <p
+              className="font-[family-name:var(--font-label)] text-[11px] md:text-[12px] tracking-[0.35em] uppercase mt-5"
+              style={{ color: "var(--c-sage)" }}
+            >
+              PromptPay
+            </p>
+            <p
+              className="font-[family-name:var(--font-thai)] text-base md:text-lg mt-1"
+              style={{ color: "var(--c-ink)" }}
+            >
+              <span className="inline-block">ธันวา พัวมณี</span>{" "}
+              <span className="inline-block">&amp; จิตตินันท์ พรหมลิ</span>
+            </p>
+
+            <a
+              href="/promptpay-qr.jpg"
+              download="thanwa-meena-promptpay.jpg"
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-[family-name:var(--font-thai)] text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--c-sage)_10%,transparent)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
+              style={{ border: "1px solid var(--c-sage)", color: "var(--c-sage)" }}
+            >
+              <svg width="12" height="13" viewBox="0 0 12 13" fill="none" aria-hidden>
+                <path d="M6 1v8m0 0L2.5 5.5M6 9l3.5-3.5M1 12h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              บันทึก QR
+            </a>
+            <p
+              className="font-[family-name:var(--font-thai)] text-[13px] md:text-sm leading-relaxed mt-3"
+              style={{ color: "var(--c-muted)" }}
+            >
+              <span className="inline-block">บันทึกรูปแล้วเปิดจากเมนูสแกน</span>{" "}
+              <span className="inline-block">ในแอปธนาคาร</span>
+            </p>
+
+            <div className="mt-9">
+              <Divider />
             </div>
             <p
               className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed mt-6"
               style={{ color: "var(--c-ink-2)" }}
             >
-              กล่องใส่ซองดิจิทัล...
-              <br />
-              ขอบคุณสำหรับทุกความรักและคำอวยพร ✨
+              <span className="inline-block">ขอบคุณสำหรับทุกความรัก</span>
+              <span className="inline-block">และคำอวยพร ✨</span>
             </p>
           </div>
         </div>
