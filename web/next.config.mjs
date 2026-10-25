@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    // Admin pre-wedding uploads: browser pre-shrinks to ≤4 MB, leave headroom
-    serverActions: { bodySizeLimit: "5mb" },
-  },
   async headers() {
     // Dev only: lets a local stand-in for Supabase Storage serve images
     const devImg = process.env.NODE_ENV === "development" ? " http://localhost:*" : ""
@@ -24,6 +20,14 @@ const nextConfig = {
     ].join("; ")
 
     return [
+      {
+        // Gift QR "save" button: Vercel serves public files as inline, which
+        // makes Safari/Firefox open the image in a tab instead of saving it
+        source: "/promptpay-qr.jpg",
+        headers: [
+          { key: "Content-Disposition", value: 'attachment; filename="thanwa-meena-promptpay.jpg"' },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [
