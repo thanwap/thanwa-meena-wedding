@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image, { getImageProps } from "next/image"
 import { Countdown } from "@/components/countdown"
 import { RSVPForm } from "@/components/rsvp-form"
 import { NavMenu } from "@/components/nav-menu"
@@ -7,6 +7,7 @@ import { GuestbookWall } from "@/components/guestbook-wall"
 import { ScheduleTimeline } from "@/components/schedule-timeline"
 import { PreweddingGallery } from "@/components/prewedding-gallery"
 import { SaveQrButton } from "@/components/save-qr-button"
+import { HeroVideo } from "@/components/hero-video"
 import { getRandomGuestbookEntries } from "@/app/actions/guestbook"
 import { getPreweddingPhotos } from "@/app/actions/prewedding"
 
@@ -104,6 +105,30 @@ function FloralAccent({ className = "" }: { className?: string }) {
   )
 }
 
+/* ─── Hero logo — white over the reel on mobile, ink on desktop ─── */
+/** Art-directed with <picture> so each device downloads only its own colour,
+    instead of recolouring one PNG with CSS filters */
+function HeroLogo() {
+  const common = { alt: "Thanwa & Jittinan", width: 960, height: 460, priority: true }
+  const {
+    props: { srcSet: desktop },
+  } = getImageProps({ ...common, src: "/wedding-logo-transparent.png" })
+  const {
+    props: { srcSet: mobile, ...rest },
+  } = getImageProps({ ...common, src: "/wedding-logo-white.png" })
+  return (
+    <picture>
+      <source media="(min-width: 1024px)" srcSet={desktop} />
+      <img
+        {...rest}
+        srcSet={mobile}
+        alt={common.alt}
+        className="h-auto w-full max-w-[74vw] lg:max-w-[440px]"
+      />
+    </picture>
+  )
+}
+
 /* ─── Dress code palette ─────────────────────── */
 const DRESS_PALETTE = [
   { hex: "#D4A5A8", name: "Dusty Rose" },
@@ -158,87 +183,114 @@ export default async function Page() {
           ══════════════════════════════ */}
       <section
         id="hero"
-        className="relative flex min-h-svh flex-col items-center justify-center px-6 pb-16 pt-20 text-center"
+        className="relative overflow-hidden lg:grid lg:min-h-svh lg:grid-cols-[auto_minmax(0,540px)] lg:grid-rows-[1fr_auto_auto_1fr] lg:items-center lg:justify-center lg:gap-x-20 lg:px-12 lg:pt-24 lg:pb-16"
       >
+        {/* Desktop ambient backdrop — blurred still of the reel washed into ivory.
+            blur-3xl hides the detail, so a small variant is plenty */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 hidden lg:block">
+          <Image
+            src="/hero-poster.jpg"
+            alt=""
+            fill
+            sizes="320px"
+            className="scale-110 object-cover opacity-45 blur-3xl"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at 30% 50%, transparent 0%, color-mix(in srgb, var(--c-ivory) 70%, transparent) 55%, var(--c-ivory) 100%)",
+            }}
+          />
+        </div>
+
         {/* Grain texture overlay */}
         <div
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 z-10"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")`,
             backgroundSize: "256px 256px",
           }}
         />
 
-        {/* Names — wedding logo */}
-        <h1 className="hero-2 relative z-10 flex justify-center">
-          <span className="sr-only">Meena &amp; Thanwa</span>
-          <span className="logo-anim">
-            <Image
-              src="/wedding-logo-transparent.png"
-              alt="Thanwa & Jittinan"
-              width={960}
-              height={460}
-              priority
-              className="h-auto w-full max-w-[72vw] md:max-w-[min(40vw,480px)]"
-            />
-          </span>
-        </h1>
-
-        {/* Hero image in decorative frame */}
-        <div className="hero-3 relative mt-10 w-full max-w-[260px] md:max-w-[320px]">
-          {/* Offset decorative border */}
+        {/* Reel — full-bleed on mobile, framed 9:16 card on desktop */}
+        <div className="relative h-svh w-full lg:row-span-4 lg:h-[min(80svh,880px)] lg:w-auto lg:aspect-[9/16]">
+          {/* Offset decorative border (desktop) */}
           <div
-            className="absolute inset-0 z-0"
+            aria-hidden
+            className="absolute inset-0 hidden lg:block"
             style={{
               border: "1px solid var(--c-blush)",
-              transform: "translate(10px, 10px)",
-              opacity: 0.6,
+              transform: "translate(14px, 14px)",
+              opacity: 0.7,
             }}
           />
-          <div
-            className="relative z-10 w-full overflow-hidden"
-            style={{ aspectRatio: "3 / 4" }}
-          >
-            <Image
-              src="/landing.png"
-              alt="Meena & Thanwa"
-              fill
-              priority
-              sizes="(min-width: 768px) 320px, 260px"
-              className="object-contain"
+          <div className="relative h-full w-full overflow-hidden lg:shadow-[0_30px_60px_-24px_rgba(72,84,64,0.45)]">
+            <HeroVideo
+              className="object-cover"
+              buttonClassName="absolute right-4 bottom-[27svh] z-10 lg:bottom-4"
+            />
+            {/* Mobile scrims: darken the sky behind the logo, fade the foot into the page */}
+            <div
+              aria-hidden
+              className="absolute inset-x-0 top-0 h-[50%] lg:hidden"
+              style={{ background: "linear-gradient(to bottom, rgba(28,42,24,0.58) 0%, rgba(28,42,24,0.24) 55%, transparent 100%)" }}
+            />
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-[40%] lg:hidden"
+              style={{ background: "linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--c-ivory) 75%, transparent) 62%, var(--c-ivory) 100%)" }}
             />
           </div>
         </div>
 
-        {/* Date + hashtag */}
-        <div className="hero-4 mt-10 space-y-2.5">
-          <p
-            className="font-[family-name:var(--font-label)] text-base md:text-xl tracking-[0.5em] uppercase"
-            style={{ color: "var(--c-ink-2)" }}
-          >
-            26 &middot; 12 &middot; 2026
-          </p>
-          <p
-            className="font-[family-name:var(--font-label)] text-[12px] md:text-[14px] tracking-[0.3em]"
-            style={{ color: "var(--c-muted)" }}
-          >
-            #frommeenatothanwaforever
-          </p>
-        </div>
+        {/* Names — wedding logo (white over the reel on mobile, ink and centred beside it on desktop) */}
+        <h1 className="hero-2 absolute inset-x-0 top-[max(11svh,56px)] z-20 flex justify-center px-6 lg:static lg:col-start-2 lg:row-start-2 lg:px-0">
+          <span className="sr-only">Meena &amp; Thanwa</span>
+          {/* Soft shade behind the white logo — a gradient, not a CSS filter: iOS Safari
+              drew the old brightness/invert/drop-shadow stack as a visible rectangle */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[95%] -translate-x-1/2 -translate-y-1/2 lg:hidden"
+            style={{ background: "radial-gradient(closest-side, rgba(28,42,24,0.3), transparent)" }}
+          />
+          <span className="logo-anim">
+            <HeroLogo />
+          </span>
+        </h1>
 
-        {/* Countdown */}
-        <div className="hero-5 mt-10">
-          <Countdown />
-        </div>
+        <div className="relative z-20 -mt-[22svh] flex flex-col items-center px-6 pb-16 text-center lg:col-start-2 lg:row-start-3 lg:mt-0 lg:px-0 lg:pb-0">
+          {/* Date + hashtag */}
+          <div className="hero-4 space-y-3 lg:mt-10">
+            {/* Same face and size as the countdown digits */}
+            <p
+              className="whitespace-nowrap font-[family-name:var(--font-display)] font-light leading-none tracking-[0.04em] lining-nums"
+              style={{ color: "var(--c-ink)", fontSize: "clamp(44px, 13vw, 72px)" }}
+            >
+              26<span className="mx-[0.18em]" style={{ color: "var(--c-blush-deep)", opacity: 0.6 }}>&middot;</span>12<span className="mx-[0.18em]" style={{ color: "var(--c-blush-deep)", opacity: 0.6 }}>&middot;</span>2026
+            </p>
+            <p
+              className="font-[family-name:var(--font-label)] text-[14px] md:text-[17px] tracking-[0.3em]"
+              style={{ color: "var(--c-muted)" }}
+            >
+              #frommeenatothanwaforever
+            </p>
+          </div>
 
-        {/* RSVP button */}
-        <div className="hero-5 mt-10">
-          <a
-            href="#rsvp"
-            className="inline-flex items-center rounded-full px-10 py-3.5 font-[family-name:var(--font-thai)] text-[17px] md:text-lg tracking-[0.06em] text-white bg-[linear-gradient(135deg,var(--c-blush)_0%,var(--c-blush-deep)_100%)] shadow-[0_8px_22px_-10px_rgba(184,132,126,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[0.96] hover:shadow-[0_12px_26px_-10px_rgba(184,132,126,0.7)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
-          >
-            ตอบรับคำเชิญ
-          </a>
+          {/* Countdown — pushed below the fold on mobile so it clears the menu pill */}
+          <div className="hero-5 mt-[18svh] lg:mt-10">
+            <Countdown />
+          </div>
+
+          {/* RSVP button */}
+          <div className="hero-5 mt-10">
+            <a
+              href="#rsvp"
+              className="inline-flex items-center rounded-full px-10 py-3.5 font-[family-name:var(--font-thai)] text-[17px] md:text-lg tracking-[0.06em] text-white bg-[linear-gradient(135deg,var(--c-blush)_0%,var(--c-blush-deep)_100%)] shadow-[0_8px_22px_-10px_rgba(184,132,126,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[0.96] hover:shadow-[0_12px_26px_-10px_rgba(184,132,126,0.7)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
+            >
+              ตอบรับคำเชิญ
+            </a>
+          </div>
         </div>
       </section>
 
