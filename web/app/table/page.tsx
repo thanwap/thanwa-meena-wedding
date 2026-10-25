@@ -90,7 +90,7 @@ export default function TablePage() {
         <div className="mt-10 text-center">
           <Link
             href="/"
-            className="font-[family-name:var(--font-label)] inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase"
+            className="font-[family-name:var(--font-thai)] inline-flex items-center gap-2 text-[13px] tracking-[0.02em]"
             style={{ color: "var(--c-muted)" }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

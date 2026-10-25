@@ -104,9 +104,8 @@ export function PhotoPreview({
             <label
               style={{
                 fontFamily: "var(--font-label)",
-                fontSize: 10,
-                letterSpacing: "0.3em",
-                textTransform: "uppercase",
+                fontSize: 12,
+                letterSpacing: "0.05em",
                 color: "rgba(232,195,190,0.8)",
               }}
             >
@@ -172,10 +171,9 @@ export function PhotoPreview({
               background: "rgba(255,255,255,0.1)",
               border: "1px solid rgba(255,255,255,0.15)",
               color: "rgba(255,255,255,0.8)",
-              fontFamily: "var(--font-label)",
-              fontSize: 11,
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
+              fontFamily: "var(--font-thai)",
+              fontSize: 14,
+              letterSpacing: "0.02em",
               cursor: "pointer",
             }}
           >
@@ -196,10 +194,9 @@ export function PhotoPreview({
                   : "rgba(232,195,190,0.9)",
               border: "none",
               color: saving || (needsName && !name.trim()) ? "rgba(0,0,0,0.4)" : "#2d1b1a",
-              fontFamily: "var(--font-label)",
-              fontSize: 11,
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
+              fontFamily: "var(--font-thai)",
+              fontSize: 14,
+              letterSpacing: "0.02em",
               cursor:
                 saving || (needsName && !name.trim()) ? "not-allowed" : "pointer",
               transition: "background 0.2s ease",

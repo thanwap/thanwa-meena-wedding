@@ -267,9 +267,8 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
         <div
           style={{
             fontFamily: "var(--font-label)",
-            fontSize: 11,
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
+            fontSize: 12,
+            letterSpacing: "0.05em",
             color: atLimit ? "#f87171" : "rgba(255,255,255,0.85)",
             background: "rgba(0,0,0,0.35)",
             borderRadius: 20,
@@ -397,10 +396,9 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
                 background: "rgba(255,255,255,0.1)",
                 border: "1px solid rgba(255,255,255,0.2)",
                 color: "rgba(255,255,255,0.8)",
-                fontFamily: "var(--font-label)",
-                fontSize: 11,
-                letterSpacing: "0.25em",
-                textTransform: "uppercase",
+                fontFamily: "var(--font-thai)",
+                fontSize: 14,
+                letterSpacing: "0.02em",
                 cursor: "pointer",
               }}
             >
@@ -416,10 +414,9 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
                 background: capturing ? "rgba(232,195,190,0.35)" : "rgba(232,195,190,0.9)",
                 border: "none",
                 color: capturing ? "rgba(0,0,0,0.4)" : "#2d1b1a",
-                fontFamily: "var(--font-label)",
-                fontSize: 11,
-                letterSpacing: "0.25em",
-                textTransform: "uppercase",
+                fontFamily: "var(--font-thai)",
+                fontSize: 14,
+                letterSpacing: "0.02em",
                 cursor: capturing ? "not-allowed" : "pointer",
                 transition: "background 0.2s ease",
               }}
@@ -469,10 +466,9 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
               </div>
               <span
                 style={{
-                  fontFamily: "var(--font-label)",
-                  fontSize: 8,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
+                  fontFamily: "var(--font-thai)",
+                  fontSize: 10,
+                  letterSpacing: "0.02em",
                   color: "rgba(255,255,255,0.55)",
                 }}
               >

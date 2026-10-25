@@ -11,11 +11,12 @@ type FormState = {
   message: string
 }
 
+// Labels/toggles are Thai — wide tracking detaches Thai vowel/tone marks
+// (and splits สระอำ) on iOS Safari, so keep it near zero
 const LABEL: React.CSSProperties = {
-  fontFamily: "var(--font-label)",
-  fontSize: "12px",
-  letterSpacing: "0.4em",
-  textTransform: "uppercase",
+  fontFamily: "var(--font-thai)",
+  fontSize: "14px",
+  letterSpacing: "0.02em",
   color: "var(--c-muted)",
   display: "block",
   marginBottom: "6px",
@@ -24,10 +25,9 @@ const LABEL: React.CSSProperties = {
 const TOGGLE_BASE: React.CSSProperties = {
   flex: 1,
   padding: "12px 8px",
-  fontFamily: "var(--font-label)",
-  fontSize: "12px",
-  letterSpacing: "0.3em",
-  textTransform: "uppercase",
+  fontFamily: "var(--font-thai)",
+  fontSize: "15px",
+  letterSpacing: "0.02em",
   cursor: "pointer",
   transition: "all 0.2s",
   border: "1px solid var(--c-blush)",

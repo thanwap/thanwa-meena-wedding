@@ -202,10 +202,9 @@ export function PhotoLightbox({ photo, isOwner, onClose, onDelete, onPrev, onNex
               borderRadius: 8,
               padding: "6px 18px",
               color: "#f87171",
-              fontFamily: "var(--font-label)",
-              fontSize: 10,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
+              fontFamily: "var(--font-thai)",
+              fontSize: 13,
+              letterSpacing: "0.02em",
               cursor: "pointer",
             }}
           >

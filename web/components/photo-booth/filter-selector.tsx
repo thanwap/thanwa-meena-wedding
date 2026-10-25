@@ -83,10 +83,9 @@ export function FilterSelector({ current, onChange }: Props) {
             </div>
             <span
               style={{
-                fontFamily: "var(--font-label)",
-                fontSize: 9,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
+                fontFamily: "var(--font-thai)",
+                fontSize: 11,
+                letterSpacing: "0.02em",
                 color: active ? "rgba(232,195,190,1)" : "rgba(255,255,255,0.65)",
                 whiteSpace: "nowrap",
                 transition: "color 0.2s ease",

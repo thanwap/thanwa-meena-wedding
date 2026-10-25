@@ -62,7 +62,7 @@ export function TableSearch() {
         />
         {isPending && (
           <span
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-[family-name:var(--font-label)] text-[11px] tracking-[0.2em] uppercase"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-[family-name:var(--font-thai)] text-[13px] tracking-[0.02em]"
             style={{ color: "var(--c-muted)" }}
           >
             กำลังค้นหา...
@@ -132,7 +132,7 @@ export function TableSearch() {
 
                   {/* Tablemates */}
                   <p
-                    className="mb-2 font-[family-name:var(--font-label)] text-[11px] tracking-[0.25em] uppercase"
+                    className="mb-2 font-[family-name:var(--font-thai)] text-[13px] tracking-[0.02em]"
                     style={{ color: "var(--c-muted)" }}
                   >
                     ผู้ร่วมโต๊ะ
