@@ -119,13 +119,13 @@ export function GuestbookForm() {
     return (
       <div className="text-center py-10">
         <p
-          className="font-[family-name:var(--font-cormorant)] italic"
+          className="font-[family-name:var(--font-display)] italic"
           style={{ fontSize: 28, color: "var(--c-blush-deep)" }}
         >
           ขอบคุณมากนะคะ ♡
         </p>
         <p
-          className="font-[family-name:var(--font-sarabun)] text-base mt-3"
+          className="font-[family-name:var(--font-thai)] text-base mt-3"
           style={{ color: "var(--c-ink-2)" }}
         >
           Thank you for your beautiful message!
@@ -150,7 +150,7 @@ export function GuestbookForm() {
       <div>
         <label
           htmlFor="gb-name"
-          className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.3em] uppercase block mb-2"
+          className="font-[family-name:var(--font-label)] text-[12px] tracking-[0.3em] uppercase block mb-2"
           style={{ color: "var(--c-muted)" }}
         >
           Your Name
@@ -169,7 +169,7 @@ export function GuestbookForm() {
             border: "1px solid rgba(232,195,190,0.6)",
             borderRadius: 8,
             padding: "12px 14px",
-            fontFamily: "var(--font-sarabun)",
+            fontFamily: "var(--font-thai)",
             fontSize: 16,
             color: "var(--c-ink)",
             outline: "none",
@@ -181,7 +181,7 @@ export function GuestbookForm() {
       <div>
         <label
           htmlFor="gb-message"
-          className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.3em] uppercase block mb-2"
+          className="font-[family-name:var(--font-label)] text-[12px] tracking-[0.3em] uppercase block mb-2"
           style={{ color: "var(--c-muted)" }}
         >
           Your Message
@@ -200,7 +200,7 @@ export function GuestbookForm() {
             border: "1px solid rgba(232,195,190,0.6)",
             borderRadius: 8,
             padding: "12px 14px",
-            fontFamily: "var(--font-sarabun)",
+            fontFamily: "var(--font-thai)",
             fontSize: 16,
             color: "var(--c-ink)",
             outline: "none",
@@ -212,7 +212,7 @@ export function GuestbookForm() {
       {/* Image upload */}
       <div>
         <label
-          className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.3em] uppercase block mb-2"
+          className="font-[family-name:var(--font-label)] text-[12px] tracking-[0.3em] uppercase block mb-2"
           style={{ color: "var(--c-muted)" }}
         >
           Photos (optional, max {MAX_IMAGES})
@@ -286,8 +286,8 @@ export function GuestbookForm() {
                 border: "1px dashed rgba(232,195,190,0.8)",
                 background: "rgba(255,255,255,0.4)",
                 cursor: "pointer",
-                fontFamily: "var(--font-josefin)",
-                fontSize: 11,
+                fontFamily: "var(--font-label)",
+                fontSize: 12,
                 letterSpacing: "0.25em",
                 textTransform: "uppercase",
                 color: "var(--c-muted)",
@@ -304,7 +304,7 @@ export function GuestbookForm() {
 
       {error && (
         <p
-          className="font-[family-name:var(--font-sarabun)] text-sm"
+          className="font-[family-name:var(--font-thai)] text-base"
           style={{ color: "#e05252" }}
         >
           {error}
@@ -323,7 +323,7 @@ export function GuestbookForm() {
             ? "rgba(232,195,190,0.5)"
             : "linear-gradient(135deg, var(--c-blush) 0%, var(--c-blush-deep) 100%)",
           color: isPending || isCompressing ? "var(--c-muted)" : "#fff",
-          fontFamily: "var(--font-josefin)",
+          fontFamily: "var(--font-label)",
           fontSize: 12,
           letterSpacing: "0.35em",
           textTransform: "uppercase",

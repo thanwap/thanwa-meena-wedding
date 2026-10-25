@@ -57,7 +57,7 @@ function SectionLabel({
 }) {
   return (
     <p
-      className="font-[family-name:var(--font-josefin)] text-[13px] tracking-[0.35em] uppercase"
+      className="font-[family-name:var(--font-label)] text-[13px] md:text-[15px] tracking-[0.35em] uppercase"
       style={{ color }}
     >
       {children}
@@ -138,19 +138,6 @@ export default async function Page() {
           }}
         />
 
-        {/* Floating botanical top */}
-        <div
-          className="hero-1 float-anim pointer-events-none absolute top-16 left-1/2 -translate-x-1/2"
-          style={{ color: "var(--c-sage)", width: 100 }}
-        >
-          <FloralAccent />
-        </div>
-
-        {/* Save the Date label */}
-        <div className="hero-1 mb-6">
-          <SectionLabel color="var(--c-muted)">Save the Date</SectionLabel>
-        </div>
-
         {/* Names — wedding logo */}
         <h1 className="hero-2 relative z-10 flex justify-center">
           <span className="sr-only">Meena &amp; Thanwa</span>
@@ -167,7 +154,7 @@ export default async function Page() {
         </h1>
 
         {/* Hero image in decorative frame */}
-        <div className="hero-3 relative mt-10 w-full max-w-[260px]">
+        <div className="hero-3 relative mt-10 w-full max-w-[260px] md:max-w-[320px]">
           {/* Offset decorative border */}
           <div
             className="absolute inset-0 z-0"
@@ -186,7 +173,7 @@ export default async function Page() {
               alt="Meena & Thanwa"
               fill
               priority
-              sizes="260px"
+              sizes="(min-width: 768px) 320px, 260px"
               className="object-contain"
             />
           </div>
@@ -195,13 +182,13 @@ export default async function Page() {
         {/* Date + hashtag */}
         <div className="hero-4 mt-10 space-y-2.5">
           <p
-            className="font-[family-name:var(--font-josefin)] text-base tracking-[0.5em] uppercase"
+            className="font-[family-name:var(--font-label)] text-base md:text-xl tracking-[0.5em] uppercase"
             style={{ color: "var(--c-ink-2)" }}
           >
             26 &middot; 12 &middot; 2026
           </p>
           <p
-            className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.3em]"
+            className="font-[family-name:var(--font-label)] text-[12px] md:text-[14px] tracking-[0.3em]"
             style={{ color: "var(--c-muted)" }}
           >
             #frommeenatothanwaforever
@@ -213,22 +200,11 @@ export default async function Page() {
           <Countdown />
         </div>
 
-        {/* RSVP link */}
-        <div className="hero-5 mt-8">
+        {/* RSVP button */}
+        <div className="hero-5 mt-10">
           <a
             href="#rsvp"
-            className="inline-flex items-center gap-2"
-            style={{
-              fontFamily: "var(--font-josefin)",
-              fontSize: 10,
-              letterSpacing: "0.32em",
-              textTransform: "uppercase",
-              color: "var(--c-sage)",
-              textDecoration: "none",
-              borderBottom: "1px solid var(--c-sage-light)",
-              paddingBottom: 3,
-              transition: "color 0.2s ease, border-color 0.2s ease",
-            }}
+            className="inline-flex items-center rounded-full px-10 py-3.5 font-[family-name:var(--font-thai)] text-[17px] md:text-lg tracking-[0.06em] text-white bg-[linear-gradient(135deg,var(--c-blush)_0%,var(--c-blush-deep)_100%)] shadow-[0_8px_22px_-10px_rgba(184,132,126,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[0.96] hover:shadow-[0_12px_26px_-10px_rgba(184,132,126,0.7)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
           >
             ตอบรับคำเชิญ
           </a>
@@ -242,15 +218,15 @@ export default async function Page() {
         id="story"
         className="px-8 py-20 text-center"
       >
-        <div className="mx-auto max-w-lg">
+        <div className="mx-auto max-w-lg md:max-w-2xl">
           <Divider />
 
           <div className="mt-12 reveal">
             <SectionLabel>Our Story</SectionLabel>
 
             <h2
-              className="font-[family-name:var(--font-cormorant)] font-light italic mt-4 leading-snug"
-              style={{ fontSize: "clamp(36px, 10vw, 48px)", color: "var(--c-ink)" }}
+              className="font-[family-name:var(--font-display)] font-light italic mt-4 leading-snug"
+              style={{ fontSize: "clamp(36px, 10vw, 60px)", color: "var(--c-ink)" }}
             >
               Coding guy,
               <br />
@@ -258,7 +234,7 @@ export default async function Page() {
             </h2>
 
             <p
-              className="font-[family-name:var(--font-cormorant)] text-2xl italic mt-5"
+              className="font-[family-name:var(--font-display)] text-2xl md:text-3xl italic mt-5"
               style={{ color: "var(--c-blush-deep)" }}
             >
               Started on Tinder, growing ever after
@@ -266,13 +242,13 @@ export default async function Page() {
 
             <div className="mt-6 space-y-1">
               <p
-                className="font-[family-name:var(--font-sarabun)] text-base"
+                className="font-[family-name:var(--font-thai)] text-base md:text-lg"
                 style={{ color: "var(--c-ink-2)" }}
               >
                 เขาเขียนโค้ด เธอรักษาคนเจ็บไข้
               </p>
               <p
-                className="font-[family-name:var(--font-sarabun)] text-base"
+                className="font-[family-name:var(--font-thai)] text-base md:text-lg"
                 style={{ color: "var(--c-muted)" }}
               >
                 เริ่มต้นจากแอพไฟ และเติบโตไปด้วยกัน
@@ -295,7 +271,7 @@ export default async function Page() {
             ].map((text, i) => (
               <p
                 key={i}
-                className="font-[family-name:var(--font-sarabun)] text-[17px] leading-[1.85]"
+                className="font-[family-name:var(--font-thai)] text-[17px] md:text-[20px] leading-[1.85]"
                 style={{ color: "var(--c-ink)" }}
               >
                 {text}
@@ -316,12 +292,11 @@ export default async function Page() {
         >
           <div className="mx-auto max-w-sm md:max-w-4xl">
             <div className="reveal mb-14 text-center">
-              <SectionLabel>Photo Gallery</SectionLabel>
               <h2
-                className="font-[family-name:var(--font-cormorant)] font-light italic mt-3"
-                style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+                className="font-[family-name:var(--font-display)] font-light italic"
+                style={{ fontSize: "clamp(36px, 10vw, 60px)" }}
               >
-                Pre-wedding
+                Our Gallery
               </h2>
             </div>
 
@@ -337,13 +312,13 @@ export default async function Page() {
         id="details"
         className="px-6 py-20"
       >
-        <div className="mx-auto max-w-sm">
+        <div className="mx-auto max-w-sm md:max-w-xl">
           {/* Header */}
           <div className="reveal mb-12 text-center">
             <SectionLabel>The Celebration</SectionLabel>
             <h2
-              className="font-[family-name:var(--font-cormorant)] font-light italic mt-3 mb-6"
-              style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+              className="font-[family-name:var(--font-display)] font-light italic mt-3 mb-6"
+              style={{ fontSize: "clamp(36px, 10vw, 60px)" }}
             >
               Event Details
             </h2>
@@ -351,13 +326,13 @@ export default async function Page() {
             {/* Date */}
             <div className="mb-5">
               <p
-                className="font-[family-name:var(--font-cormorant)] text-3xl"
+                className="font-[family-name:var(--font-display)] text-3xl md:text-4xl"
                 style={{ color: "var(--c-ink)" }}
               >
                 Saturday, 26 December 2026
               </p>
               <p
-                className="font-[family-name:var(--font-sarabun)] text-base mt-1"
+                className="font-[family-name:var(--font-thai)] text-base md:text-lg mt-1"
                 style={{ color: "var(--c-muted)" }}
               >
                 วันเสาร์ที่ 26 ธันวาคม 2569
@@ -367,19 +342,19 @@ export default async function Page() {
             {/* Venue */}
             <div className="mb-6">
               <p
-                className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.45em] uppercase mb-2"
+                className="font-[family-name:var(--font-label)] text-[12px] md:text-[14px] tracking-[0.45em] uppercase mb-2"
                 style={{ color: "var(--c-sage)" }}
               >
                 Venue
               </p>
               <p
-                className="font-[family-name:var(--font-cormorant)] text-3xl"
+                className="font-[family-name:var(--font-display)] text-3xl md:text-4xl"
                 style={{ color: "var(--c-ink)" }}
               >
                 THE COP Seminar &amp; Resort
               </p>
               <p
-                className="font-[family-name:var(--font-josefin)] text-[12px] tracking-[0.35em] mb-4"
+                className="font-[family-name:var(--font-label)] text-[13px] md:text-[15px] tracking-[0.35em] mb-4"
                 style={{ color: "var(--c-muted)" }}
               >
                 PATTAYA
@@ -392,9 +367,9 @@ export default async function Page() {
                 style={{
                   border: "1px solid var(--c-sage)",
                   color: "var(--c-sage)",
-                  fontFamily: "var(--font-josefin)",
-                  fontSize: 12,
-                  letterSpacing: "0.35em",
+                  fontFamily: "var(--font-label)",
+                  fontSize: 13,
+                  letterSpacing: "0.3em",
                   textTransform: "uppercase",
                   textDecoration: "none",
                 }}
@@ -429,17 +404,17 @@ export default async function Page() {
         id="rsvp"
         className="px-6 py-20"
       >
-        <div className="mx-auto max-w-sm">
+        <div className="mx-auto max-w-sm md:max-w-xl">
           <div className="reveal mb-10 text-center">
             <SectionLabel>Kindly Reply</SectionLabel>
             <h2
-              className="font-[family-name:var(--font-cormorant)] font-light italic mt-3 mb-5"
-              style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+              className="font-[family-name:var(--font-display)] font-light italic mt-3 mb-5"
+              style={{ fontSize: "clamp(36px, 10vw, 60px)" }}
             >
               RSVP
             </h2>
             <p
-              className="font-[family-name:var(--font-sarabun)] text-base leading-relaxed"
+              className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
               style={{ color: "var(--c-ink-2)" }}
             >
               เพื่อให้เราสามารถเตรียมการต้อนรับท่านได้อย่างดีที่สุด
@@ -447,7 +422,7 @@ export default async function Page() {
               โปรดแจ้งความประสงค์ในการเข้าร่วมงาน
             </p>
             <p
-              className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.3em] mt-3"
+              className="font-[family-name:var(--font-label)] text-[12px] md:text-[14px] tracking-[0.3em] mt-3"
               style={{ color: "var(--c-blush-deep)" }}
             >
               BEFORE 12 DECEMBER 2026
@@ -465,17 +440,17 @@ export default async function Page() {
         id="guestbook"
         className="px-6 py-20"
       >
-        <div className="mx-auto max-w-sm">
+        <div className="mx-auto max-w-sm md:max-w-xl">
           <div className="reveal mb-10 text-center">
             <SectionLabel>Guestbook</SectionLabel>
             <h2
-              className="font-[family-name:var(--font-cormorant)] font-light italic mt-3 mb-5"
-              style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+              className="font-[family-name:var(--font-display)] font-light italic mt-3 mb-5"
+              style={{ fontSize: "clamp(36px, 10vw, 60px)" }}
             >
               ข้อความถึงบ่าวสาว
             </h2>
             <p
-              className="font-[family-name:var(--font-sarabun)] text-base leading-relaxed"
+              className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
               style={{ color: "var(--c-ink-2)" }}
             >
               ฝากคำอวยพรและความประทับใจให้กับคู่บ่าวสาว
@@ -499,12 +474,12 @@ export default async function Page() {
         id="dress"
         className="px-6 py-20 text-center"
       >
-        <div className="mx-auto max-w-sm reveal">
+        <div className="mx-auto max-w-sm md:max-w-xl reveal">
           <SectionLabel>Dress Code</SectionLabel>
 
           <h2
-            className="font-[family-name:var(--font-cormorant)] font-light italic mt-3"
-            style={{ fontSize: "clamp(36px, 10vw, 50px)" }}
+            className="font-[family-name:var(--font-display)] font-light italic mt-3"
+            style={{ fontSize: "clamp(36px, 10vw, 60px)" }}
           >
             Garden Whimsical
           </h2>
@@ -538,10 +513,10 @@ export default async function Page() {
                   }}
                 />
                 <span
-                  className="font-[family-name:var(--font-josefin)] text-center leading-tight whitespace-pre-line"
+                  className="font-[family-name:var(--font-label)] text-center leading-tight whitespace-pre-line"
                   style={{
-                    fontSize: 11,
-                    letterSpacing: "0.08em",
+                    fontSize: 12,
+                    letterSpacing: "0.06em",
                     color: "var(--c-muted)",
                     maxWidth: 40,
                   }}
@@ -556,13 +531,13 @@ export default async function Page() {
 
           <div className="mt-8 space-y-3">
             <p
-              className="font-[family-name:var(--font-sarabun)] text-base leading-relaxed"
+              className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
               style={{ color: "var(--c-ink-2)" }}
             >
               แต่งกายให้เข้ากับบรรยากาศสวนที่ดูโรแมนติกและสดใส
             </p>
             <p
-              className="font-[family-name:var(--font-sarabun)] text-base"
+              className="font-[family-name:var(--font-thai)] text-base md:text-lg"
               style={{ color: "var(--c-muted)" }}
             >
               ขอสงวนสีขาวและสีดำล้วนไว้สำหรับบ่าวสาว
@@ -594,13 +569,13 @@ export default async function Page() {
 
         <div className="mt-4 space-y-1.5">
           <p
-            className="font-[family-name:var(--font-josefin)] text-[12px] tracking-[0.45em]"
+            className="font-[family-name:var(--font-label)] text-[13px] md:text-[15px] tracking-[0.45em]"
             style={{ color: "var(--c-ivory)", opacity: 0.45 }}
           >
             26 &middot; 12 &middot; 2026
           </p>
           <p
-            className="font-[family-name:var(--font-josefin)] text-[12px] tracking-[0.3em]"
+            className="font-[family-name:var(--font-label)] text-[12px] md:text-[13px] tracking-[0.3em]"
             style={{ color: "var(--c-ivory)", opacity: 0.25 }}
           >
             #FROMMEENATOTHANWAFOREVER
@@ -612,7 +587,7 @@ export default async function Page() {
         </div>
 
         <p
-          className="font-[family-name:var(--font-josefin)] text-[12px] tracking-wider mt-6"
+          className="font-[family-name:var(--font-label)] text-[12px] md:text-[13px] tracking-wider mt-6"
           style={{ color: "var(--c-ivory)", opacity: 0.2 }}
         >
           THE COP SEMINAR &amp; RESORT · PATTAYA

@@ -61,7 +61,7 @@ export function PreweddingGallery({ photos }: { photos: PreweddingPhoto[] }) {
               >
                 {photo.title && (
                   <span
-                    className="font-[family-name:var(--font-cormorant)] italic text-lg md:text-xl text-left"
+                    className="font-[family-name:var(--font-display)] italic text-lg md:text-xl text-left"
                     style={{ color: "var(--c-ivory)" }}
                   >
                     {photo.title}
@@ -194,14 +194,14 @@ function Lightbox({
         </div>
         <figcaption className="mt-5 text-center" style={{ color: "#fff" }}>
           {photo.title && (
-            <p className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl italic">{photo.title}</p>
+            <p className="font-[family-name:var(--font-display)] text-2xl md:text-3xl italic">{photo.title}</p>
           )}
           {photo.caption && (
-            <p className="font-[family-name:var(--font-josefin)] text-[12px] tracking-[0.25em] uppercase mt-1.5" style={{ color: "rgba(255,255,255,0.6)" }}>
+            <p className="font-[family-name:var(--font-label)] text-[12px] tracking-[0.25em] uppercase mt-1.5" style={{ color: "rgba(255,255,255,0.6)" }}>
               {photo.caption}
             </p>
           )}
-          <p className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.2em] mt-2" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <p className="font-[family-name:var(--font-label)] text-[11px] tracking-[0.2em] mt-2" style={{ color: "rgba(255,255,255,0.4)" }}>
             {index + 1} / {total}
           </p>
         </figcaption>

@@ -62,7 +62,7 @@ export function TableSearch() {
         />
         {isPending && (
           <span
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-[family-name:var(--font-josefin)] text-[10px] tracking-[0.2em] uppercase"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-[family-name:var(--font-label)] text-[11px] tracking-[0.2em] uppercase"
             style={{ color: "var(--c-muted)" }}
           >
             กำลังค้นหา...
@@ -73,7 +73,7 @@ export function TableSearch() {
       {/* Error */}
       {error && (
         <p
-          className="mt-4 text-center font-[family-name:var(--font-sarabun)] text-sm"
+          className="mt-4 text-center font-[family-name:var(--font-thai)] text-base"
           style={{ color: "var(--c-blush-deep)" }}
         >
           {error}
@@ -83,7 +83,7 @@ export function TableSearch() {
       {/* No results */}
       {hasSearched && results && results.length === 0 && (
         <p
-          className="mt-6 text-center font-[family-name:var(--font-sarabun)] text-sm"
+          className="mt-6 text-center font-[family-name:var(--font-thai)] text-base"
           style={{ color: "var(--c-muted)" }}
         >
           ไม่พบชื่อของคุณในระบบ กรุณาลองใหม่
@@ -104,7 +104,7 @@ export function TableSearch() {
             >
               {/* Guest name */}
               <p
-                className="font-[family-name:var(--font-sarabun)] text-base font-normal"
+                className="font-[family-name:var(--font-thai)] text-base font-normal"
                 style={{ color: "var(--c-ink)" }}
               >
                 {result.guestName}
@@ -114,7 +114,7 @@ export function TableSearch() {
                 <>
                   {/* Table name */}
                   <p
-                    className="mt-3 font-[family-name:var(--font-cormorant)] text-2xl font-bold"
+                    className="mt-3 font-[family-name:var(--font-display)] text-2xl font-bold"
                     style={{ color: "var(--c-blush-deep)" }}
                   >
                     โต๊ะ {result.table.tableName}
@@ -132,7 +132,7 @@ export function TableSearch() {
 
                   {/* Tablemates */}
                   <p
-                    className="mb-2 font-[family-name:var(--font-josefin)] text-[10px] tracking-[0.25em] uppercase"
+                    className="mb-2 font-[family-name:var(--font-label)] text-[11px] tracking-[0.25em] uppercase"
                     style={{ color: "var(--c-muted)" }}
                   >
                     ผู้ร่วมโต๊ะ
@@ -141,7 +141,7 @@ export function TableSearch() {
                     {result.table.guests.map((name, j) => (
                       <li
                         key={j}
-                        className="font-[family-name:var(--font-sarabun)] text-sm font-light"
+                        className="font-[family-name:var(--font-thai)] text-base"
                         style={{
                           color:
                             name === result.guestName
@@ -156,7 +156,7 @@ export function TableSearch() {
                 </>
               ) : (
                 <p
-                  className="mt-2 font-[family-name:var(--font-sarabun)] text-sm font-light"
+                  className="mt-2 font-[family-name:var(--font-thai)] text-base"
                   style={{ color: "var(--c-muted)" }}
                 >
                   ยังไม่ได้จัดโต๊ะ

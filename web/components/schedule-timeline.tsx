@@ -67,9 +67,9 @@ export function ScheduleTimeline() {
   }, [])
 
   return (
-    <div ref={sectionRef}>
+    <div ref={sectionRef} className="mx-auto w-fit">
       <p
-        className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.5em] uppercase mb-8 text-center"
+        className="font-[family-name:var(--font-label)] text-[12px] md:text-[14px] tracking-[0.5em] uppercase mb-8 text-center"
         style={{ color: "var(--c-sage)" }}
       >
         Schedule
@@ -122,7 +122,7 @@ export function ScheduleTimeline() {
               {/* Time */}
               <div className="shrink-0 text-right" style={{ width: 72 }}>
                 <span
-                  className="font-[family-name:var(--font-josefin)] text-base"
+                  className="font-[family-name:var(--font-label)] text-base md:text-lg"
                   style={{ color: "var(--c-muted)" }}
                 >
                   {item.time}
@@ -150,13 +150,13 @@ export function ScheduleTimeline() {
               {/* Content */}
               <div className="pl-3">
                 <p
-                  className="font-[family-name:var(--font-sarabun)] text-base leading-tight"
+                  className="font-[family-name:var(--font-thai)] text-base md:text-xl leading-tight"
                   style={{ color: "var(--c-ink)" }}
                 >
                   {item.thai}
                 </p>
                 <p
-                  className="font-[family-name:var(--font-josefin)] text-[11px] tracking-wider mt-0.5"
+                  className="font-[family-name:var(--font-label)] text-[12px] md:text-[13px] tracking-wider mt-1"
                   style={{ color: "var(--c-muted)" }}
                 >
                   {item.en}

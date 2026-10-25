@@ -83,7 +83,7 @@ export function FilterSelector({ current, onChange }: Props) {
             </div>
             <span
               style={{
-                fontFamily: "var(--font-josefin)",
+                fontFamily: "var(--font-label)",
                 fontSize: 9,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",

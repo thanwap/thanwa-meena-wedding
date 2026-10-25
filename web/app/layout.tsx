@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Cormorant_Garamond, Josefin_Sans, Great_Vibes, Sarabun, Geist } from "next/font/google"
+import { Cormorant_Garamond, Josefin_Sans, Great_Vibes, Taviraj, Geist } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -24,10 +24,12 @@ const greatVibes = Great_Vibes({
   variable: "--font-script",
 })
 
-const sarabun = Sarabun({
+// Looped Thai serif — pairs with Cormorant's contrast and reads as formal
+const taviraj = Taviraj({
   subsets: ["thai", "latin"],
-  weight: ["300", "400"],
-  variable: "--font-sarabun",
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+  variable: "--font-taviraj",
 })
 
 // Keep Geist for admin UI (shadcn components)
@@ -65,7 +67,7 @@ export default function RootLayout({
         cormorant.variable,
         josefin.variable,
         greatVibes.variable,
-        sarabun.variable,
+        taviraj.variable,
         geist.variable,
       )}
     >

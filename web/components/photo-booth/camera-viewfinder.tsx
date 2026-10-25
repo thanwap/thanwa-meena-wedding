@@ -266,7 +266,7 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
         {/* Photo count */}
         <div
           style={{
-            fontFamily: "var(--font-josefin)",
+            fontFamily: "var(--font-label)",
             fontSize: 11,
             letterSpacing: "0.25em",
             textTransform: "uppercase",
@@ -334,7 +334,7 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
             </svg>
             <p
               style={{
-                fontFamily: "var(--font-sarabun)",
+                fontFamily: "var(--font-thai)",
                 color: "rgba(255,255,255,0.6)",
                 textAlign: "center",
                 lineHeight: 1.6,
@@ -397,7 +397,7 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
                 background: "rgba(255,255,255,0.1)",
                 border: "1px solid rgba(255,255,255,0.2)",
                 color: "rgba(255,255,255,0.8)",
-                fontFamily: "var(--font-josefin)",
+                fontFamily: "var(--font-label)",
                 fontSize: 11,
                 letterSpacing: "0.25em",
                 textTransform: "uppercase",
@@ -416,7 +416,7 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
                 background: capturing ? "rgba(232,195,190,0.35)" : "rgba(232,195,190,0.9)",
                 border: "none",
                 color: capturing ? "rgba(0,0,0,0.4)" : "#2d1b1a",
-                fontFamily: "var(--font-josefin)",
+                fontFamily: "var(--font-label)",
                 fontSize: 11,
                 letterSpacing: "0.25em",
                 textTransform: "uppercase",
@@ -469,7 +469,7 @@ export function CameraViewfinder({ photoCount, maxPhotos, onCapture, onClose }: 
               </div>
               <span
                 style={{
-                  fontFamily: "var(--font-josefin)",
+                  fontFamily: "var(--font-label)",
                   fontSize: 8,
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",

@@ -63,20 +63,20 @@ export default function TablePage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <p
-            className="font-[family-name:var(--font-josefin)] text-[11px] tracking-[0.35em] uppercase"
+            className="font-[family-name:var(--font-label)] text-[11px] tracking-[0.35em] uppercase"
             style={{ color: "var(--c-sage)" }}
           >
             Meena & Thanwa
           </p>
           <h1
-            className="mt-2 font-[family-name:var(--font-cormorant)] text-2xl font-light italic"
+            className="mt-2 font-[family-name:var(--font-display)] text-2xl font-light italic"
             style={{ color: "var(--c-ink)" }}
           >
             ค้นหาโต๊ะของคุณ
           </h1>
           <Divider />
           <p
-            className="mt-1 font-[family-name:var(--font-sarabun)] text-sm font-light"
+            className="mt-1 font-[family-name:var(--font-thai)] text-base"
             style={{ color: "var(--c-muted)" }}
           >
             พิมพ์ชื่อของคุณเพื่อค้นหาโต๊ะที่นั่ง
@@ -90,7 +90,7 @@ export default function TablePage() {
         <div className="mt-10 text-center">
           <Link
             href="/"
-            className="font-[family-name:var(--font-josefin)] inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase"
+            className="font-[family-name:var(--font-label)] inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase"
             style={{ color: "var(--c-muted)" }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

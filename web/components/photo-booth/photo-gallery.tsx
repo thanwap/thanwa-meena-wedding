@@ -145,7 +145,7 @@ export function PhotoGallery() {
             <Link
               href="/"
               style={{
-                fontFamily: "var(--font-josefin)",
+                fontFamily: "var(--font-label)",
                 fontSize: 10,
                 letterSpacing: "0.3em",
                 textTransform: "uppercase",
@@ -164,7 +164,7 @@ export function PhotoGallery() {
             </Link>
             <h1
               style={{
-                fontFamily: "var(--font-cormorant)",
+                fontFamily: "var(--font-display)",
                 fontSize: "clamp(32px, 5vw, 48px)",
                 fontWeight: 300,
                 fontStyle: "italic",
@@ -177,7 +177,7 @@ export function PhotoGallery() {
             </h1>
             <p
               style={{
-                fontFamily: "var(--font-josefin)",
+                fontFamily: "var(--font-label)",
                 fontSize: 10,
                 letterSpacing: "0.35em",
                 textTransform: "uppercase",
@@ -194,8 +194,8 @@ export function PhotoGallery() {
             {photoCount > 0 && (
               <p
                 style={{
-                  fontFamily: "var(--font-sarabun)",
-                  fontSize: 12,
+                  fontFamily: "var(--font-thai)",
+                  fontSize: 13,
                   color: "var(--c-muted, #7a8472)",
                   margin: 0,
                   textAlign: "right",
@@ -267,8 +267,8 @@ export function PhotoGallery() {
               <div className="pin-overlay">
                 <p
                   style={{
-                    fontFamily: "var(--font-sarabun)",
-                    fontSize: 11,
+                    fontFamily: "var(--font-thai)",
+                    fontSize: 13,
                     color: "rgba(255,255,255,0.92)",
                     margin: 0,
                   }}
@@ -307,7 +307,7 @@ export function PhotoGallery() {
             </svg>
             <p
               style={{
-                fontFamily: "var(--font-sarabun)",
+                fontFamily: "var(--font-thai)",
                 fontSize: 14,
                 color: "var(--c-muted, #7a8472)",
                 margin: 0,
@@ -396,7 +396,7 @@ export function PhotoGallery() {
           border: none;
           background: var(--c-blush-deep, #c4796b);
           color: #fff;
-          font-family: var(--font-josefin);
+          font-family: var(--font-label);
           font-size: 10px;
           letter-spacing: 0.3em;
           text-transform: uppercase;
@@ -422,7 +422,7 @@ export function PhotoGallery() {
           background: transparent;
           border: 1px solid rgba(28,42,24,0.14);
           color: var(--c-muted, #7a8472);
-          font-family: var(--font-josefin);
+          font-family: var(--font-label);
           font-size: 10px;
           letter-spacing: 0.25em;
           text-transform: uppercase;

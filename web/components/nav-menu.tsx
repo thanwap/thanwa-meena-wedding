@@ -6,7 +6,7 @@ import Link from "next/link"
 const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }> = [
   { id: "hero",      label: "Home",      th: "หน้าแรก" },
   { id: "story",     label: "Our Story", th: "เรื่องของเรา" },
-  { id: "prewedding", label: "Pre-wedding", th: "พรีเวดดิ้ง" },
+  { id: "prewedding", label: "Our Gallery", th: "แกลเลอรี่ของเรา" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
   { id: "guestbook", label: "Guestbook", th: "ข้อความ" },
@@ -111,9 +111,9 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
                   style={{
                     display: "block",
                     padding: "14px 12px",
-                    fontFamily: "var(--font-josefin)",
-                    fontSize: 10,
-                    letterSpacing: "0.32em",
+                    fontFamily: "var(--font-label)",
+                    fontSize: 11,
+                    letterSpacing: "0.28em",
                     textTransform: "uppercase",
                     color: "var(--c-muted)",
                     textDecoration: "none",
@@ -131,9 +131,9 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
                     border: "none",
                     cursor: "pointer",
                     padding: "14px 12px",
-                    fontFamily: "var(--font-josefin)",
-                    fontSize: 10,
-                    letterSpacing: "0.32em",
+                    fontFamily: "var(--font-label)",
+                    fontSize: 11,
+                    letterSpacing: "0.28em",
                     textTransform: "uppercase",
                     color: active === id ? "var(--c-blush-deep)" : "var(--c-muted)",
                     position: "relative",
@@ -199,9 +199,9 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
           </svg>
           <span
             style={{
-              fontFamily: "var(--font-josefin)",
-              fontSize: 10,
-              letterSpacing: "0.35em",
+              fontFamily: "var(--font-label)",
+              fontSize: 11,
+              letterSpacing: "0.32em",
               textTransform: "uppercase",
               color: "var(--c-ink)",
             }}
@@ -211,8 +211,8 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
           {/* Active section indicator */}
           <span
             style={{
-              fontFamily: "var(--font-josefin)",
-              fontSize: 9,
+              fontFamily: "var(--font-label)",
+              fontSize: 10,
               letterSpacing: "0.2em",
               textTransform: "uppercase",
               color: "var(--c-blush-deep)",
@@ -328,7 +328,7 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
                       />
                       <span
                         style={{
-                          fontFamily: "var(--font-cormorant)",
+                          fontFamily: "var(--font-display)",
                           fontSize: 26,
                           fontStyle: "italic",
                           fontWeight: 300,
@@ -340,10 +340,10 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
                     </div>
                     <span
                       style={{
-                        fontFamily: "var(--font-sarabun)",
-                        fontSize: 13,
+                        fontFamily: "var(--font-thai)",
+                        fontSize: 14,
                         color: "var(--c-muted)",
-                        opacity: 0.7,
+                        opacity: 0.85,
                       }}
                     >
                       {th}
@@ -379,7 +379,7 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
                       />
                       <span
                         style={{
-                          fontFamily: "var(--font-cormorant)",
+                          fontFamily: "var(--font-display)",
                           fontSize: 26,
                           fontStyle: "italic",
                           fontWeight: 300,
@@ -392,10 +392,10 @@ export function NavMenu({ hiddenIds = [] }: { hiddenIds?: string[] }) {
                     </div>
                     <span
                       style={{
-                        fontFamily: "var(--font-sarabun)",
-                        fontSize: 13,
+                        fontFamily: "var(--font-thai)",
+                        fontSize: 14,
                         color: "var(--c-muted)",
-                        opacity: 0.7,
+                        opacity: 0.85,
                       }}
                     >
                       {th}

@@ -147,7 +147,19 @@
   --c-ink:          #1C2A18;
   --c-ink-2:        #485440;
   --c-muted:        #877A6A;
+
+  /* Type stacks — Latin faces carry no Thai glyphs, so Taviraj (looped Thai
+     serif) follows each one and picks up Thai characters on mixed lines.
+     Family names are literal so Taviraj sits ahead of next/font's metric
+     fallbacks (local Arial / Times), which would otherwise render the Thai. */
+  --font-display: "Cormorant Garamond", var(--font-taviraj), var(--font-cormorant);
+  --font-label:   "Josefin Sans", var(--font-taviraj), var(--font-josefin);
+  --font-thai:    var(--font-taviraj);
 }
+
+/* Cormorant defaults to old-style figures (1 → "I", 0 → "o"); use lining
+   figures so dates and the countdown read as numbers */
+body { font-variant-numeric: lining-nums; }
 
 /* Smooth in-page jumps (e.g. hero → #rsvp), skipped for reduced-motion users */
 @media (prefers-reduced-motion: no-preference) {
@@ -238,8 +250,8 @@
   border-bottom: 1px solid var(--c-blush);
   border-radius: 0;
   padding: 8px 0;
-  font-size: 14px;
-  font-family: var(--font-sarabun), sans-serif;
+  font-size: 16px;
+  font-family: var(--font-thai);
   color: var(--c-ink);
   width: 100%;
   outline: none;
@@ -257,8 +269,8 @@
   border: 1px solid var(--c-blush);
   border-radius: 0;
   padding: 10px 12px;
-  font-size: 14px;
-  font-family: var(--font-sarabun), sans-serif;
+  font-size: 16px;
+  font-family: var(--font-thai);
   color: var(--c-ink);
   width: 100%;
   outline: none;
@@ -279,8 +291,8 @@
   border-bottom: 1px solid var(--c-blush);
   border-radius: 0;
   padding: 8px 0;
-  font-size: 14px;
-  font-family: var(--font-sarabun), sans-serif;
+  font-size: 16px;
+  font-family: var(--font-thai);
   color: var(--c-ink);
   width: 100%;
   outline: none;

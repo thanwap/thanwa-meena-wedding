@@ -217,22 +217,22 @@ function GuestbookCard({ entry }: { entry: GuestbookEntryDto }) {
       >
         <div className="flex items-start justify-between gap-3 mb-3 shrink-0">
           <p
-            className="font-[family-name:var(--font-cormorant)] italic"
+            className="font-[family-name:var(--font-display)] italic"
             style={{ fontSize: 20, color: "var(--c-ink)", lineHeight: 1.2 }}
           >
             {entry.name}
           </p>
           <p
-            className="font-[family-name:var(--font-josefin)] shrink-0"
-            style={{ fontSize: 10, letterSpacing: "0.2em", color: "var(--c-muted)", paddingTop: 4 }}
+            className="font-[family-name:var(--font-label)] shrink-0"
+            style={{ fontSize: 11, letterSpacing: "0.2em", color: "var(--c-muted)", paddingTop: 4 }}
           >
             {formatDate(entry.createdAt)}
           </p>
         </div>
 
         <p
-          className="font-[family-name:var(--font-sarabun)] leading-relaxed"
-          style={{ fontSize: 15, color: "var(--c-ink-2)", whiteSpace: "pre-wrap", overflowY: "auto", flex: 1 }}
+          className="font-[family-name:var(--font-thai)] leading-relaxed"
+          style={{ fontSize: 16, color: "var(--c-ink-2)", whiteSpace: "pre-wrap", overflowY: "auto", flex: 1 }}
         >
           {entry.message}
         </p>
@@ -303,8 +303,8 @@ export function GuestbookWall({ entries }: { entries: GuestbookEntryDto[] }) {
   if (entries.length === 0) {
     return (
       <p
-        className="text-center font-[family-name:var(--font-sarabun)]"
-        style={{ color: "var(--c-muted)", fontSize: 15 }}
+        className="text-center font-[family-name:var(--font-thai)]"
+        style={{ color: "var(--c-muted)", fontSize: 16 }}
       >
         Be the first to leave a message ♡
       </p>

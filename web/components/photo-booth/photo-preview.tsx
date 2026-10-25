@@ -103,7 +103,7 @@ export function PhotoPreview({
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <label
               style={{
-                fontFamily: "var(--font-josefin)",
+                fontFamily: "var(--font-label)",
                 fontSize: 10,
                 letterSpacing: "0.3em",
                 textTransform: "uppercase",
@@ -126,7 +126,7 @@ export function PhotoPreview({
                 borderRadius: 10,
                 padding: "12px 14px",
                 color: "#fff",
-                fontFamily: "var(--font-sarabun)",
+                fontFamily: "var(--font-thai)",
                 fontSize: 16,
                 outline: "none",
               }}
@@ -147,8 +147,8 @@ export function PhotoPreview({
           >
             <p
               style={{
-                fontFamily: "var(--font-sarabun)",
-                fontSize: 12,
+                fontFamily: "var(--font-thai)",
+                fontSize: 13,
                 color: "#f87171",
                 margin: 0,
                 lineHeight: 1.6,
@@ -172,7 +172,7 @@ export function PhotoPreview({
               background: "rgba(255,255,255,0.1)",
               border: "1px solid rgba(255,255,255,0.15)",
               color: "rgba(255,255,255,0.8)",
-              fontFamily: "var(--font-josefin)",
+              fontFamily: "var(--font-label)",
               fontSize: 11,
               letterSpacing: "0.25em",
               textTransform: "uppercase",
@@ -196,7 +196,7 @@ export function PhotoPreview({
                   : "rgba(232,195,190,0.9)",
               border: "none",
               color: saving || (needsName && !name.trim()) ? "rgba(0,0,0,0.4)" : "#2d1b1a",
-              fontFamily: "var(--font-josefin)",
+              fontFamily: "var(--font-label)",
               fontSize: 11,
               letterSpacing: "0.25em",
               textTransform: "uppercase",

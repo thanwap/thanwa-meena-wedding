@@ -12,7 +12,7 @@ type FormState = {
 }
 
 const LABEL: React.CSSProperties = {
-  fontFamily: "var(--font-josefin)",
+  fontFamily: "var(--font-label)",
   fontSize: "12px",
   letterSpacing: "0.4em",
   textTransform: "uppercase",
@@ -24,7 +24,7 @@ const LABEL: React.CSSProperties = {
 const TOGGLE_BASE: React.CSSProperties = {
   flex: 1,
   padding: "12px 8px",
-  fontFamily: "var(--font-josefin)",
+  fontFamily: "var(--font-label)",
   fontSize: "12px",
   letterSpacing: "0.3em",
   textTransform: "uppercase",
@@ -73,19 +73,19 @@ export function RSVPForm() {
     return (
       <div className="reveal text-center py-10">
         <p
-          className="font-[family-name:var(--font-script)]"
-          style={{ fontSize: 52, color: "var(--c-blush-deep)", lineHeight: 1.1 }}
+          className="font-[family-name:var(--font-display)] font-light italic"
+          style={{ fontSize: 44, color: "var(--c-blush-deep)", lineHeight: 1.2 }}
         >
-          ขอบคุณมาก!
+          ขอบคุณมาก
         </p>
         <p
-          className="font-[family-name:var(--font-sarabun)] text-sm mt-4"
+          className="font-[family-name:var(--font-thai)] text-base mt-4"
           style={{ color: "var(--c-ink-2)" }}
         >
           เราได้รับการตอบรับของท่านแล้ว ✨
         </p>
         <p
-          className="font-[family-name:var(--font-sarabun)] text-sm mt-1"
+          className="font-[family-name:var(--font-thai)] text-base mt-1"
           style={{ color: "var(--c-muted)" }}
         >
           รอพบกันในวันที่ 26 ธันวาคม 2569
@@ -249,7 +249,7 @@ export function RSVPForm() {
           {/* Inline error */}
           {formError && (
             <p
-              className="font-[family-name:var(--font-sarabun)] text-sm"
+              className="font-[family-name:var(--font-thai)] text-base"
               style={{ color: "var(--c-blush-deep)" }}
               role="alert"
             >
@@ -265,7 +265,7 @@ export function RSVPForm() {
             style={{
               background: "var(--c-ink)",
               color: "var(--c-ivory)",
-              fontFamily: "var(--font-josefin)",
+              fontFamily: "var(--font-label)",
               fontSize: "13px",
               letterSpacing: "0.45em",
               textTransform: "uppercase",
@@ -282,7 +282,7 @@ export function RSVPForm() {
           {/* Inline error for declining path */}
           {formError && (
             <p
-              className="font-[family-name:var(--font-sarabun)] text-sm"
+              className="font-[family-name:var(--font-thai)] text-base"
               style={{ color: "var(--c-blush-deep)" }}
               role="alert"
             >
@@ -291,13 +291,13 @@ export function RSVPForm() {
           )}
           <div className="text-center py-6 space-y-2">
             <p
-              className="font-[family-name:var(--font-cormorant)] text-2xl italic"
+              className="font-[family-name:var(--font-display)] text-2xl italic"
               style={{ color: "var(--c-ink-2)" }}
             >
               เราเข้าใจค่ะ 💗
             </p>
             <p
-              className="font-[family-name:var(--font-sarabun)] text-sm leading-relaxed"
+              className="font-[family-name:var(--font-thai)] text-base leading-relaxed"
               style={{ color: "var(--c-muted)" }}
             >
               ขอบคุณที่แจ้งให้ทราบ

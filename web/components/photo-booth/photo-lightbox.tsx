@@ -171,7 +171,7 @@ export function PhotoLightbox({ photo, isOwner, onClose, onDelete, onPrev, onNex
       >
         <p
           style={{
-            fontFamily: "var(--font-cormorant)",
+            fontFamily: "var(--font-display)",
             fontSize: 20,
             fontStyle: "italic",
             fontWeight: 300,
@@ -183,8 +183,8 @@ export function PhotoLightbox({ photo, isOwner, onClose, onDelete, onPrev, onNex
         </p>
         <p
           style={{
-            fontFamily: "var(--font-sarabun)",
-            fontSize: 12,
+            fontFamily: "var(--font-thai)",
+            fontSize: 13,
             color: "rgba(255,255,255,0.4)",
             margin: 0,
           }}
@@ -202,7 +202,7 @@ export function PhotoLightbox({ photo, isOwner, onClose, onDelete, onPrev, onNex
               borderRadius: 8,
               padding: "6px 18px",
               color: "#f87171",
-              fontFamily: "var(--font-josefin)",
+              fontFamily: "var(--font-label)",
               fontSize: 10,
               letterSpacing: "0.2em",
               textTransform: "uppercase",
