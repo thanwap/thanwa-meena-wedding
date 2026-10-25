@@ -123,7 +123,7 @@ function HeroLogo() {
         {...rest}
         srcSet={mobile}
         alt={common.alt}
-        className="h-auto w-full max-w-[74vw] lg:max-w-[440px]"
+        className="h-auto w-full max-w-[46vw] lg:max-w-[440px]"
       />
     </picture>
   )
@@ -245,7 +245,7 @@ export default async function Page() {
         </div>
 
         {/* Names — wedding logo (white over the reel on mobile, ink and centred beside it on desktop) */}
-        <h1 className="hero-2 absolute inset-x-0 top-[max(11svh,56px)] z-20 flex justify-center px-6 lg:static lg:col-start-2 lg:row-start-2 lg:px-0">
+        <h1 className="hero-2 absolute inset-x-0 top-[max(5svh,32px)] z-20 flex justify-center px-6 lg:static lg:col-start-2 lg:row-start-2 lg:px-0">
           <span className="sr-only">Meena &amp; Thanwa</span>
           {/* Soft shade behind the white logo — a gradient, not a CSS filter: iOS Safari
               drew the old brightness/invert/drop-shadow stack as a visible rectangle */}
@@ -277,8 +277,8 @@ export default async function Page() {
             </p>
           </div>
 
-          {/* Countdown — pushed below the fold on mobile so it clears the menu pill */}
-          <div className="hero-5 mt-[18svh] lg:mt-10">
+          {/* Countdown */}
+          <div className="hero-5 mt-10">
             <Countdown />
           </div>
 
