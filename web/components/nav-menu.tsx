@@ -5,13 +5,13 @@ import Link from "next/link"
 
 const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }> = [
   { id: "hero",      label: "Home",      th: "หน้าแรก" },
-  { id: "story",     label: "Our Story", th: "เรื่องของเรา" },
   { id: "prewedding", label: "Our Gallery", th: "แกลเลอรี่ของเรา" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
   { id: "dress",     label: "Dress Code",th: "การแต่งกาย" },
   { id: "rsvp",      label: "RSVP",      th: "ตอบรับ" },
   { id: "guestbook", label: "Guestbook", th: "ข้อความ" },
-  { id: "gallery",   label: "Gallery",   th: "รูปภาพ", href: "/gallery" },
+  // Hidden for now — re-enable together with GALLERY_ENABLED in app/gallery/page.tsx
+  // { id: "gallery",   label: "Gallery",   th: "รูปภาพ", href: "/gallery" },
 ]
 
 /** `hiddenIds` drops items whose section isn't rendered (e.g. an empty gallery). */
