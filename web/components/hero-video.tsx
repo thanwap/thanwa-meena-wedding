@@ -93,9 +93,10 @@ export function HeroVideo({
       />
       <video
         ref={ref}
-        // 1px bleed on every side: subpixel card widths would otherwise let the poster peek out
-        // at an edge (max-w-none lifts preflight's video max-width: 100%)
-        className={`absolute -top-px -left-px h-[calc(100%+2px)] w-[calc(100%+2px)] max-w-none transition-opacity duration-700 ${playing ? "opacity-100" : "opacity-0"} ${className}`}
+        // 1px bleed on the desktop card: subpixel card widths would otherwise let the poster peek
+        // out at an edge (max-w-none lifts preflight's video max-width: 100%). Mobile is full-bleed
+        // and iOS doesn't clip composited video to overflow:hidden, so the bleed drew hairlines there
+        className={`absolute inset-0 h-full w-full max-w-none lg:-top-px lg:-left-px lg:h-[calc(100%+2px)] lg:w-[calc(100%+2px)] transition-opacity duration-700 ${playing ? "opacity-100" : "opacity-0"} ${className}`}
         src="/hero.mp4"
         muted
         loop

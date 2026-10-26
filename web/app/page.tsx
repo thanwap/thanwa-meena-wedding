@@ -225,7 +225,8 @@ export default async function Page() {
               opacity: 0.7,
             }}
           />
-          <div className="relative h-full w-full overflow-hidden lg:shadow-[0_30px_60px_-24px_rgba(72,84,64,0.45)]">
+          {/* clip-path forces iOS Safari to clip the composited video, which overflow alone doesn't */}
+          <div className="relative h-full w-full overflow-hidden [clip-path:inset(0)] lg:shadow-[0_30px_60px_-24px_rgba(72,84,64,0.45)]">
             <HeroVideo
               className="object-cover"
               buttonClassName="absolute right-4 bottom-[27svh] z-10 lg:bottom-4"
