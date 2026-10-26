@@ -129,6 +129,8 @@ public class AppDbContext : DbContext
                 .HasMaxLength(3000)
                 .IsRequired(false);
 
+            entity.Property(e => e.PostcardId).IsRequired(false);
+
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
             entity.Property(e => e.DeletedAt).IsRequired(false);

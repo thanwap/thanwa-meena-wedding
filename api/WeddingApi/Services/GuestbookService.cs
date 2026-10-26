@@ -1,6 +1,7 @@
-using System.Text.Encodings.Web;
+using System.Globalization;
+using System.Net;
+using System.Text;
 using System.Text.Json;
-using System.Text.Unicode;
 using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
@@ -10,21 +11,16 @@ namespace WeddingApi.Services;
 
 public class GuestbookService : IGuestbookService
 {
-    // Encodes only HTML-dangerous chars (<, >, &, ", ') — leaves Thai/Unicode intact
-    private static readonly HtmlEncoder SafeEncoder =
-        HtmlEncoder.Create(new TextEncoderSettings(UnicodeRanges.All));
-
-    private static readonly string[] AllowedMimeTypes =
-        ["image/jpeg", "image/png", "image/webp", "image/heic"];
-    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+    public const int NameMaxLength = 120;
+    public const int MessageMaxLength = 2000;
+    /// <summary>Postcards live in the frontend; any id in this range is accepted so new photos need no API change.</summary>
+    public const int MaxPostcardId = 99;
 
     private readonly AppDbContext _db;
-    private readonly IStorageService _storage;
 
-    public GuestbookService(AppDbContext db, IStorageService storage)
+    public GuestbookService(AppDbContext db)
     {
         _db = db;
-        _storage = storage;
     }
 
     public async Task<GuestbookDto> CreateAsync(GuestbookCreateFormRequest request)
@@ -32,34 +28,28 @@ public class GuestbookService : IGuestbookService
         if (!string.IsNullOrEmpty(request.HpWebsite))
             throw new InvalidOperationException("rejected");
 
-        var images = request.Images ?? new List<IFormFile>();
+        var name = Clean(request.Name);
+        var message = Clean(request.Message);
 
-        if (images.Count > 3)
-            throw new ArgumentException("Maximum 3 images allowed.");
+        if (!HasVisibleText(name))
+            throw new ArgumentException("Name is required.");
+        if (name.Length > NameMaxLength)
+            throw new ArgumentException($"Name must be {NameMaxLength} characters or fewer.");
+        if (!HasVisibleText(message))
+            throw new ArgumentException("Message is required.");
+        if (message.Length > MessageMaxLength)
+            throw new ArgumentException($"Message must be {MessageMaxLength} characters or fewer.");
+        if (request.PostcardId is not (>= 1 and <= MaxPostcardId))
+            throw new ArgumentException("Choose a postcard.");
 
-        foreach (var image in images)
-        {
-            if (!AllowedMimeTypes.Contains(image.ContentType))
-                throw new ArgumentException($"File type '{image.ContentType}' is not allowed.");
-            if (image.Length > MaxFileSizeBytes)
-                throw new ArgumentException($"'{image.FileName}' exceeds the 5 MB size limit.");
-        }
-
-        // Upload images to Google Drive
-        var imageUrls = new List<string>();
-        foreach (var image in images)
-        {
-            using var stream = image.OpenReadStream();
-            var url = await _storage.UploadAsync(stream, image.FileName, image.ContentType);
-            imageUrls.Add(url);
-        }
-
+        // Stored as typed: React escapes on render. (Rows saved before this were
+        // HTML-encoded — ToDto decodes them.)
         var now = DateTime.UtcNow;
         var entry = new GuestbookEntry
         {
-            Name = SafeEncoder.Encode(request.Name.Trim()),
-            Message = SafeEncoder.Encode(request.Message.Trim()),
-            ImageUrls = imageUrls.Count > 0 ? JsonSerializer.Serialize(imageUrls) : null,
+            Name = name,
+            Message = message,
+            PostcardId = request.PostcardId,
             CreatedAt = now,
             UpdatedAt = now,
         };
@@ -117,6 +107,28 @@ public class GuestbookService : IGuestbookService
         return true;
     }
 
+    /// <summary>
+    /// Drops characters nobody means to type into a guestbook: control characters
+    /// other than line breaks and tabs (a NUL makes Postgres reject the insert), and
+    /// bidi overrides, which can make a name render backwards.
+    /// </summary>
+    private static string Clean(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+        var sb = new StringBuilder(value.Length);
+        foreach (var c in value)
+        {
+            if (char.IsControl(c) && c is not ('\n' or '\r' or '\t')) continue;
+            if (c is (>= '\u202A' and <= '\u202E') or (>= '\u2066' and <= '\u2069')) continue;
+            sb.Append(c);
+        }
+        return sb.ToString().Trim();
+    }
+
+    /// <summary>False for text that is only whitespace or invisible format characters (e.g. zero-width spaces).</summary>
+    private static bool HasVisibleText(string value) =>
+        value.Any(c => !char.IsWhiteSpace(c) && CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.Format);
+
     private static List<string> ParseImageUrls(string? json)
     {
         if (string.IsNullOrEmpty(json)) return new();
@@ -127,8 +139,9 @@ public class GuestbookService : IGuestbookService
     private static GuestbookDto ToDto(GuestbookEntry e) => new()
     {
         Id = e.Id,
-        Name = e.Name,
-        Message = e.Message,
+        Name = WebUtility.HtmlDecode(e.Name),
+        Message = WebUtility.HtmlDecode(e.Message),
+        PostcardId = e.PostcardId,
         ImageUrls = ParseImageUrls(e.ImageUrls),
         CreatedAt = e.CreatedAt,
     };
@@ -136,8 +149,9 @@ public class GuestbookService : IGuestbookService
     private static GuestbookAdminDto ToAdminDto(GuestbookEntry e) => new()
     {
         Id = e.Id,
-        Name = e.Name,
-        Message = e.Message,
+        Name = WebUtility.HtmlDecode(e.Name),
+        Message = WebUtility.HtmlDecode(e.Message),
+        PostcardId = e.PostcardId,
         ImageUrls = ParseImageUrls(e.ImageUrls),
         CreatedAt = e.CreatedAt,
         UpdatedAt = e.UpdatedAt,

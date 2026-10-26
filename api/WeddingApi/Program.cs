@@ -50,9 +50,11 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;
     });
+    // One shared window for everyone (requests arrive via Vercel, so there is no
+    // trustworthy per-guest key) — sized for a room full of guests posting at once
     options.AddFixedWindowLimiter("guestbook-post", opt =>
     {
-        opt.PermitLimit = 3;
+        opt.PermitLimit = 30;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 0;

@@ -26,15 +26,6 @@ public class GuestbookController : ControllerBase
         if (!string.IsNullOrEmpty(request.HpWebsite))
             return BadRequest(new { error = "rejected" });
 
-        if (string.IsNullOrWhiteSpace(request.Name))
-            return BadRequest(new { error = "Name is required." });
-
-        if (string.IsNullOrWhiteSpace(request.Message))
-            return BadRequest(new { error = "Message is required." });
-
-        if ((request.Images?.Count ?? 0) > 3)
-            return BadRequest(new { error = "Maximum 3 images allowed." });
-
         try
         {
             var created = await _service.CreateAsync(request);
