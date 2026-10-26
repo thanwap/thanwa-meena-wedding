@@ -384,20 +384,23 @@ export default async function Page() {
                 href="https://maps.app.goo.gl/WysXSoYYKXm98CcD8"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2 transition-opacity hover:opacity-70"
+                className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 transition-[opacity,transform] hover:opacity-85 hover:-translate-y-px"
                 style={{
-                  border: "1px solid var(--c-sage)",
-                  color: "var(--c-sage)",
+                  background: "color-mix(in srgb, var(--c-sage) 70%, var(--c-ink))",
+                  color: "var(--c-ivory)",
+                  boxShadow: "0 6px 16px -8px color-mix(in srgb, var(--c-sage) 80%, var(--c-ink))",
                   fontFamily: "var(--font-label)",
-                  fontSize: 13,
-                  letterSpacing: "0.3em",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  letterSpacing: "0.24em",
                   textTransform: "uppercase",
                   textDecoration: "none",
                 }}
               >
                 <svg
-                  width="9"
-                  height="11"
+                  aria-hidden
+                  width="15"
+                  height="18"
                   viewBox="0 0 9 11"
                   fill="none"
                 >
