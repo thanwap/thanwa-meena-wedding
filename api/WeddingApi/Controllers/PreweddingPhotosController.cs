@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using WeddingApi.Security;
 using WeddingApi.Dtos;
 using WeddingApi.Services;
 
@@ -25,7 +25,7 @@ public class PreweddingPhotosController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [EnableRateLimiting("photos-get")]
+    [GuestRateLimit("photos-get")]
     public async Task<IActionResult> List() => Ok(await _service.GetAllAsync());
 
     // ── Admin ──────────────────────────────────────────────────────────────────

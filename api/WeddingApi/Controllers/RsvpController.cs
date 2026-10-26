@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using WeddingApi.Security;
 using WeddingApi.Dtos;
 using WeddingApi.Services;
 
@@ -20,7 +20,7 @@ public class RsvpController : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
-    [EnableRateLimiting("rsvp-post")]
+    [GuestRateLimit("rsvp-post")]
     public async Task<IActionResult> Create([FromBody] RsvpCreateRequest request)
     {
         // Honeypot check
@@ -41,6 +41,10 @@ public class RsvpController : ControllerBase
         catch (InvalidOperationException ex) when (ex.Message == "rejected")
         {
             return BadRequest(new { error = "rejected" });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message.Split(" (Parameter")[0] });
         }
     }
 

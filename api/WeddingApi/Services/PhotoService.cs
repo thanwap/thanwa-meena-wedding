@@ -28,11 +28,11 @@ public class PhotoService : IPhotoService
             ?? throw new InvalidOperationException("Supabase:ServiceRoleKey is not configured");
     }
 
-    public async Task<PhotoPagedResult> GetPhotosAsync(string? cursor, int limit, string? deviceId)
+    public async Task<PhotoPagedResult> GetPhotosAsync(string? cursor, int limit, string? deviceId, bool mineOnly)
     {
         var query = _db.Photos.AsNoTracking().AsQueryable();
 
-        if (!string.IsNullOrEmpty(deviceId))
+        if (mineOnly)
             query = query.Where(p => p.DeviceId == deviceId);
 
         if (!string.IsNullOrEmpty(cursor) && DateTime.TryParse(cursor, null,
@@ -48,10 +48,10 @@ public class PhotoService : IPhotoService
         var page = hasMore ? rows.Take(limit).ToList() : rows;
         var nextCursor = hasMore ? page.Last().CreatedAt.ToString("O") : null;
 
-        return new PhotoPagedResult(page.Select(ToDto).ToList(), nextCursor);
+        return new PhotoPagedResult(page.Select(p => ToGuestDto(p, deviceId)).ToList(), nextCursor);
     }
 
-    public async Task<PhotoDto> UploadPhotoAsync(
+    public async Task<GuestPhotoDto> UploadPhotoAsync(
         IFormFile full, IFormFile thumb,
         string deviceId, string displayName, string filterName)
     {
@@ -59,9 +59,10 @@ public class PhotoService : IPhotoService
         if (count >= MaxPhotosPerDevice)
             throw new InvalidOperationException("Photo limit reached");
 
-        var ts = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var fullPath = $"full/{deviceId}/{ts}.jpg";
-        var thumbPath = $"thumb/{deviceId}/{ts}.jpg";
+        // Stored by photo id, not device id — public URLs must not reveal the owner's device id
+        var id = Guid.NewGuid();
+        var fullPath = $"full/{id}.jpg";
+        var thumbPath = $"thumb/{id}.jpg";
 
         await Task.WhenAll(
             UploadToStorageAsync(full, fullPath),
@@ -70,6 +71,7 @@ public class PhotoService : IPhotoService
 
         var photo = new Photo
         {
+            Id = id,
             DeviceId = deviceId,
             DisplayName = displayName.Trim(),
             FilePath = fullPath,
@@ -91,7 +93,7 @@ public class PhotoService : IPhotoService
             throw;
         }
 
-        return ToDto(photo);
+        return ToGuestDto(photo, deviceId);
     }
 
     public async Task<bool> DeletePhotoByOwnerAsync(Guid id, string deviceId)
@@ -189,6 +191,16 @@ public class PhotoService : IPhotoService
 
     private string PublicUrl(string path) =>
         $"{_supabaseUrl}/storage/v1/object/public/{Bucket}/{path}";
+
+    private GuestPhotoDto ToGuestDto(Photo p, string? deviceId) => new(
+        p.Id,
+        p.DisplayName,
+        p.FilterName,
+        PublicUrl(p.FilePath),
+        PublicUrl(p.ThumbPath),
+        p.CreatedAt,
+        deviceId is not null && p.DeviceId == deviceId
+    );
 
     private PhotoDto ToDto(Photo p) => new(
         p.Id,

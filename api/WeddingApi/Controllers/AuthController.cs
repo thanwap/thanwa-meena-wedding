@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using WeddingApi.Security;
 using WeddingApi.Dtos;
 using WeddingApi.Services;
 
@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
-    [EnableRateLimiting("login-post")]
+    [GuestRateLimit("login-post")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var result = await _service.LoginAsync(request);

@@ -1,10 +1,9 @@
 using System.Text;
-using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WeddingApi.Data;
+using WeddingApi.Security;
 using WeddingApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,61 +40,21 @@ builder.Services.AddCors(options =>
 });
 
 // ─── Rate Limiting ─────────────────────────────────────────────────────────
+// Per-guest + global windows for public endpoints — see GuestRateLimits
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddFixedWindowLimiter("rsvp-post", opt =>
-    {
-        opt.PermitLimit = 5;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
-    // One shared window for everyone (requests arrive via Vercel, so there is no
-    // trustworthy per-guest key) — sized for a room full of guests posting at once
-    options.AddFixedWindowLimiter("guestbook-post", opt =>
-    {
-        opt.PermitLimit = 30;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("table-search", opt =>
-    {
-        opt.PermitLimit = 30;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("login-post", opt =>
-    {
-        opt.PermitLimit = 5;
-        opt.Window = TimeSpan.FromMinutes(15);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("guestbook-get", opt =>
-    {
-        opt.PermitLimit = 60;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("photos-get", opt =>
-    {
-        opt.PermitLimit = 60;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("photos-upload", opt =>
-    {
-        opt.PermitLimit = 100;
-        opt.Window = TimeSpan.FromHours(1);
-        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 0;
-    });
+    options.GlobalLimiter = GuestRateLimits.Create();
     options.RejectionStatusCode = 429;
 });
+
+// ─── Gateway secret ────────────────────────────────────────────────────────
+// Shared with the Next.js server (Vercel API_GATEWAY_SECRET). Production refuses to
+// start without it — an unguarded API would let anyone forge X-Guest-Ip.
+var gatewaySecret = builder.Configuration["Gateway:Secret"];
+if (string.IsNullOrEmpty(gatewaySecret) && builder.Environment.IsProduction())
+    throw new InvalidOperationException("Gateway:Secret is not configured");
+if (!string.IsNullOrEmpty(gatewaySecret) && gatewaySecret.Length < 32)
+    throw new InvalidOperationException("Gateway:Secret must be at least 32 characters");
 
 // ─── Authentication: self-issued HS256 JWT ────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -202,6 +161,8 @@ if (args.Length > 0 && (args[0] == "seed-admins" || args[0] == "reset-admins"))
     return;
 }
 
+if (!string.IsNullOrEmpty(gatewaySecret))
+    app.UseMiddleware<GatewaySecretMiddleware>(gatewaySecret);
 app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();

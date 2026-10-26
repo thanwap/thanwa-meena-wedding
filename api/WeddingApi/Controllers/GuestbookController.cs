@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using WeddingApi.Security;
 using WeddingApi.Dtos;
 using WeddingApi.Services;
 
@@ -20,7 +20,7 @@ public class GuestbookController : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
-    [EnableRateLimiting("guestbook-post")]
+    [GuestRateLimit("guestbook-post")]
     public async Task<IActionResult> Create([FromForm] GuestbookCreateFormRequest request)
     {
         if (!string.IsNullOrEmpty(request.HpWebsite))
@@ -43,7 +43,7 @@ public class GuestbookController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [EnableRateLimiting("guestbook-get")]
+    [GuestRateLimit("guestbook-get")]
     public async Task<IActionResult> List([FromQuery] int count = 0)
     {
         var entries = await _service.ListPublicAsync(count);

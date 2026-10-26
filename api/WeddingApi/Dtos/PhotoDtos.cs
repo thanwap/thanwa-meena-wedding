@@ -10,8 +10,22 @@ public record PhotoDto(
     DateTime CreatedAt
 );
 
+/// <summary>
+/// What guests see. No device id — it is the only proof of ownership for deleting a photo,
+/// so publishing it would let anyone delete everyone's photos.
+/// </summary>
+public record GuestPhotoDto(
+    Guid Id,
+    string DisplayName,
+    string FilterName,
+    string FullUrl,
+    string ThumbUrl,
+    DateTime CreatedAt,
+    bool IsMine
+);
+
 public record PhotoPagedResult(
-    List<PhotoDto> Photos,
+    List<GuestPhotoDto> Photos,
     string? NextCursor
 );
 

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
 using WeddingApi.Entities;
+using WeddingApi.Security;
 
 namespace WeddingApi.Services;
 
@@ -13,6 +14,11 @@ public class RsvpService : IRsvpService
     // Encodes only HTML-dangerous chars (<, >, &, ", ') — leaves Thai/Unicode intact
     private static readonly HtmlEncoder SafeEncoder =
         HtmlEncoder.Create(new TextEncoderSettings(UnicodeRanges.All));
+
+    // Column sizes (AppDbContext)
+    public const int NameMaxLength = 120;
+    public const int DietaryMaxLength = 300;
+    public const int MessageMaxLength = 1000;
 
     private readonly AppDbContext _db;
     private readonly ISeatingService _seating;
@@ -29,20 +35,32 @@ public class RsvpService : IRsvpService
         if (!string.IsNullOrEmpty(request.HpWebsite))
             throw new InvalidOperationException("rejected");
 
-        if (string.IsNullOrWhiteSpace(request.Name))
+        var nameText = GuestText.Clean(request.Name);
+        if (!GuestText.HasVisibleText(nameText))
             throw new ArgumentException("Name is required.", nameof(request));
 
         if (request.GuestCount < 1 || request.GuestCount > 10)
             throw new ArgumentOutOfRangeException(nameof(request), "GuestCount must be between 1 and 10.");
 
+        // Length is checked after encoding — that is what has to fit the column
+        var name = SafeEncoder.Encode(nameText);
+        var dietary = EncodeOptional(request.Dietary);
+        var message = EncodeOptional(request.Message);
+        if (name.Length > NameMaxLength)
+            throw new ArgumentException($"Name must be {NameMaxLength} characters or fewer.", nameof(request));
+        if (dietary?.Length > DietaryMaxLength)
+            throw new ArgumentException($"Dietary notes must be {DietaryMaxLength} characters or fewer.", nameof(request));
+        if (message?.Length > MessageMaxLength)
+            throw new ArgumentException($"Message must be {MessageMaxLength} characters or fewer.", nameof(request));
+
         var now = DateTime.UtcNow;
         var rsvp = new Rsvp
         {
             Attending = request.Attending,
-            Name = SafeEncoder.Encode(request.Name.Trim()),
+            Name = name,
             GuestCount = request.GuestCount,
-            Dietary = string.IsNullOrWhiteSpace(request.Dietary) ? null : SafeEncoder.Encode(request.Dietary.Trim()),
-            Message = string.IsNullOrWhiteSpace(request.Message) ? null : SafeEncoder.Encode(request.Message.Trim()),
+            Dietary = dietary,
+            Message = message,
             Status = "pending",
             CreatedAt = now,
             UpdatedAt = now
@@ -55,6 +73,12 @@ public class RsvpService : IRsvpService
             await _seating.GenerateGuestsForRsvpAsync(rsvp.Id);
 
         return ToDto(rsvp);
+    }
+
+    private static string? EncodeOptional(string? value)
+    {
+        var text = GuestText.Clean(value);
+        return GuestText.HasVisibleText(text) ? SafeEncoder.Encode(text) : null;
     }
 
     public async Task<RsvpDto> AdminCreateAsync(AdminRsvpCreateRequest request)

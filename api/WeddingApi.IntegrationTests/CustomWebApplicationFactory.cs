@@ -21,11 +21,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
 
     public FakePhotoStorage PhotoStorage { get; } = new();
 
+    public const string GatewaySecret = "test-gateway-secret-at-least-32-characters-long";
+
     public async Task InitializeAsync()
     {
         Environment.SetEnvironmentVariable("Jwt__Key", "test-secret-key-must-be-long-enough-for-hs256-aaaaaaaa");
         Environment.SetEnvironmentVariable("Jwt__Issuer", "wedding-api");
         Environment.SetEnvironmentVariable("Jwt__Audience", "wedding-web");
+        Environment.SetEnvironmentVariable("Gateway__Secret", GatewaySecret);
         await _postgres.StartAsync();
     }
 
@@ -74,6 +77,28 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         });
 
         builder.UseEnvironment("Testing");
+    }
+
+    /// <summary>
+    /// Clients act like the Next.js server: they send the gateway secret, and each client
+    /// is a different guest IP so tests don't share rate-limit windows.
+    /// </summary>
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("X-Gateway-Secret", GatewaySecret);
+        client.DefaultRequestHeaders.Add("X-Guest-Ip", RandomGuestIp());
+    }
+
+    public static string RandomGuestIp() =>
+        $"10.{Random.Shared.Next(256)}.{Random.Shared.Next(256)}.{Random.Shared.Next(1, 255)}";
+
+    /// <summary>A client with no gateway secret — a direct call to the public Railway URL.</summary>
+    public HttpClient CreateDirectClient()
+    {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Remove("X-Gateway-Secret");
+        return client;
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

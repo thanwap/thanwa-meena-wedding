@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using WeddingApi.Security;
 using WeddingApi.Services;
 
 namespace WeddingApi.Controllers;
@@ -16,7 +16,7 @@ public class TableSearchController : ControllerBase
     }
 
     [HttpGet("search")]
-    [EnableRateLimiting("table-search")]
+    [GuestRateLimit("table-search")]
     public async Task<IActionResult> Search([FromQuery] string? name)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Trim().Length < 2)

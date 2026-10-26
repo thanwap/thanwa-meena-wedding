@@ -1,11 +1,10 @@
-using System.Globalization;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WeddingApi.Data;
 using WeddingApi.Dtos;
 using WeddingApi.Entities;
+using static WeddingApi.Security.GuestText;
 
 namespace WeddingApi.Services;
 
@@ -106,28 +105,6 @@ public class GuestbookService : IGuestbookService
         await _db.SaveChangesAsync();
         return true;
     }
-
-    /// <summary>
-    /// Drops characters nobody means to type into a guestbook: control characters
-    /// other than line breaks and tabs (a NUL makes Postgres reject the insert), and
-    /// bidi overrides, which can make a name render backwards.
-    /// </summary>
-    private static string Clean(string? value)
-    {
-        if (string.IsNullOrEmpty(value)) return string.Empty;
-        var sb = new StringBuilder(value.Length);
-        foreach (var c in value)
-        {
-            if (char.IsControl(c) && c is not ('\n' or '\r' or '\t')) continue;
-            if (c is (>= '\u202A' and <= '\u202E') or (>= '\u2066' and <= '\u2069')) continue;
-            sb.Append(c);
-        }
-        return sb.ToString().Trim();
-    }
-
-    /// <summary>False for text that is only whitespace or invisible format characters (e.g. zero-width spaces).</summary>
-    private static bool HasVisibleText(string value) =>
-        value.Any(c => !char.IsWhiteSpace(c) && CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.Format);
 
     private static List<string> ParseImageUrls(string? json)
     {
