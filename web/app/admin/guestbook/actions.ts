@@ -6,6 +6,7 @@ export interface GuestbookAdminDto {
   id: number
   name: string
   message: string
+  postcardId: number | null
   imageUrls: string[]
   createdAt: string
   updatedAt: string

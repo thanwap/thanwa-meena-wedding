@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Cormorant_Garamond, Josefin_Sans, Great_Vibes, Taviraj, Mali, Geist } from "next/font/google"
+import { Cormorant_Garamond, Josefin_Sans, Great_Vibes, Taviraj, Mali, Sriracha, Geist } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -39,6 +39,13 @@ const mali = Mali({
   variable: "--font-script-thai",
 })
 
+// Ballpoint handwriting (Thai + Latin) — what guests "write" on the guestbook postcard
+const sriracha = Sriracha({
+  subsets: ["thai", "latin"],
+  weight: ["400"],
+  variable: "--font-hand",
+})
+
 // Keep Geist for admin UI (shadcn components)
 const geist = Geist({
   subsets: ["latin"],
@@ -75,6 +82,7 @@ export default function RootLayout({
         josefin.variable,
         greatVibes.variable,
         mali.variable,
+        sriracha.variable,
         taviraj.variable,
         geist.variable,
       )}

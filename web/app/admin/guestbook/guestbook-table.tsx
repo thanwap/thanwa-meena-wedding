@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog"
 import { Pagination } from "@/components/pagination"
 import { deleteGuestbookEntry, type GuestbookAdminDto } from "./actions"
+import { getPostcard } from "@/components/guestbook/postcards"
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -30,6 +31,22 @@ function formatDate(iso: string): string {
     month: "short",
     year: "numeric",
   })
+}
+
+function PostcardThumb({ id }: { id: number }) {
+  const card = getPostcard(id)
+  return (
+    <div className="flex items-center gap-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={card.src}
+        alt={card.alt}
+        className="h-14 w-10 rounded-sm border object-cover"
+        style={{ objectPosition: card.focus }}
+      />
+      <span className="text-sm text-muted-foreground">{card.caption}</span>
+    </div>
+  )
 }
 
 function ImagePreview({ urls }: { urls: string[] }) {
@@ -144,7 +161,7 @@ export function GuestbookTable({
             <TableRow>
               <TableHead className="w-36">Name</TableHead>
               <TableHead>Message</TableHead>
-              <TableHead className="w-52">Photos</TableHead>
+              <TableHead className="w-52">Postcard</TableHead>
               <TableHead className="w-28">Date</TableHead>
               {isSuperAdmin && <TableHead className="w-20 text-right">Actions</TableHead>}
             </TableRow>
@@ -169,7 +186,12 @@ export function GuestbookTable({
                   </p>
                 </TableCell>
                 <TableCell>
-                  <ImagePreview urls={entry.imageUrls} />
+                  {entry.postcardId !== null ? (
+                    <PostcardThumb id={entry.postcardId} />
+                  ) : (
+                    // Entries from before the postcard guestbook may carry uploaded photos
+                    <ImagePreview urls={entry.imageUrls} />
+                  )}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(entry.createdAt)}

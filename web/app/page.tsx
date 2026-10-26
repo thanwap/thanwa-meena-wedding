@@ -2,8 +2,7 @@ import Image, { getImageProps } from "next/image"
 import { Countdown } from "@/components/countdown"
 import { RSVPForm } from "@/components/rsvp-form"
 import { NavMenu } from "@/components/nav-menu"
-import { GuestbookForm } from "@/components/guestbook-form"
-import { GuestbookWall } from "@/components/guestbook-wall"
+import { GuestbookExperience } from "@/components/guestbook/guestbook-experience"
 import { ScheduleTimeline } from "@/components/schedule-timeline"
 import { PreweddingGallery } from "@/components/prewedding-gallery"
 import { SaveQrButton } from "@/components/save-qr-button"
@@ -165,7 +164,7 @@ function PaletteText({ text }: { text: string }) {
 
 export default async function Page() {
   const [guestbookEntries, preweddingPhotos] = await Promise.all([
-    getRandomGuestbookEntries(5),
+    getRandomGuestbookEntries(24),
     getPreweddingPhotos(),
   ])
   return (
@@ -614,16 +613,13 @@ export default async function Page() {
               className="font-[family-name:var(--font-thai)] text-base md:text-lg leading-relaxed"
               style={{ color: "var(--c-ink-2)" }}
             >
-              ฝากคำอวยพรให้กับคู่บ่าวสาว
+              เลือกหยิบโปสการ์ดสักใบ เพื่ออวยพรบ่าวสาว
             </p>
           </div>
 
-          <div className="reveal mb-12">
-            <GuestbookForm />
-          </div>
-
-          <div className="reveal">
-            <GuestbookWall entries={guestbookEntries} />
+          {/* Wider than the text column: the clothesline bleeds to the screen edges, the box gets room */}
+          <div className="reveal relative left-1/2 w-[min(calc(100vw-32px),760px)] -translate-x-1/2">
+            <GuestbookExperience entries={guestbookEntries} />
           </div>
 
           {/* Digital gift envelope — PromptPay QR. The page shows only the
