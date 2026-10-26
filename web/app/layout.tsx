@@ -53,6 +53,8 @@ const geist = Geist({
 })
 
 export const metadata: Metadata = {
+  // Lets Next.js emit absolute og:image / og:url — LINE and Facebook ignore relative ones
+  metadataBase: new URL("https://frommeenatothanwaforever.com"),
   title: "Meena & Thanwa — 26.12.2026",
   description:
     "You are invited to celebrate the wedding of Meena & Thanwa · The Cop Seminar and Resort, Pattaya · 26 December 2026",
@@ -61,6 +63,12 @@ export const metadata: Metadata = {
     description:
       "You are invited · 26 December 2026 · The Cop Seminar and Resort, Pattaya",
     type: "website",
+    url: "/",
+    siteName: "Meena & Thanwa",
+    locale: "th_TH",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 }
 
