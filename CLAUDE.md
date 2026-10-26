@@ -114,6 +114,7 @@ AUTH_SECRET=                        # any 32+ char random string
 DOTNET_API_URL=http://localhost:5000
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+API_GATEWAY_SECRET=                 # optional locally; must match the API's Gateway__Secret if set
 ```
 
 ### Local dev — `api/WeddingApi/appsettings.Development.json` (or user-secrets)
@@ -135,6 +136,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 AUTH_SECRET
 AUTH_URL=https://frommeenatothanwaforever.com
 DOTNET_API_URL=https://<railway-host>.up.railway.app
+API_GATEWAY_SECRET                  # same value as Railway Gateway__Secret
 ```
 
 ### Railway (production) — set on the .NET service
@@ -146,6 +148,7 @@ Jwt__Issuer=wedding-api
 Jwt__Audience=wedding-web
 Supabase__Url
 Supabase__ServiceKey
+Gateway__Secret                        # 32+ chars; API refuses to start in Production without it
 ```
 
 ---
@@ -245,6 +248,13 @@ Seeder prints a clearly-bannered credentials table at the end.
 - **Integration tests** set JWT env vars in `CustomWebApplicationFactory.InitializeAsync`
   via `Environment.SetEnvironmentVariable` because `WebApplicationBuilder`
   reads config before `ConfigureAppConfiguration` callbacks run.
+- **All server-side calls to the .NET API go through `apiFetch()` (`web/lib/api.ts`).**
+  It adds `X-Gateway-Secret`; the API 403s anything without it. Pass `{ guest: true }`
+  when handling a guest's request so the API rate-limits per guest IP (`X-Guest-Ip`,
+  resolved in `web/lib/guest-ip.ts` — Cloudflare-aware). Public endpoints use
+  `[GuestRateLimit("…")]` with limits in `api/WeddingApi/Security/GuestRateLimits.cs`.
+- **Rolling out a new gateway secret:** set it on Vercel and deploy web first, then
+  Railway + deploy API — otherwise the site gets 403s in between.
 - **Seed output** is buried in EF debug logs — run with `2>/dev/null` or
   scroll to the banner printed after `SaveChanges`.
 

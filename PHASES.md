@@ -36,7 +36,7 @@
 - [x] Guestbook / wishwall — public form + wall on landing page, admin `/admin/guestbook`, landscape scenes
 - [x] Photo gallery (optimized for fast load) — admin-managed pre-wedding bento gallery, WebP via API
 - [x] Guestbook redesign — clothesline postcards → write → 3D letter box, `postcardId` stored ([plan](./docs/superpowers/plans/2026-10-26-guestbook-postcard-redesign.md))
-- [ ] **Before the wedding:** guestbook spam / lock-out protection. The API is public and its
+- [x] **Before the wedding:** guestbook spam / lock-out protection — done for every public endpoint ([plan](./docs/superpowers/plans/2026-10-26-public-api-hardening.md)). The API is public and its
   30/min POST limit is shared by everyone, so one script can flood the box and block real guests.
   Fix: Next route sends a shared secret the API requires on POST (direct calls rejected) + the
   guest IP from Vercel's `x-forwarded-for` for a per-guest limit (e.g. 5/min). Needs a new env
