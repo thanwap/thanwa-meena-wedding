@@ -137,8 +137,9 @@ const DRESS_PALETTE = [
   { hex: "#A86B45", name: "Cinnamon" },
 ]
 
-/** Colours each character with the next palette colour. Splits on grapheme
-    clusters so Thai vowels and tone marks stay attached to their consonant. */
+/** Colours each character with the next palette colour and staggers a wave
+    across them. Splits on grapheme clusters so Thai vowels and tone marks
+    stay attached to their consonant. */
 function PaletteText({ text }: { text: string }) {
   const graphemes = Array.from(
     new Intl.Segmenter("th", { granularity: "grapheme" }).segment(text),
@@ -149,7 +150,14 @@ function PaletteText({ text }: { text: string }) {
       <span className="sr-only">{text}</span>
       <span aria-hidden>
         {graphemes.map((g, i) => (
-          <span key={i} style={{ color: DRESS_PALETTE[i % DRESS_PALETTE.length].hex }}>
+          <span
+            key={i}
+            className="palette-wave"
+            style={{
+              color: DRESS_PALETTE[i % DRESS_PALETTE.length].hex,
+              animationDelay: `${i * 0.12}s`,
+            }}
+          >
             {g}
           </span>
         ))}

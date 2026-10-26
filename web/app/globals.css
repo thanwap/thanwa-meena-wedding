@@ -234,6 +234,19 @@ body { font-variant-numeric: lining-nums; }
   will-change: transform;
 }
 
+/* ── Dress-code palette text wave (per-character delay set inline) ── */
+@keyframes palette-wave {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%           { transform: translateY(-7px); }
+}
+.palette-wave {
+  display: inline-block;
+  animation: palette-wave 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .palette-wave { animation: none; }
+}
+
 /* ── Timeline dot pulse ── */
 @keyframes dot-pulse {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-blush) 60%, transparent); }
