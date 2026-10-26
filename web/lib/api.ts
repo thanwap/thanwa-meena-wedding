@@ -1,3 +1,4 @@
+import { PHASE_PRODUCTION_BUILD } from "next/constants"
 import { headers } from "next/headers"
 import { guestIp } from "@/lib/guest-ip"
 
@@ -26,4 +27,18 @@ export async function apiFetch(
   }
 
   return fetch(`${API}${path}`, { ...init, headers: requestHeaders })
+}
+
+/**
+ * For reads behind the landing page's ISR cache. During `next build` a failed read falls
+ * back to `empty` so a deploy never depends on the API being up. At runtime it throws:
+ * a failed regeneration makes Next keep serving the last good page, whereas returning
+ * `empty` would cache an empty guestbook / gallery until the next regeneration.
+ */
+export function failedCachedRead<T>(empty: T, what: string, cause: unknown): T {
+  if (process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) {
+    console.error(`[${what}] API unavailable during build — rendering empty`, cause)
+    return empty
+  }
+  throw new Error(`[${what}] API unavailable`, { cause })
 }

@@ -1,7 +1,7 @@
 "use server"
 
 import { GUESTBOOK_TAG } from "@/lib/cache-tags"
-import { apiFetch } from "@/lib/api"
+import { apiFetch, failedCachedRead } from "@/lib/api"
 
 export interface GuestbookEntryDto {
   id: number
@@ -14,25 +14,27 @@ export interface GuestbookEntryDto {
 }
 
 export async function getGuestbookEntries(): Promise<GuestbookEntryDto[]> {
+  let res: Response
   try {
-    const res = await apiFetch("/api/guestbook", {
+    res = await apiFetch("/api/guestbook", {
       next: { revalidate: 60, tags: [GUESTBOOK_TAG] },
     })
-    if (!res.ok) return []
-    return res.json()
-  } catch {
-    return []
+  } catch (err) {
+    return failedCachedRead([], "getGuestbookEntries", err)
   }
+  if (!res.ok) return failedCachedRead([], "getGuestbookEntries", `HTTP ${res.status}`)
+  return res.json()
 }
 
 export async function getRandomGuestbookEntries(count: number): Promise<GuestbookEntryDto[]> {
+  let res: Response
   try {
-    const res = await apiFetch(`/api/guestbook?count=${count}`, {
+    res = await apiFetch(`/api/guestbook?count=${count}`, {
       next: { revalidate: 60, tags: [GUESTBOOK_TAG] },
     })
-    if (!res.ok) return []
-    return res.json()
-  } catch {
-    return []
+  } catch (err) {
+    return failedCachedRead([], "getRandomGuestbookEntries", err)
   }
+  if (!res.ok) return failedCachedRead([], "getRandomGuestbookEntries", `HTTP ${res.status}`)
+  return res.json()
 }
