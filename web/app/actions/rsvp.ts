@@ -1,6 +1,6 @@
 "use server"
 
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 export async function submitRsvp(
   formData: FormData,
@@ -23,11 +23,15 @@ export async function submitRsvp(
       hpWebsite: hpWebsite || null,
     }
 
-    const res = await fetch(`${API}/api/rsvps`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
+    const res = await apiFetch(
+      "/api/rsvps",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+      { guest: true },
+    )
 
     if (res.status === 429) {
       return { success: false, error: "Too many submissions. Please try again later." }

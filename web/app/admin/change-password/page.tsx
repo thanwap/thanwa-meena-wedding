@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
+import { apiFetch } from "@/lib/api"
 import { SubmitButton } from "@/components/submit-button"
 import {
   Card,
@@ -10,8 +11,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-const API = process.env.DOTNET_API_URL!
 
 export default async function ChangePasswordPage({
   searchParams,
@@ -38,7 +37,7 @@ export default async function ChangePasswordPage({
       redirect("/admin/change-password?status=mismatch")
     }
 
-    const res = await fetch(`${API}/api/auth/change-password`, {
+    const res = await apiFetch("/api/auth/change-password", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.idToken}`,

@@ -1,13 +1,12 @@
 "use server"
 
 import { PREWEDDING_CACHE_TAG, type PreweddingPhoto } from "@/lib/prewedding"
-
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 /** Public read for the landing page. Cached until an admin change calls updateTag. */
 export async function getPreweddingPhotos(): Promise<PreweddingPhoto[]> {
   try {
-    const res = await fetch(`${API}/api/prewedding-photos`, {
+    const res = await apiFetch("/api/prewedding-photos", {
       next: { tags: [PREWEDDING_CACHE_TAG] },
     })
     if (!res.ok) {

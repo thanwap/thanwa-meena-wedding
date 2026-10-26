@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
-
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 export async function adminFetch(path: string, options?: RequestInit): Promise<Response> {
   const session = await auth()
@@ -12,7 +11,7 @@ export async function adminFetch(path: string, options?: RequestInit): Promise<R
   // Multipart bodies need fetch to set Content-Type itself (it adds the boundary)
   const isFormData = options?.body instanceof FormData
 
-  const res = await fetch(`${API}${path}`, {
+  const res = await apiFetch(path, {
     ...options,
     headers: {
       Authorization: `Bearer ${session.idToken}`,

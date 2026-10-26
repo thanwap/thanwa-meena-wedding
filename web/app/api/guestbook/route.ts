@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { revalidateTag } from "next/cache"
 import { GUESTBOOK_TAG } from "@/lib/cache-tags"
-
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin")
@@ -14,10 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
 
-    const res = await fetch(`${API}/api/guestbook`, {
-      method: "POST",
-      body: formData,
-    })
+    const res = await apiFetch("/api/guestbook", { method: "POST", body: formData }, { guest: true })
 
     const data = await res.json().catch(() => ({}))
     // Expire now, not stale-while-revalidate: a guest who reloads should find their letter in the box
@@ -31,7 +27,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const res = await fetch(`${API}/api/guestbook`, { next: { revalidate: 60 } })
+    const res = await apiFetch("/api/guestbook", { next: { revalidate: 60 } })
     if (!res.ok) return NextResponse.json([], { status: res.status })
     const data = await res.json()
     return NextResponse.json(data)

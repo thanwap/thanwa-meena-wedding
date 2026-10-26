@@ -1,8 +1,7 @@
 "use server"
 
 import { GUESTBOOK_TAG } from "@/lib/cache-tags"
-
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 export interface GuestbookEntryDto {
   id: number
@@ -16,7 +15,7 @@ export interface GuestbookEntryDto {
 
 export async function getGuestbookEntries(): Promise<GuestbookEntryDto[]> {
   try {
-    const res = await fetch(`${API}/api/guestbook`, {
+    const res = await apiFetch("/api/guestbook", {
       next: { revalidate: 60, tags: [GUESTBOOK_TAG] },
     })
     if (!res.ok) return []
@@ -28,7 +27,7 @@ export async function getGuestbookEntries(): Promise<GuestbookEntryDto[]> {
 
 export async function getRandomGuestbookEntries(count: number): Promise<GuestbookEntryDto[]> {
   try {
-    const res = await fetch(`${API}/api/guestbook?count=${count}`, {
+    const res = await apiFetch(`/api/guestbook?count=${count}`, {
       next: { revalidate: 60, tags: [GUESTBOOK_TAG] },
     })
     if (!res.ok) return []

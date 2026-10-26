@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
+import { apiFetch } from "@/lib/api"
 
 export async function GET() {
   const session = await auth()
@@ -7,15 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const apiUrl = process.env.DOTNET_API_URL
-  if (!apiUrl) {
-    return NextResponse.json(
-      { error: "API URL not configured" },
-      { status: 500 },
-    )
-  }
-
-  const upstream = await fetch(`${apiUrl}/api/rsvps/export.csv`, {
+  const upstream = await apiFetch("/api/rsvps/export.csv", {
     headers: { Authorization: `Bearer ${session.idToken}` },
     cache: "no-store",
   })

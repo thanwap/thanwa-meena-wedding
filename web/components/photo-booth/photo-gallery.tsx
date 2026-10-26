@@ -48,7 +48,7 @@ export function PhotoGallery() {
   // Sync photoCount from server once deviceId is known — localStorage can drift.
   useEffect(() => {
     if (!deviceId) return
-    getPhotos({ deviceId, limit: MAX_PHOTOS + 1 }).then(({ photos, nextCursor }) => {
+    getPhotos({ deviceId, mine: true, limit: MAX_PHOTOS + 1 }).then(({ photos, nextCursor }) => {
       if (!nextCursor) {
         setPhotoCount(photos.length)
       }
@@ -62,7 +62,8 @@ export function PhotoGallery() {
       const result = await getPhotos({
         cursor: prevCursor,
         limit: 24,
-        deviceId: tab === "mine" ? (deviceId || undefined) : undefined,
+        deviceId: deviceId || undefined,
+        mine: tab === "mine",
       })
       setPhotos((prev) => (reset ? result.photos : [...prev, ...result.photos]))
       setCursor(result.nextCursor)
@@ -80,7 +81,8 @@ export function PhotoGallery() {
       const result = await getPhotos({
         cursor: undefined,
         limit: 24,
-        deviceId: tab === "mine" ? (deviceId || undefined) : undefined,
+        deviceId: deviceId || undefined,
+        mine: tab === "mine",
       })
       setPhotos(result.photos)
       setCursor(result.nextCursor)
@@ -364,7 +366,7 @@ export function PhotoGallery() {
       {lightboxPhoto && (
         <PhotoLightbox
           photo={lightboxPhoto}
-          isOwner={lightboxPhoto.deviceId === deviceId}
+          isOwner={lightboxPhoto.isMine}
           onClose={() => setLightboxIdx(null)}
           onDelete={handleDelete}
           onPrev={lightboxIdx! > 0 ? () => setLightboxIdx((i) => i! - 1) : null}

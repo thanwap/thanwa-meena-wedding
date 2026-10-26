@@ -1,6 +1,6 @@
 "use server"
 
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 interface TableSearchResult {
   tableName: string
@@ -21,9 +21,10 @@ export async function searchTable(
   }
 
   try {
-    const res = await fetch(
-      `${API}/api/table/search?name=${encodeURIComponent(trimmed)}`,
+    const res = await apiFetch(
+      `/api/table/search?name=${encodeURIComponent(trimmed)}`,
       { cache: "no-store" },
+      { guest: true },
     )
 
     if (res.status === 429) {

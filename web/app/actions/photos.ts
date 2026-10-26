@@ -1,50 +1,55 @@
 "use server"
 
-const API = process.env.DOTNET_API_URL!
+import { apiFetch } from "@/lib/api"
 
 export interface PhotoRecord {
   id: string
-  deviceId: string
   displayName: string
   fullUrl: string
   thumbUrl: string
   filterName: string
   createdAt: string
+  /** Taken on this device — the API never reveals other devices' ids */
+  isMine: boolean
 }
 
 interface ApiPhotoDto {
   id: string
-  deviceId: string
   displayName: string
   filterName: string
   fullUrl: string
   thumbUrl: string
   createdAt: string
+  isMine: boolean
 }
 
 function toRecord(dto: ApiPhotoDto): PhotoRecord {
   return {
     id: dto.id,
-    deviceId: dto.deviceId,
     displayName: dto.displayName,
     fullUrl: dto.fullUrl,
     thumbUrl: dto.thumbUrl,
     filterName: dto.filterName,
     createdAt: dto.createdAt,
+    isMine: dto.isMine,
   }
 }
 
 export async function getPhotos(options?: {
   cursor?: string
   limit?: number
+  /** This device — marks its photos as `isMine` */
   deviceId?: string
+  /** Only this device's photos (needs `deviceId`) */
+  mine?: boolean
 }): Promise<{ photos: PhotoRecord[]; nextCursor: string | null }> {
   const params = new URLSearchParams()
   if (options?.limit) params.set("limit", String(options.limit))
   if (options?.cursor) params.set("cursor", options.cursor)
   if (options?.deviceId) params.set("deviceId", options.deviceId)
+  if (options?.mine) params.set("mine", "true")
 
-  const res = await fetch(`${API}/api/photos?${params}`, { cache: "no-store" })
+  const res = await apiFetch(`/api/photos?${params}`, { cache: "no-store" }, { guest: true })
 
   if (!res.ok) {
     console.error("[getPhotos]", res.status, await res.text())
@@ -63,10 +68,7 @@ export async function uploadPhoto(
 ): Promise<PhotoRecord | { error: string }> {
   let res: Response
   try {
-    res = await fetch(`${API}/api/photos/upload`, {
-      method: "POST",
-      body: formData,
-    })
+    res = await apiFetch("/api/photos/upload", { method: "POST", body: formData }, { guest: true })
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error("[uploadPhoto] network error:", msg)
@@ -97,11 +99,15 @@ export async function deletePhotoByOwner(
   photoId: string,
   deviceId: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const res = await fetch(`${API}/api/photos/${photoId}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ deviceId }),
-  })
+  const res = await apiFetch(
+    `/api/photos/${encodeURIComponent(photoId)}`,
+    {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deviceId }),
+    },
+    { guest: true },
+  )
 
   if (res.status === 404) return { success: false, error: "Photo not found" }
   if (!res.ok) return { success: false, error: "Delete failed" }

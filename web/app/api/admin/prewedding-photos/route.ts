@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { revalidateTag } from "next/cache"
 import { auth } from "@/auth"
+import { apiFetch } from "@/lib/api"
 import { PREWEDDING_CACHE_TAG } from "@/lib/prewedding"
 
 /**
@@ -13,12 +14,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const apiUrl = process.env.DOTNET_API_URL
-  if (!apiUrl) {
-    return NextResponse.json({ error: "API URL not configured" }, { status: 500 })
-  }
-
-  const upstream = await fetch(`${apiUrl}/api/prewedding-photos`, {
+  const upstream = await apiFetch("/api/prewedding-photos", {
     method: "POST",
     headers: { Authorization: `Bearer ${session.idToken}` },
     body: await request.formData(),

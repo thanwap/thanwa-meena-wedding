@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import { apiFetch } from "@/lib/api"
 
 declare module "next-auth" {
   interface Session {
@@ -39,20 +40,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = credentials?.password as string | undefined
         if (!username || !password) return null
 
-        const apiUrl = process.env.DOTNET_API_URL
-        if (!apiUrl) {
-          console.error("[auth] DOTNET_API_URL not set")
-          return null
-        }
-
         let res: Response
         try {
-          res = await fetch(`${apiUrl}/api/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-            cache: "no-store",
-          })
+          // Guest IP so the API's brute-force limit is per attacker, not shared with the admins
+          res = await apiFetch(
+            "/api/auth/login",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password }),
+              cache: "no-store",
+            },
+            { guest: true },
+          )
         } catch (err) {
           console.error("[auth] API unreachable:", err)
           return null
