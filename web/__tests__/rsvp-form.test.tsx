@@ -57,7 +57,7 @@ describe("RSVPForm", () => {
       target: { value: "สมชาย ใจดี" },
     })
 
-    fireEvent.click(screen.getByText(/Confirm Attendance/i))
+    fireEvent.click(screen.getByText("ส่งข้อมูล"))
 
     await waitFor(() => {
       expect(screen.getByText(/ขอบคุณมาก/)).toBeInTheDocument()
@@ -72,7 +72,7 @@ describe("RSVPForm", () => {
       target: { value: "ทดสอบ" },
     })
 
-    fireEvent.click(screen.getByText(/Confirm Attendance/i))
+    fireEvent.click(screen.getByText("ส่งข้อมูล"))
 
     await waitFor(() => {
       expect(mockSubmitRsvp).toHaveBeenCalledOnce()
@@ -96,7 +96,7 @@ describe("RSVPForm", () => {
       target: { value: "สมชาย ใจดี" },
     })
 
-    fireEvent.click(screen.getByText(/Confirm Attendance/i))
+    fireEvent.click(screen.getByText("ส่งข้อมูล"))
 
     await waitFor(() => {
       expect(

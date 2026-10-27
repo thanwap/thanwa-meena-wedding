@@ -300,7 +300,7 @@ export function RSVPForm() {
               textTransform: "uppercase",
             }}
           >
-            {isPending ? "Sending…" : "Confirm Attendance"}
+            {isPending ? "กำลังส่ง…" : "ส่งข้อมูล"}
           </button>
         </>
       )}
