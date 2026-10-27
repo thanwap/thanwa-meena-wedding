@@ -6,6 +6,7 @@ import { GuestbookExperience } from "@/components/guestbook/guestbook-experience
 import { ScheduleTimeline } from "@/components/schedule-timeline"
 import { PreweddingGallery } from "@/components/prewedding-gallery"
 import { SaveQrButton } from "@/components/save-qr-button"
+import { GiftNotice } from "@/components/gift-notice"
 import { HeroVideo } from "@/components/hero-video"
 import { InvitationCard } from "@/components/invitation-card"
 import { getRandomGuestbookEntries } from "@/app/actions/guestbook"
@@ -607,16 +608,19 @@ export default async function Page() {
               <span className="inline-block">&amp; จิตตินันทน์ พรหมลิ</span>
             </p>
 
-            <SaveQrButton
-              src="/promptpay-qr.jpg"
-              filename="thanwa-meena-promptpay.jpg"
-              className="btn-secondary mt-6"
-            >
-              <svg width="12" height="13" viewBox="0 0 12 13" fill="none" aria-hidden>
-                <path d="M6 1v8m0 0L2.5 5.5M6 9l3.5-3.5M1 12h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              บันทึก QR
-            </SaveQrButton>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <SaveQrButton
+                src="/promptpay-qr.jpg"
+                filename="thanwa-meena-promptpay.jpg"
+                className="btn-secondary"
+              >
+                <svg width="12" height="13" viewBox="0 0 12 13" fill="none" aria-hidden>
+                  <path d="M6 1v8m0 0L2.5 5.5M6 9l3.5-3.5M1 12h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                บันทึก QR
+              </SaveQrButton>
+              <GiftNotice className="btn-secondary" />
+            </div>
             <p
               className="font-[family-name:var(--font-thai)] text-[13px] md:text-sm leading-relaxed mt-3"
               style={{ color: "var(--c-muted)" }}

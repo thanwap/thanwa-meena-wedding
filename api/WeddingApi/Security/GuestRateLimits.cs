@@ -26,6 +26,9 @@ public static class GuestRateLimits
         ["rsvp-post"] = new(15, 60, TimeSpan.FromMinutes(1)),
         ["login-post"] = new(5, 30, TimeSpan.FromMinutes(15)),
         ["photos-upload"] = new(30, 100, TimeSpan.FromMinutes(10)),
+        // Re-picking a slip uploads again, so leave room for a few tries per notice
+        ["gift-slip-upload"] = new(10, 100, TimeSpan.FromMinutes(10)),
+        ["gift-notice-post"] = new(15, 60, TimeSpan.FromMinutes(1)),
         ["photos-delete"] = new(30, 300, TimeSpan.FromMinutes(1)),
         ["table-search"] = new(20, 600, TimeSpan.FromMinutes(1)),
         ["photos-get"] = new(120, 1200, TimeSpan.FromMinutes(1)),

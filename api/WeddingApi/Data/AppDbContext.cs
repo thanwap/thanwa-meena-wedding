@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<GuestbookEntry> GuestbookEntries => Set<GuestbookEntry>();
     public DbSet<Photo> Photos => Set<Photo>();
     public DbSet<PreweddingPhoto> PreweddingPhotos => Set<PreweddingPhoto>();
+    public DbSet<GiftNotice> GiftNotices => Set<GiftNotice>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -226,6 +227,38 @@ public class AppDbContext : DbContext
                 .HasDefaultValueSql("now()");
 
             entity.HasIndex(e => e.SortOrder).HasDatabaseName("idx_prewedding_photos_sort_order");
+        });
+
+        modelBuilder.Entity<GiftNotice>(entity =>
+        {
+            entity.ToTable("gift_notices");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Giver)
+                .HasColumnName("giver")
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(e => e.TransferredAt).HasColumnName("transferred_at").IsRequired();
+
+            entity.Property(e => e.Amount)
+                .HasColumnName("amount")
+                .HasPrecision(12, 2)
+                .IsRequired(false);
+
+            entity.Property(e => e.SlipPath)
+                .HasColumnName("slip_path")
+                .HasMaxLength(100)
+                .IsRequired(false);
+
+            entity.Property(e => e.Verified).HasColumnName("verified").IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired()
+                .HasDefaultValueSql("now()");
+
+            entity.HasIndex(e => e.TransferredAt).HasDatabaseName("idx_gift_notices_transferred_at");
         });
     }
 }

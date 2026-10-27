@@ -20,6 +20,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         .Build();
 
     public FakePhotoStorage PhotoStorage { get; } = new();
+    public FakeSlipStorage SlipStorage { get; } = new();
 
     public const string GatewaySecret = "test-gateway-secret-at-least-32-characters-long";
 
@@ -65,6 +66,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
             // Swap Supabase Storage for an in-memory fake
             services.RemoveAll<IPhotoStorage>();
             services.AddSingleton<IPhotoStorage>(PhotoStorage);
+            services.RemoveAll<ISlipStorage>();
+            services.AddSingleton<ISlipStorage>(SlipStorage);
 
             // Replace Google JWT auth with test scheme that always succeeds
             services.AddAuthentication(options =>

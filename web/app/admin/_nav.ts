@@ -6,6 +6,7 @@ import {
   RiImageLine,
   RiGalleryLine,
   RiUserLine,
+  RiGiftLine,
 } from "@remixicon/react"
 import type { RemixiconComponentType } from "@remixicon/react"
 
@@ -39,6 +40,11 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/admin/seating/manage",
         label: "Seating Tables",
         icon: RiTable2,
+      },
+      {
+        href: "/admin/gifts",
+        label: "Gifts",
+        icon: RiGiftLine,
       },
     ],
   },

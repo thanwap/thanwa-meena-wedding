@@ -23,6 +23,9 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddSingleton<IPhotoStorage, SupabasePhotoStorage>();
 builder.Services.AddSingleton<IImageProcessor, ImageSharpProcessor>();
 builder.Services.AddScoped<IPreweddingPhotoService, PreweddingPhotoService>();
+builder.Services.AddSingleton<ISlipStorage, SupabaseSlipStorage>();
+builder.Services.AddScoped<IGiftNoticeService, GiftNoticeService>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 // ─── CORS ──────────────────────────────────────────────────────────────────
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(',', StringSplitOptions.RemoveEmptyEntries)

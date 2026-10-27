@@ -47,6 +47,9 @@ public class PublicApiSecurityTests : IClassFixture<CustomWebApplicationFactory>
     [InlineData("GET", "/api/photos")]
     [InlineData("GET", "/api/table/search?name=ab")]
     [InlineData("GET", "/api/rsvps")]
+    [InlineData("POST", "/api/gift-notices")]
+    [InlineData("POST", "/api/gift-notices/slips")]
+    [InlineData("GET", "/api/gift-notices")]
     public async Task DirectCall_WithoutSecret_Returns403(string method, string url)
     {
         var client = _factory.CreateDirectClient();
