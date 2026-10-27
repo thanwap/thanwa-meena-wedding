@@ -5,6 +5,7 @@ import Link from "next/link"
 
 const NAV_ITEMS: Array<{ id: string; label: string; th: string; href?: string }> = [
   { id: "hero",      label: "Home",      th: "หน้าแรก" },
+  { id: "invitation", label: "Invitation", th: "การ์ดเชิญ" },
   { id: "prewedding", label: "Our Gallery", th: "แกลเลอรี่ของเรา" },
   { id: "details",   label: "Details",   th: "รายละเอียด" },
   { id: "dress",     label: "Dress Code",th: "การแต่งกาย" },

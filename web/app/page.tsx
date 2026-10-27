@@ -7,6 +7,7 @@ import { ScheduleTimeline } from "@/components/schedule-timeline"
 import { PreweddingGallery } from "@/components/prewedding-gallery"
 import { SaveQrButton } from "@/components/save-qr-button"
 import { HeroVideo } from "@/components/hero-video"
+import { InvitationCard } from "@/components/invitation-card"
 import { getRandomGuestbookEntries } from "@/app/actions/guestbook"
 import { getPreweddingPhotos } from "@/app/actions/prewedding"
 
@@ -181,7 +182,9 @@ export default async function Page() {
       style={{
         background: "var(--c-ivory)",
         color: "var(--c-ink)",
-        overflowX: "hidden",
+        // clip, not hidden: hidden makes <main> a scroll container and breaks
+        // the invitation's sticky stage
+        overflowX: "clip",
       }}
     >
       <NavMenu hiddenIds={preweddingPhotos.length === 0 ? ["prewedding"] : []} />
@@ -301,6 +304,11 @@ export default async function Page() {
           </div>
         </div>
       </section>
+
+      {/* ══════════════════════════════
+          SECTION 2 — INVITATION CARD
+          ══════════════════════════════ */}
+      <InvitationCard />
 
       {/* ══════════════════════════════
           SECTION 3 — PRE-WEDDING GALLERY

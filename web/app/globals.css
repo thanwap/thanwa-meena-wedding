@@ -375,3 +375,194 @@ body { font-variant-numeric: lining-nums; }
 @media (prefers-reduced-motion: reduce) {
   .gb-sway, .gb-letter-in, .gb-drop-in { animation: none; }
 }
+
+/* ── Invitation envelope (components/invitation-card.tsx) ──
+   The section is tall and the stage sticks, so scroll drives the scene.
+   JS writes the --vars below; everything animates via transform/opacity. */
+/* Scroll distance the scene plays over, below the pinned stage. A real
+   element, not padding: sticky only travels within the parent's content box */
+.inv-runway {
+  height: 120svh;
+}
+.inv-stage {
+  /* height budget: padding + heading + button + gaps + fixed menu; the scene is 1.42× the card width */
+  --card-w: min(84vw, 360px, calc((100svh - 352px) * 0.7));
+  /* fixed menu the stage centres around (read by the component) */
+  --stage-inset-top: 0px;
+  --stage-inset-bottom: 80px;
+  /* Landscape envelope: the card lies sideways inside it */
+  --env-w: calc(var(--card-w) * 1.5);
+  --env-h: calc(var(--card-w) * 1.06);
+  --scene-scale: 0.7;
+  --scene-shift: 0;
+  --flap: 0deg;
+  --flap-z: 4;
+  --env-y: 0;
+  --env-opacity: 1;
+  --card-y: 0;
+  --card-rotate: -90deg;
+  --card-scale: 0.92;
+  --card-z: 2;
+  --flip: 0deg;
+  --hint-opacity: 1;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  /* only as tall as its content; the component sets `top` so it pins centred */
+  position: sticky;
+  top: 0;
+  display: grid;
+  /* heading, card and button sit together in the middle instead of
+     spreading to the screen edges on tall viewports */
+  justify-items: center;
+  row-gap: 36px;
+  padding: 40px 16px 32px;
+  overflow: clip;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 55%, color-mix(in srgb, var(--c-blush) 22%, transparent), transparent 70%);
+}
+@media (min-width: 1024px) {
+  .inv-stage {
+    --card-w: min(400px, calc((100svh - 350px) * 0.7));
+    --stage-inset-top: 45px;
+    --stage-inset-bottom: 0px;
+  }
+}
+
+.inv-scene {
+  position: relative;
+  /* card-wide, so the wider envelope overhangs evenly instead of pushing the layout */
+  width: var(--card-w);
+  height: var(--env-h);
+  /* the upright card is taller than the envelope — reserve its overhang */
+  margin-block: calc(var(--card-w) * 0.18);
+  transform: translateY(calc(var(--scene-shift) * var(--env-h))) scale(var(--scene-scale));
+  will-change: transform;
+}
+
+/* Envelope layers share the slide-down + fade */
+.inv-env {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: var(--env-w);
+  margin-left: calc(var(--env-w) / -2);
+  opacity: var(--env-opacity);
+  transform: translateY(calc(var(--env-y) * var(--env-h) / 100));
+  will-change: transform, opacity;
+  /* decorative — and once faded it still sits over the flip button */
+  pointer-events: none;
+}
+.inv-env-back {
+  z-index: 0;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #E6DEB0, #EFE8C3 60%);
+  box-shadow: 0 28px 50px -26px rgba(122, 104, 60, 0.55), 0 2px 6px -2px rgba(122, 104, 60, 0.25);
+}
+.inv-pocket {
+  z-index: 3;
+  height: 100%;
+  filter: drop-shadow(0 -1px 1px rgba(122, 104, 60, 0.12));
+}
+.inv-flap {
+  z-index: var(--flap-z);
+  bottom: auto;
+  height: 60%;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  transform: translateY(calc(var(--env-y) * var(--env-h) / 100)) perspective(1100px) rotateX(var(--flap));
+  /* opacity < 1 would flatten the 3D flap, so the faces fade instead */
+  opacity: 1;
+  will-change: transform;
+}
+.inv-flap-face {
+  position: absolute;
+  inset: 0;
+  opacity: var(--env-opacity);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.inv-flap-outer { width: 100%; height: 100%; overflow: visible; }
+/* Inner face is pre-turned so it reads upright once the flap swings open;
+   its triangle points up in local space for the same reason */
+.inv-flap-inner {
+  transform: rotateX(180deg);
+  clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  background: #F3EDC9;
+}
+.inv-flap-liner {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(6% 97%, 94% 97%, 50% 7%);
+  background: url("/invitation/liner.webp") 50% 78% / cover no-repeat;
+}
+
+/* Card: slide (scroll) → tilt (pointer) → turn (scroll) → turn (tap) */
+.inv-card {
+  position: absolute;
+  z-index: var(--card-z);
+  left: 50%;
+  top: 50%;
+  width: var(--card-w);
+  aspect-ratio: 1240 / 1748;
+  margin-left: calc(var(--card-w) / -2);
+  margin-top: calc(var(--card-w) * -0.705);
+  transform: translateY(calc(var(--card-y) * var(--env-h) / 100)) rotate(var(--card-rotate)) scale(var(--card-scale));
+  will-change: transform;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.inv-tilt {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: perspective(1400px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.inv-turn {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.inv-turn-scroll { transform: rotateY(var(--flip)); }
+.inv-turn-manual { transition: transform 0.8s cubic-bezier(0.45, 0, 0.2, 1); }
+.inv-turn-manual[data-turned="true"] { transform: rotateY(180deg); }
+.inv-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #FEFCF4;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 30px 60px -30px rgba(122, 96, 70, 0.55), 0 4px 12px -6px rgba(122, 96, 70, 0.3);
+}
+/* Faint paper fibre over the printed art */
+.inv-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.37 0 0 0 0 0.25 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.inv-face-back { transform: rotateY(180deg); }
+
+.inv-foot {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+}
+.inv-foot > * { grid-area: 1 / 1; }
+.inv-hint { opacity: var(--hint-opacity); pointer-events: none; }
+.inv-flip-btn { transition: opacity 0.4s ease, transform 0.2s, background-color 0.2s; }
+.inv-flip-btn:disabled { opacity: 0; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-runway { display: none; }
+  .inv-stage { position: relative; padding: 80px 16px 64px; row-gap: 36px; }
+  .inv-scene { height: calc(var(--card-w) * 1.41); margin-block: 0; }
+  .inv-env, .inv-hint { display: none; }
+  .inv-turn-manual { transition: none; }
+}
