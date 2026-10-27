@@ -297,7 +297,7 @@ export default async function Page() {
           <div className="hero-5 mt-10">
             <a
               href="#rsvp"
-              className="inline-flex items-center rounded-full px-10 py-3.5 font-[family-name:var(--font-thai)] text-[17px] md:text-lg tracking-[0.06em] text-white bg-[linear-gradient(135deg,var(--c-blush)_0%,var(--c-blush-deep)_100%)] shadow-[0_8px_22px_-10px_rgba(184,132,126,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[0.96] hover:shadow-[0_12px_26px_-10px_rgba(184,132,126,0.7)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
+              className="btn-primary px-10 md:text-lg tracking-[0.06em]"
             >
               ตอบรับคำเชิญ
             </a>
@@ -392,18 +392,7 @@ export default async function Page() {
                 href="https://maps.app.goo.gl/WysXSoYYKXm98CcD8"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 transition-[opacity,transform] hover:opacity-85 hover:-translate-y-px"
-                style={{
-                  background: "color-mix(in srgb, var(--c-sage) 70%, var(--c-ink))",
-                  color: "var(--c-ivory)",
-                  boxShadow: "0 6px 16px -8px color-mix(in srgb, var(--c-sage) 80%, var(--c-ink))",
-                  fontFamily: "var(--font-label)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  letterSpacing: "0.24em",
-                  textTransform: "uppercase",
-                  textDecoration: "none",
-                }}
+                className="btn-secondary gap-2.5 font-[family-name:var(--font-label)] text-[14px] font-semibold tracking-[0.24em] uppercase"
               >
                 <svg
                   aria-hidden
@@ -621,8 +610,7 @@ export default async function Page() {
             <SaveQrButton
               src="/promptpay-qr.jpg"
               filename="thanwa-meena-promptpay.jpg"
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-[family-name:var(--font-thai)] text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--c-sage)_10%,transparent)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
-              style={{ border: "1px solid var(--c-sage)", color: "var(--c-sage)" }}
+              className="btn-secondary mt-6"
             >
               <svg width="12" height="13" viewBox="0 0 12 13" fill="none" aria-hidden>
                 <path d="M6 1v8m0 0L2.5 5.5M6 9l3.5-3.5M1 12h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />

@@ -251,8 +251,7 @@ export function InvitationCard() {
             onClick={flip}
             disabled={!out}
             aria-pressed={turned}
-            className="inv-flip-btn inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-[family-name:var(--font-thai)] text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--c-sage)_10%,transparent)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
-            style={{ border: "1px solid var(--c-sage)", color: "var(--c-sage)" }}
+            className="inv-flip-btn btn-secondary"
           >
             <svg aria-hidden width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M2 5.5A5 5 0 0 1 11.5 4M12 8.5A5 5 0 0 1 2.5 10M11.5 1.5V4H9M2.5 12.5V10H5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />

@@ -303,7 +303,7 @@ export function PostcardComposer({
               <button
                 type="submit"
                 disabled={sending}
-                className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--c-blush)_0%,var(--c-blush-deep)_100%)] px-9 py-3.5 font-[family-name:var(--font-thai)] text-[17px] tracking-[0.04em] text-white shadow-[0_8px_22px_-10px_rgba(184,132,126,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[0.96] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)]"
+                className="btn-primary"
               >
                 <RiMailSendLine size={18} />
                 {saving ? "กำลังส่ง…" : "ส่งจดหมาย"}

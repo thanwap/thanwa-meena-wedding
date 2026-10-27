@@ -48,7 +48,7 @@ export function PreweddingGallery({ photos }: { photos: PreweddingPhoto[] }) {
               type="button"
               onClick={() => setOpenIndex(i)}
               aria-label={`View photo ${i + 1}${photo.title ? ` — ${photo.title}` : ""}`}
-              className={`reveal group relative overflow-hidden rounded-xl cursor-zoom-in ${SIZE_CLASS[size]}`}
+              className={`reveal group relative overflow-hidden rounded-xl cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-sage)] ${SIZE_CLASS[size]}`}
               style={{ background: "var(--c-ivory-dark)" }}
             >
               <Image
@@ -161,7 +161,7 @@ function Lightbox({
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute top-4 right-4 md:top-6 md:right-6 grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full transition-colors hover:bg-white/20"
+        className="absolute top-4 right-4 md:top-6 md:right-6 grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         style={{ background: "rgba(255,255,255,0.1)", color: "#fff" }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -221,7 +221,7 @@ function NavButton({ side, label, onClick }: { side: "left" | "right"; label: st
       type="button"
       aria-label={label}
       onClick={(e) => { e.stopPropagation(); onClick() }}
-      className={`absolute top-1/2 -translate-y-1/2 ${side === "left" ? "left-2 md:left-6" : "right-2 md:right-6"} z-10 grid h-11 w-11 md:h-14 md:w-14 place-items-center rounded-full transition-colors hover:bg-white/20`}
+      className={`absolute top-1/2 -translate-y-1/2 ${side === "left" ? "left-2 md:left-6" : "right-2 md:right-6"} z-10 grid h-11 w-11 md:h-14 md:w-14 place-items-center rounded-full transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white`}
       style={{ background: "rgba(255,255,255,0.1)", color: "#fff" }}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

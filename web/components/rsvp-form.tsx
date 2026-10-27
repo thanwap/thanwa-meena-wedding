@@ -31,6 +31,7 @@ const TOGGLE_BASE: React.CSSProperties = {
   cursor: "pointer",
   transition: "all 0.2s",
   border: "1px solid var(--c-blush)",
+  borderRadius: 9999,
   background: "transparent",
   color: "var(--c-ink-2)",
 }
@@ -290,15 +291,7 @@ export function RSVPForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-4 transition-opacity hover:opacity-75 active:opacity-60 disabled:opacity-50"
-            style={{
-              background: "var(--c-ink)",
-              color: "var(--c-ivory)",
-              fontFamily: "var(--font-label)",
-              fontSize: "13px",
-              letterSpacing: "0.45em",
-              textTransform: "uppercase",
-            }}
+            className="btn-primary w-full"
           >
             {isPending ? "กำลังส่ง…" : "ส่งข้อมูล"}
           </button>

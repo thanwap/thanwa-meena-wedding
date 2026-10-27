@@ -276,6 +276,62 @@ body { font-variant-numeric: lining-nums; }
   .heart-pop { display: none; }
 }
 
+/* ── Landing buttons: one primary (filled sage pill), one secondary (sage outline).
+   In the components layer so per-use utilities (mt-6, w-full, px-10) still win. ── */
+@layer components {
+  .btn-primary,
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    font-family: var(--font-thai);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s, background-color 0.2s, opacity 0.2s;
+  }
+  .btn-primary:hover:not(:disabled),
+  .btn-secondary:hover:not(:disabled) { transform: translateY(-2px); }
+  .btn-primary:active:not(:disabled),
+  .btn-secondary:active:not(:disabled) { transform: scale(0.98); }
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible {
+    outline: 2px solid var(--c-sage);
+    outline-offset: 4px;
+  }
+  .btn-primary:disabled,
+  .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .btn-primary {
+    padding: 0.875rem 2.25rem;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--c-sage) 75%, var(--c-sage-light)) 0%,
+      color-mix(in srgb, var(--c-sage) 80%, var(--c-ink)) 100%
+    );
+    box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--c-sage) 75%, transparent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(0.96);
+    box-shadow: 0 12px 26px -10px color-mix(in srgb, var(--c-sage) 85%, transparent);
+  }
+
+  .btn-secondary {
+    padding: 0.625rem 1.5rem;
+    font-size: 15px;
+    color: var(--c-sage);
+    border: 1px solid var(--c-sage);
+    background: transparent;
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--c-sage) 10%, transparent);
+  }
+}
+
 /* ── RSVP input focus line ── */
 .rsvp-input {
   background: transparent;
