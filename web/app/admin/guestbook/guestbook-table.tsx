@@ -112,6 +112,7 @@ export function GuestbookTable({
   const [searchInput, setSearchInput] = useState(search)
   const [deleteTarget, setDeleteTarget] = useState<GuestbookAdminDto | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [viewTarget, setViewTarget] = useState<GuestbookAdminDto | null>(null)
 
   // Sync entries when server re-renders with new data
   useEffect(() => { setEntries(initialEntries) }, [initialEntries])
@@ -179,11 +180,20 @@ export function GuestbookTable({
             )}
             {entries.map((entry) => (
               <TableRow key={entry.id}>
-                <TableCell className="font-medium">{entry.name}</TableCell>
-                <TableCell>
-                  <p className="max-w-xs line-clamp-2 text-sm text-muted-foreground">
-                    {entry.message}
-                  </p>
+                <TableCell className="font-medium whitespace-normal [overflow-wrap:anywhere]">
+                  {entry.name}
+                </TableCell>
+                <TableCell className="whitespace-normal">
+                  <button
+                    type="button"
+                    onClick={() => setViewTarget(entry)}
+                    className="block w-full text-left rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    title="Read full message"
+                  >
+                    <p className="line-clamp-2 text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                      {entry.message}
+                    </p>
+                  </button>
                 </TableCell>
                 <TableCell>
                   {entry.postcardId !== null ? (
@@ -214,6 +224,20 @@ export function GuestbookTable({
       </div>
 
       <Pagination page={page} pageSize={pageSize} totalPages={totalPages} totalCount={totalCount} />
+
+      <Dialog open={!!viewTarget} onOpenChange={(o) => { if (!o) setViewTarget(null) }}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="[overflow-wrap:anywhere]">{viewTarget?.name}</DialogTitle>
+            <DialogDescription>
+              {viewTarget && formatDate(viewTarget.createdAt)}
+            </DialogDescription>
+          </DialogHeader>
+          <p className="max-h-[60vh] overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed [overflow-wrap:anywhere]">
+            {viewTarget?.message}
+          </p>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null) }}>
         <DialogContent>
