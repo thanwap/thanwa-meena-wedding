@@ -268,7 +268,7 @@ export function SeatingClient({ initialData, isSuperAdmin = false }: SeatingClie
   }
 
   return (
-    <div className="-mx-6 -mt-8 flex h-[calc(100svh-65px)] flex-col">
+    <div className="-mx-6 -my-8 flex h-[calc(100svh-3rem)] flex-col">
       <SeatingToolbar
         totalGuests={totalGuests}
         assignedGuests={assignedGuests}

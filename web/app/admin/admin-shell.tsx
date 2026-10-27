@@ -149,7 +149,7 @@ export function AdminShell({
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
           <SidebarTrigger aria-label="Toggle sidebar" />
           <ThemeToggle />
